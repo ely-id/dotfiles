@@ -13,7 +13,7 @@
 - Botão de sessão **128×128** raio 12, passo **136** (Pond 127). Círculo 80×80 raio 40 em (24,24), ícone 20 no centro. Hover de Desligar: o botão inteiro vira `danger` e o nome aparece à direita em Serif 32 `dangerText`, **60 ms depois**. Bloquear / Suspender / Reiniciar: o mesmo padrão com a cor de acento (não com perigo). Ponto `dangerText` 8×8 no Desligar em repouso.
 - Bandeja no topo (ícones 16 em botões 36×36 raio 6, faixa 204×44 raio 8).
 - Perfil de energia na borda direita: coluna 48×136 com três botões ícone 40 (Economia, Equilibrado selecionado, Desempenho). Ver *A CONFIRMAR* do ícone `zap` vs `rocket` na ficha 08.
-- Selo de atualização embaixo: pílula `accentSubtle`, ícone + “N atualizações disponíveis” `accentText`.
+- Selo de atualização embaixo: pílula `accentSubtle`, ícone + “N atualizações disponíveis” `accentText`. A contagem vem do estado do Cachy Update (decidido em 2026-11-14, P-32).
 - Entrada: cada cartão 0,86→1 em ordem aleatória, **28 ms** entre eles, cada um em 32 ms (`settings/Window.qml:369-421`). Fechar 180 ms.
 
 ## Modal padrão
@@ -38,6 +38,7 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado, Fus
 
 ### Idioma do teclado / Fuso horário
 
+- Fuso horário: a origem troca o fuso com uma regra de `sudo` sem senha. Procuro um caminho sem essa regra; se não houver um caminho limpo, a página de fuso sai e o relógio segue o horário do sistema (decidido em 2026-11-14, P-34).
 - Modal com busca 520×44 (caret no acento) + lista 520×44. Escolhida: fundo `accentSubtle`, check `accentText`, código Mono 11 vira `text` (não `muted`).
 - Altura máxima da lista: 460, com rolagem (Pond `Picker.qml`).
 - Inclua “Inglês (EUA, internacional)” / `us · intl` — é o layout do escopo.
@@ -71,6 +72,7 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado, Fus
 - Escolhida: anel `accent` 1 px com folga de 4 px + check 24 fundo `accent`.
 - Hover: título e autor sobre degradê preto 0→80% na base.
 - Tile “Escolher imagem” com traço tracejado `[4,4]`. “Dinâmico” pode permanecer (shader da Pond), visualmente como na prévia.
+- As imagens da grade são as minhas, uma por variação (Chiba, Freeside, Sprawl), e moram no repositório. As fotos da origem não entram (decidido em 2026-11-14, P-31; o formato e a resolução que vão para o git são a P-37).
 
 ## A CONFIRMAR
 

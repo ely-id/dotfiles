@@ -65,7 +65,7 @@ Fonte: `g2.src.js` `orgCollapsed` + correção documentada em `armitage-shell/st
 8. **Reordenando workspaces.** A linha inteira segue o cursor; as do caminho deslizam ±50 px (110 ms). Solta = `MoveWorkspaceToIndex`.
 9. **Recolhido.** Números Mono 13; ativo empilha 32 px; inativos até 4 pontos.
 10. **Recolhido, mouse numa linha inativa.** Acende o número e o fundo 6%. Sem arraste.
-11. **Terminais com agente.** No lugar do ícone: Trabalhando (`accentText`), Atenção (`attentionText`), Não lido (`warning`), Lido (`successText`). Detecção pelo título continua a da Pond (`NiriMsg.qml:314-325` — o próprio código chama de hack).
+11. **Terminais com agente.** No lugar do ícone: Trabalhando (`accentText`), Atenção (`attentionText`), Não lido (`warning`), Lido (`successText`). Detecção pelo título continua a da Pond (`NiriMsg.qml:314-325` — o próprio código chama de hack), mas passa a reconhecer também o Ghostty: a origem só olha janelas com app-id `kitty`, e o meu terminal é o Ghostty (decidido em 2026-11-14, P-30). O app-id do Ghostty e o formato dos títulos são conferidos na sessão do Niri antes de implementar.
 12. **Monitor sem janelas.** Substitui o 12º estado “Unthemed” da Pond. Só a linha de criação ativa, “+” visível; duas linhas de pontos completam o mínimo de 3.
 
 ## Comportamento a herdar (não redesenhar a lógica)

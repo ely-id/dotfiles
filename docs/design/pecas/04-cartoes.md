@@ -35,4 +35,4 @@ Outros estados da Pond (bateria baixa com faixa de aviso, pílula de % no hover 
 ## Instalações
 
 - Cartão 156×88. Linhas de 32 de altura com ícone, nome e, à direita, anel de progresso 16 (trilho `track`, arco `accent`, innerRadius 0,69) ou check `successText` ao terminar.
-- Comportamento da Pond permanece (`installs/State.qml`).
+- Comportamento da Pond permanece (`installs/State.qml`). O que muda é quem manda o progresso: na origem era o gerenciador de pacotes da distribuição; aqui é o Cachy Update (decidido em 2026-11-14, P-32).

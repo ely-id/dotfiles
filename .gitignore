@@ -1,0 +1,39 @@
+# Configuração local do Claude Code (permissões e ajustes só desta máquina)
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
+
+# Segredos e ambiente
+.env
+.env.*
+*.key
+*.pem
+secrets/
+
+# Referências pesadas: ficam em ~/Projects/referencias/dotfiles-estudo/
+docs/design/referencias/
+*.fig
+
+# Build e cache do Qt/QML
+build/
+*.qmlc
+*.jsc
+.qmlls.ini
+compile_commands.json
+__pycache__/
+*.pyc
+
+# Editor e sistema
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+.directory
+
+# Rascunhos e saídas de teste
+*.log
+*.bak
+*.orig
+tmp/
+qa-prints/

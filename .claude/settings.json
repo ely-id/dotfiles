@@ -1,0 +1,29 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "additionalDirectories": [
+      "~/Documents/Journal/projeto-dotfiles"
+    ],
+    "deny": [
+      "Edit(~/Documents/Journal/projeto-dotfiles/ESCOPO.md)",
+      "Edit(~/Projects/referencias/**)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/estado-do-projeto.sh",
+            "timeout": 10,
+            "statusMessage": "Lendo o painel do projeto"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -15,12 +15,12 @@ Moram em `.agents/skills/`, que o Antigravity lê. O Claude Code lê uma cópia 
 
 ## Por momento do trabalho
 
-No Claude Code, as skills externas vêm dos plugins. No Antigravity, as que são arquivos de skill entram pela cópia que `.agents/scripts/instalar-skills-externas.sh` faz para `~/.gemini/config/skills/`, e são chamadas pelo nome sem o prefixo do plugin (`/diagnosing-bugs` em vez de `mattpocock-skills:diagnosing-bugs`). Os servidores MCP do Antigravity estão em `.agents/mcp_config.json`.
+No Claude Code, as skills externas vêm dos plugins. No Antigravity, as que são arquivos de skill entram pela cópia que `.agents/scripts/instalar-skills-externas.sh` faz para `~/.gemini/config/skills/`, e são chamadas pelo nome sem o prefixo do plugin (`/diagnosing-bugs` em vez de `mattpocock-skills:diagnosing-bugs`). Figma e Context7 vêm dos plugins de mesmo nome do marketplace de parceiros do Antigravity, instalados na configuração global; cada plugin traz o próprio servidor MCP e as próprias skills.
 
 | Momento | Skill ou ferramenta | No Antigravity | Observação |
 |---|---|---|---|
-| Antes de ler um board do Figma para implementar | `figma:figma-design-to-code` | `figma-design-to-code`, com o MCP `figma` | Obrigatória antes de `get_design_context`. Os node-ids estão em `docs/design/README.md` |
-| Dúvida sobre API do Quickshell, do Niri ou do Qt/QML | Context7 (`resolve-library-id` e `query-docs`) | MCP `context7` | Consultar a documentação atual em vez de responder de memória |
+| Antes de ler um board do Figma para implementar | `figma:figma-design-to-code` | `figma-design-to-code`, do plugin Figma | Obrigatória antes de `get_design_context`. Os node-ids estão em `docs/design/README.md` |
+| Dúvida sobre API do Quickshell, do Niri ou do Qt/QML | Context7 (`resolve-library-id` e `query-docs`) | Plugin Context7 | Consultar a documentação atual em vez de responder de memória |
 | Algo não funciona e a causa não é óbvia | `mattpocock-skills:diagnosing-bugs` ou `engineering:debug` | `diagnosing-bugs` ou `debug` | Reproduzir, isolar, diagnosticar e só então corrigir |
 | Antes de começar uma fase grande (F2, F5, F6) | `mattpocock-skills:grilling` | `grilling` | Testar o plano da fase contra perguntas duras antes de escrever código |
 | Antes de `/qa-fase preparar` | `/code-review` | Só no Claude Code | Revisar o diff da fase atrás de erros de correção |

@@ -45,3 +45,4 @@ As skills externas ficam fora do repositório porque são de terceiros, com lice
 - O formato do hook `SessionStart`, a pasta em que o Antigravity roda os comandos dos hooks e o servidor MCP do Figma não foram testados no Antigravity quando escrevi isto. A primeira sessão nele confere os três.
 - Uma ferramenta por vez: o painel continua sem controle de versão.
 - A P-22 (o que do ferramental fica público) passa a incluir `.agents/`.
+- Nota de 2026-11-14, depois da S03: o Figma e o Context7 já estavam instalados como plugins de parceiros do Antigravity, cada um com o próprio servidor MCP e as próprias skills. O `.agents/mcp_config.json` duplicava os dois, e o servidor do Figma sem o cabeçalho de identificação do plugin, então tirei o arquivo do repositório e a `figma-design-to-code` do script de skills externas. O resto da decisão continua valendo.

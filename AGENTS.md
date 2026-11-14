@@ -131,4 +131,4 @@ Trabalho neste repositório com o Claude Code e com o Antigravity, uma ferrament
 - `.agents/hooks/estado-do-projeto.sh`: o aviso de início de sessão, chamado pelas duas ferramentas.
 - `.agents/SKILLS.md`: quando usar cada skill, e o que existe em cada ferramenta.
 
-O que é de uma ferramenta só fica com ela: `CLAUDE.md` e `.claude/settings.json` para o Claude Code; `.agents/rules/antigravity.md`, `.agents/hooks.json` e `.agents/mcp_config.json` para o Antigravity.
+O que é de uma ferramenta só fica com ela: `CLAUDE.md` e `.claude/settings.json` para o Claude Code; `.agents/rules/antigravity.md` e `.agents/hooks.json` para o Antigravity.

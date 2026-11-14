@@ -12,7 +12,6 @@ dotfiles/
 │   ├── scripts/            Sincronização das skills e cópia das skills externas
 │   ├── rules/              Regra específica do Antigravity
 │   ├── hooks.json          Hooks do Antigravity
-│   ├── mcp_config.json     Servidores MCP do Antigravity (Context7 e Figma)
 │   └── SKILLS.md           Quando usar cada skill, nas duas ferramentas
 ├── .claude/                Configuração do Claude Code para este projeto
 │   ├── settings.json       Hook de início de sessão, bloqueios e atribuição desligada
@@ -71,3 +70,4 @@ Fica vazia até a fase F9. Recebe o tema de boot do Plymouth, que hoje vive em u
 | Configuração local do Claude Code | `.claude/settings.local.json` | Permissões específicas desta máquina |
 | Permissões do Antigravity | Configuração global do Antigravity | A ferramenta não tem arquivo de permissão por projeto; os bloqueios do projeto estão no hook de `.agents/hooks.json` |
 | Skills externas no Antigravity | `~/.gemini/config/skills/` | São de terceiros, com licenças próprias; `.agents/scripts/instalar-skills-externas.sh` copia dos plugins do Claude Code |
+| Figma e Context7 no Antigravity | Plugins de parceiros, na configuração global do Antigravity | Cada plugin traz o servidor MCP e as skills mantidos pelo próprio fornecedor |

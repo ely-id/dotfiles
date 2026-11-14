@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Copia para o Antigravity as skills externas que uso neste projeto.
 #
+# Ficam de fora as do Figma: o plugin Figma do Antigravity já traz a
+# figma-design-to-code, numa versão feita para ele.
+#
 # As skills externas do .agents/SKILLS.md vêm de plugins do Claude Code
 # instalados nesta máquina. O Antigravity não lê plugins do Claude Code, então
 # copio cada skill para a pasta global dele, ~/.gemini/config/skills/, que vale
@@ -19,7 +22,6 @@ simular=0
 
 # plugin:skill, na mesma grafia do .agents/SKILLS.md
 skills=(
-    figma:figma-design-to-code
     mattpocock-skills:diagnosing-bugs
     mattpocock-skills:grilling
     mattpocock-skills:writing-for-agents

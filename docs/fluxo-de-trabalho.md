@@ -62,8 +62,8 @@ Trabalho com o Claude Code e com o Antigravity, nunca as duas ao mesmo tempo. As
 Antes da primeira sessão no Antigravity numa máquina:
 
 1. Abro `~/Projects/dotfiles` como projeto e adiciono `~/Documents/Journal/projeto-dotfiles` como segunda pasta. Sem o painel no projeto, a sessão não consegue registrar nada.
-2. Rodo `.agents/scripts/instalar-skills-externas.sh --simular` para ver o que ele encontra nos plugins do Claude Code, e depois sem `--simular` para copiar.
-3. Em Settings › Customizations, confiro que aparecem as três skills do projeto, a regra `antigravity`, os hooks `estado-do-projeto` e `protecao-de-arquivos` e os servidores `context7` e `figma`. O Figma pede login na primeira vez.
+2. Instalo os plugins Figma e Context7 do marketplace de parceiros do Antigravity. Rodo `.agents/scripts/instalar-skills-externas.sh --simular` para ver o que ele encontra nos plugins do Claude Code, e depois sem `--simular` para copiar.
+3. Em Settings › Customizations, confiro que aparecem as três skills do projeto, a regra `antigravity`, os hooks `estado-do-projeto` e `protecao-de-arquivos` e os plugins Context7 e Figma. O Figma pede login na primeira vez.
 4. Abro uma conversa nova, digito `/retomar` e confiro que o painel chegou no contexto sem eu colar nada.
 5. Peço para acrescentar uma linha ao `ESCOPO.md` e confiro que a escrita é recusada pelo hook.
 

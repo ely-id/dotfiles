@@ -27,5 +27,8 @@ Um resumo curto, em primeira pessoa, com:
 - **Próximo passo:** a próxima tarefa aberta da fase, pelo identificador (`F2-T03`).
 - **Bloqueios:** pendências que travam a fase e veredito de QA que esteja faltando.
 - **Inconsistências:** qualquer divergência encontrada no passo 6.
+- **O que eu faço agora:** a última linha do resumo, sempre. Quando o próximo passo é meu, ela traz a ação literal: o comando ou a frase que eu digito em seguida (por exemplo, `/qa-fase go`), ou o que eu preciso testar e onde. Quando o próximo passo é do agente, ela diz o que eu respondo para ele começar.
 
 Não começar a implementar dentro desta skill. Ela termina no resumo. Se a fase ativa estiver `aguardando QA`, o próximo passo é o meu veredito, e nenhuma fase nova começa sem ele.
+
+O resumo existe para eu saber continuar sem pensar. Na primeira vez em que usei esta skill, ela descreveu o estado corretamente e eu fiquei sem saber o que digitar. Um resumo que termina em "o próximo passo é dar o veredito" está incompleto; o completo termina em "se está tudo certo, digite `/qa-fase go`".

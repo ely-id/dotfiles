@@ -28,7 +28,8 @@ if [ -n "$ultimo_relatorio" ]; then
     echo "Último relatório de sessão: sessoes/$ultimo_relatorio"
     instante_relatorio="$(stat -c %Y "$painel/sessoes/$ultimo_relatorio" 2>/dev/null || echo 0)"
     instante_commit="$(git -C "$repo" log -1 --format=%ct 2>/dev/null || echo 0)"
-    if [ "$instante_commit" -gt "$instante_relatorio" ]; then
+    # Dois minutos de folga para commit e relatório escritos no mesmo momento.
+    if [ "$instante_commit" -gt "$((instante_relatorio + 120))" ]; then
         echo "ATENÇÃO: existe commit mais novo que o último relatório de sessão."
         echo "A sessão anterior pode ter terminado sem registrar. Antes de continuar,"
         echo "reconstrua o que aconteceu com 'git log' e registre no relatório desta sessão."

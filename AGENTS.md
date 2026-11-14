@@ -53,11 +53,13 @@ O problema que este protocolo resolve é a perda de continuidade entre sessões.
 
 ### Ao encerrar a sessão
 
-1. Escrever o relatório em `sessoes/AAAA-MM-DD-SNN-assunto.md` a partir de `modelos/sessao.md`.
-2. Atualizar a nota da fase (tarefas, subfases, estado).
-3. Atualizar `PAINEL.md`: estado de cada fase, "Agora", "Próximo passo" e o registro de sessões.
-4. Se a fase ficou pronta para avaliação, escrever `handoffs/FN-HANDOFF.md` com o roteiro de QA.
-5. Fazer commit do que mudou no repositório.
+1. Fazer commit do que mudou no repositório.
+2. Escrever o relatório em `sessoes/AAAA-MM-DD-SNN-assunto.md` a partir de `modelos/sessao.md`.
+3. Atualizar a nota da fase (tarefas, subfases, estado).
+4. Atualizar `PAINEL.md`: estado de cada fase, "Agora", "Próximo passo" e o registro de sessões.
+5. Se a fase ficou pronta para avaliação, escrever `handoffs/FN-HANDOFF.md` com o roteiro de QA.
+
+O commit vem antes do relatório de propósito: o hook de início de sessão trata um commit mais novo que o último relatório como sinal de sessão não registrada. O relatório é sempre a última coisa escrita.
 
 A sessão só está encerrada quando o painel descreve o estado real. Se o contexto estiver acabando, o encerramento tem prioridade sobre terminar a tarefa.
 

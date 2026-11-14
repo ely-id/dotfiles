@@ -1,0 +1,88 @@
+pragma ComponentBehavior: Bound
+import QtQuick
+import "." as Information
+import ".." as Settings
+import "../.." as Shell
+import QtQuick.Controls
+
+Settings.Modal {
+  id:root
+  objectName:"informationPanel"
+  title:"Information"
+  contentHeight:556
+  onBackRequested:Settings.State.back()
+  Keys.onEscapePressed:Settings.State.back()
+  readonly property var rows: [
+    {key:"os", label:"OS", y:92, line:130},
+    {key:"host", label:"Host", y:144, line:184},
+    {key:"board", label:"Board", y:198, line:236},
+    {key:"cpu", label:"CPU", y:250, line:288},
+    {key:"gpu", label:"GPU", y:302, line:340},
+    {key:"memory", label:"Memory", y:354, line:392},
+    {key:"disk", label:"Disk", y:406, line:0}
+  ]
+  Repeater {
+    model:root.rows
+    delegate: Item {
+      id:row
+      required property var modelData
+      required property int index
+      x:30; y:modelData.y-82; width:520; height:24
+      Rectangle {
+        width:24; height:24; radius:12
+        color:"transparent"; border.width:1; border.color:Qt.rgba(1, 1, 1, 0.15)
+        Information.Label {
+          x:0; width:24; capY:8; text:row.index+1
+          font.family:"IBM Plex Mono"; font.weight:Font.DemiBold; font.letterSpacing:-0.22
+          horizontalAlignment:Text.AlignHCenter; color:"#80ffffff"
+        }
+      }
+      Information.Label {
+        x:54; capY:7; text:row.modelData.label
+        font.pixelSize:15; font.weight:Font.Medium; font.letterSpacing:0
+        color:Qt.alpha(Shell.Theme.colors.text, 0.6)
+      }
+      Information.Label {
+        id:valueText
+        objectName:"informationValue-" + row.modelData.key
+        x:130; capY:6; width:390
+        text:Information.State.value(row.modelData.key)
+        font.family:Shell.Theme.titleFontFamily; font.styleName:"Book"; font.pixelSize:17
+        font.letterSpacing:0; color:Shell.Theme.colors.text; elide:Text.ElideRight
+        ToolTip.visible:valueHover.hovered && truncated
+        ToolTip.text:text
+        HoverHandler { id:valueHover }
+      }
+      Rectangle {
+        visible:row.modelData.line>0
+        y:row.modelData.line-row.modelData.y-1; width:520; height:1
+        color:Shell.PanelStyle.outline
+      }
+    }
+  }
+  Rectangle {
+    id:manual
+    objectName:"informationManual"
+    x:30; y:376; width:520; height:64; radius:12
+    color:manualHover.hovered || activeFocus ? Shell.PanelStyle.rowHover : Qt.alpha(Shell.PanelStyle.rowHover, 0)
+    border.width:1; border.color:Shell.PanelStyle.outline
+    activeFocusOnTab:true
+    Accessible.role:Accessible.Button
+    Accessible.name:"Manual"
+    Accessible.onPressAction:Settings.State.openPage("manual")
+    Keys.onReturnPressed:Settings.State.openPage("manual")
+    Keys.onSpacePressed:Settings.State.openPage("manual")
+    Behavior on color { ColorAnimation { duration:Settings.Style.hoverDuration; easing.type:Easing.OutCubic } }
+    Image {
+      x:20; y:20; width:24; height:24
+      source:Qt.resolvedUrl("../../assets/manual/book.svg")
+    }
+    Information.Label {
+      x:54; capY:26; text:"Manual"; color:Shell.Theme.colors.text
+      font.family:Shell.Theme.titleFontFamily; font.styleName:"Book"; font.pixelSize:17; font.letterSpacing:0
+    }
+    HoverHandler { id:manualHover; cursorShape:Qt.PointingHandCursor }
+    TapHandler { onTapped:Settings.State.openPage("manual") }
+  }
+  Footer { objectName:"informationFooter"; y:438 }
+}

@@ -36,10 +36,16 @@ for item in "${skills[@]}"; do
     plugin="${item%%:*}"
     skill="${item#*:}"
 
-    # A versão instalada fica em cache/; marketplaces/ guarda o catálogo. Entre
-    # várias versões, fico com a modificada mais recentemente.
-    origem="$(find "$plugins/cache" "$plugins/marketplaces" -path "*/$plugin/*" \
-        -path "*/skills/$skill/SKILL.md" -printf '%T@ %h\n' 2>/dev/null \
+    # A versão instalada fica em cache/<marketplace>/<plugin>/<versão>/skills/;
+    # marketplaces/ guarda o catálogo, em <plugin>/skills/; synced/ guarda os
+    # plugins que vêm sincronizados da minha conta do Claude. Alguns plugins agrupam
+    # as skills em subpastas (skills/engineering/diagnosing-bugs/), então aceito
+    # qualquer profundidade abaixo de skills/. A pasta do plugin tem de estar logo
+    # acima de skills/ ou da versão, para que uma subpasta chamada "engineering"
+    # dentro de outro plugin não seja tomada pelo plugin engineering. Entre várias
+    # versões, fico com a modificada mais recentemente.
+    origem="$(find "$plugins/cache" "$plugins/marketplaces" "$plugins/synced" -regextype posix-extended \
+        -regex ".*/$plugin/([^/]+/)?skills/(.+/)?$skill/SKILL\.md" -printf '%T@ %h\n' 2>/dev/null \
         | sort -rn | head -n 1 | cut -d' ' -f2- || true)"
 
     if [ -z "$origem" ]; then

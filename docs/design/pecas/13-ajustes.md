@@ -72,7 +72,7 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado, Fus
 - Escolhida: anel `accent` 1 px com folga de 4 px + check 24 fundo `accent`.
 - Hover: título e autor sobre degradê preto 0→80% na base.
 - Tile “Escolher imagem” com traço tracejado `[4,4]`. “Dinâmico” pode permanecer (shader da Pond), visualmente como na prévia.
-- As imagens da grade são as minhas, uma por variação (Chiba, Freeside, Sprawl), e moram no repositório. As fotos da origem não entram (decidido em 2026-11-14, P-31; o formato e a resolução que vão para o git são a P-37).
+- As imagens da grade são as minhas, uma por variação (Chiba, Freeside, Sprawl), e moram no repositório. As fotos da origem não entram (decidido em 2026-11-14, P-31). Vão para o repositório só as versões de 1920×1080, em PNG, sem perda: medi os formatos sem perda mais leves e as seis imagens juntas ainda somariam 40 MB (P-37).
 
 ## A CONFIRMAR
 

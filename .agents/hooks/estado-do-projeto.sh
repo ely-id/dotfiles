@@ -1,16 +1,25 @@
 #!/usr/bin/env bash
 # Injeta o estado do projeto no contexto de cada sessão nova.
 #
+# O mesmo script serve ao Claude Code e ao Antigravity. O Claude Code lê a
+# saída como texto; no Antigravity ela passa por antigravity-inicio.py, que
+# a embrulha no JSON que aquele hook espera.
+#
 # Leio o PAINEL.md do painel do projeto e aviso quando existe commit mais
 # novo que o último relatório de sessão, sinal de que a sessão anterior
 # terminou sem registrar o que fez.
+#
+# Também aviso quando a cópia das skills em .claude/skills/ deixou de ser
+# igual à fonte em .agents/skills/.
 #
 # O caminho do painel pode ser trocado pela variável DOTFILES_PAINEL.
 # Sem painel (por exemplo, em um clone de outra pessoa), o script não faz nada.
 
 painel="${DOTFILES_PAINEL:-$HOME/Documents/Journal/projeto-dotfiles}"
 arquivo="$painel/PAINEL.md"
-repo="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+# A raiz do repositório sai da posição deste script (.agents/hooks/), para não
+# depender da pasta de onde cada ferramenta chama o hook.
+repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 [ -r "$arquivo" ] || exit 0
 
@@ -36,6 +45,13 @@ if [ -n "$ultimo_relatorio" ]; then
     fi
 else
     echo "Ainda não existe relatório de sessão no painel."
+fi
+
+if [ -d "$repo/.agents/skills" ] && ! diff -rq "$repo/.agents/skills" "$repo/.claude/skills" >/dev/null 2>&1; then
+    echo
+    echo "ATENÇÃO: .claude/skills/ não é mais igual a .agents/skills/. A fonte é"
+    echo ".agents/skills/. Depois de conferir qual lado tem a versão certa, rode"
+    echo ".agents/scripts/sincronizar-skills.sh para refazer a cópia."
 fi
 
 echo

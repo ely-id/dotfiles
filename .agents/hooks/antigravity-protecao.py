@@ -4,7 +4,11 @@
 No Claude Code, os bloqueios de ESCOPO.md e de ~/Projects/referencias/ estão
 em .claude/settings.json. O Antigravity guarda permissões só na configuração
 global, então repito os bloqueios aqui, versionados com o repositório.
-Cobre as três ferramentas de escrita de arquivo; comando de terminal não
+Cobre as ferramentas de escrita de arquivo com os dois conjuntos de nomes que
+encontrei: write_to_file, replace_file_content e multi_replace_file_content,
+com o caminho em TargetFile, como na documentação dos hooks; e write_file e
+edit_file, com o caminho em Path, como o próprio agente do Antigravity
+descreveu as ferramentas dele na primeira sessão. Comando de terminal não
 passa por aqui, como também não passa no Claude Code.
 """
 
@@ -27,7 +31,8 @@ try:
 except json.JSONDecodeError:
     entrada = {}
 
-alvo = (entrada.get("toolCall") or {}).get("args", {}).get("TargetFile")
+args = (entrada.get("toolCall") or {}).get("args") or {}
+alvo = args.get("TargetFile") or args.get("Path")
 decisao = {"decision": "allow"}
 
 if alvo:

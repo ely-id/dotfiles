@@ -2,7 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Pond.Screenshot as Screenshot
+import "screenshot" as Screenshot
 
 Singleton {
   id: root

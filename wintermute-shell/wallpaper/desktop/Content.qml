@@ -1,5 +1,5 @@
 import QtQuick
-import Pond.Daylight
+import "../daylight"
 
 Rectangle {
   id: root

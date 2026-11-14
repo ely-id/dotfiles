@@ -96,7 +96,7 @@ Singleton {
   }
   Process {
     id: picker
-    command: ["python3", Quickshell.shellDir + "/../wallpaper/control.py", "pick"]
+    command: ["python3", Quickshell.shellDir + "/wallpaper/control.py", "pick"]
     stdout: StdioCollector {
       onStreamFinished: root.receive(text, "Could not open the image picker")
     }
@@ -154,7 +154,7 @@ Singleton {
     action.command = ["python3", Quickshell.shellDir + "/" + script].concat(args);
     action.running = true;
   }
-  function applyWallpaper(args) { apply(args, "../wallpaper/control.py"); }
+  function applyWallpaper(args) { apply(args, "wallpaper/control.py"); }
   function selectTheme(theme) {
     if (busy) return;
     apply(["theme", theme]);

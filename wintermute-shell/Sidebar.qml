@@ -10,7 +10,7 @@ import "media" as Media
 import "minimap" as Minimap
 import "notifications" as Notifications
 import "installs" as Installs
-import Pond.Screenshot as Screenshot
+import "screenshot" as Screenshot
 
 PanelWindow {
   id: root

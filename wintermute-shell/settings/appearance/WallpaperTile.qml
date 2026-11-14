@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell.Widgets
-import Pond.Daylight as Daylight
+import "../../wallpaper/daylight" as Daylight
 import "../.." as Shell
 
 Item {

@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 import Quickshell.Widgets
-import Pond.Screenshot.Native
 import "." as Screenshot
 
 Item {
@@ -17,7 +16,14 @@ Item {
   visible: hasScreenshot
   opacity: dragging ? 0 : 1
 
-  ScreenshotDrag { id: nativeDrag }
+  // O arraste da captura para outro aplicativo usa o plugin em C++ de
+  // native/, que precisa ser compilado. Fica desligado até a F6: este objeto
+  // ocupa o lugar dele e recusa o arraste, e a prévia continua copiando e
+  // fechando normalmente.
+  QtObject {
+    id: nativeDrag
+    function start(source, imageSource, hotSpot) { return false; }
+  }
 
   Rectangle {
     id: shadowShape

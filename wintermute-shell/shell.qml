@@ -9,8 +9,7 @@ import "settings" as Settings
 import "settings/appearance" as Appearance
 import "settings/system" as System
 import "notifications" as Notifications
-import Pond.Wallpaper as Wallpaper
-import Pond.System
+import "wallpaper/desktop" as Wallpaper
 
 ShellRoot {
   id: root
@@ -18,17 +17,9 @@ ShellRoot {
 
   Shortcuts {}
 
-  Logind {
-    id: logind
-    sleepInhibited: true
-    onPreparingForSleepChanged: {
-      if (preparingForSleep)
-        sleepLock.running = true;
-      else
-        sleepInhibited = true;
-    }
-    onLockRequested: Quickshell.execDetached(["python3", Quickshell.shellDir + "/settings/session.py", "lock"])
-  }
+  // O bloqueio antes de suspender dependia de um plugin compilado que mora na
+  // tela de bloqueio da origem. Tirei na F0 para a shell abrir só com QML.
+  // A ligação com a tela de bloqueio volta na F7.
 
   Variants {
     readonly property var commands: ({
@@ -45,12 +36,6 @@ ShellRoot {
   }
 
   IdleFade {}
-
-  Process {
-    id: sleepLock
-    command: ["sh", "-c", "python3 \"$0\" lock; for _ in $(seq 40); do qs -p /usr/share/pond-interface/lockscreen ipc call lockscreen isSecure 2>/dev/null | grep -qx true && exit; sleep 0.1; done", Quickshell.shellDir + "/settings/session.py"]
-    onExited: if (logind.preparingForSleep) logind.sleepInhibited = false
-  }
 
   FileView {
     path: Quickshell.screens.length

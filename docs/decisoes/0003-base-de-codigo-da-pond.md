@@ -24,6 +24,6 @@ Não quero vínculo com o repositório de origem porque este projeto segue um ru
 - A cópia é feita uma única vez, na fase F0, a partir de um ponto fixo do código de origem. Não acompanho atualizações posteriores.
 - Sem fork do GitHub, sem remoto `upstream`, sem submódulo e sem importar histórico de commits.
 - A licença BSD-3-Clause exige manter o aviso de copyright e o texto da licença da origem. Eles acompanham o código derivado e são citados na seção de licenças do README. Essa é a única menção.
-- Nomes, identificadores, caminhos de configuração e elementos de marca da origem são substituídos pelos da Wintermute ao longo das fases. A fase F9 inclui uma varredura para confirmar que não sobrou nenhum.
+- Nomes, identificadores, caminhos de configuração e elementos de marca da origem são substituídos pelos da Wintermute ao longo das fases. A fase F11 inclui uma varredura para confirmar que não sobrou nenhum.
 - Recursos visuais da origem que não fazem parte do design Armitage (papéis de parede, temas, marca) não entram no repositório.
 - Só a interface da shell é aproveitada. O restante da Pond (instalador, gerenciador de pacotes, tela de bloqueio, tema de inicialização) fica de fora.

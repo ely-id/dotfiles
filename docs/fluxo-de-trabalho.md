@@ -18,9 +18,11 @@ O objetivo do projeto está escrito em um documento de escopo que nunca é edita
 | F4 | Ajustes |
 | F5 | Launcher, seletor de cor e emoji |
 | F6 | Captura de tela, área de transferência e integração do desktop |
-| F7 | Varredura do Niri: recolher a configuração para `niri/` |
-| F8 | Instalação reproduzível: instalador, lista de pacotes, guia e teste em sistema limpo |
-| F9 | Publicação: revisão de segredos, README final, capturas, repositório público |
+| F7 | Tela de bloqueio e tela de login |
+| F8 | Varredura do Niri: recolher a configuração para `niri/` |
+| F9 | Terminal e boot: recolher zsh, Starship, Ghostty, fastfetch e o tema do Plymouth |
+| F10 | Instalação reproduzível: instalador, lista de pacotes, guia e teste em sistema limpo |
+| F11 | Publicação: revisão de segredos, README final, capturas, repositório público |
 
 Cada fase é pequena o bastante para ser avaliada de uma vez. Ajustes que surgem dentro de uma fase viram subfases numeradas (`F2.1`, `F2.2`), cada uma com sua própria lista de tarefas e seu próprio veredito.
 

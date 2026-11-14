@@ -20,5 +20,5 @@ As fichas e os tokens, por outro lado, são texto leve e são a fonte da verdade
 ## Consequências
 
 - As fichas citam as imagens por um caminho relativo (`referencias/armitage/...`). Esse caminho se resolve dentro do pacote original, conforme [design/README.md](../design/README.md).
-- Quem clonar o repositório não recebe as imagens. O Figma é a referência visual pública, e capturas leves da shell pronta entram no README na fase F9.
+- Quem clonar o repositório não recebe as imagens. O Figma é a referência visual pública, e capturas leves da shell pronta entram no README na fase F11.
 - O pacote de entrega original fica preservado como veio. A versão que vale é a de `docs/design/`, com os caminhos e os identificadores do Figma corrigidos.

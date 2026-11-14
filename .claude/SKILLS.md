@@ -23,8 +23,8 @@ Este é o mapa das skills que uso no projeto. As três primeiras são do própri
 | Depois da revisão, se o código ficou pesado | `/simplify` | Só qualidade: reaproveitamento e simplificação |
 | Decisão técnica com consequência duradoura | `engineering:architecture` | Ajuda a estruturar o registro em `docs/decisoes/` |
 | Escrever handoff, contrato ou instrução para outro agente | `mattpocock-skills:writing-for-agents` | O handoff precisa funcionar para quem não viu a conversa |
-| Guia de instalação e README final (F8, F9) | `engineering:documentation` | Documentação para quem nunca viu o projeto |
-| Antes de tornar o repositório público (F9) | `/security-review` | Procurar segredos, dados da máquina e caminhos pessoais em todo o histórico |
+| Guia de instalação e README final (F10, F11) | `engineering:documentation` | Documentação para quem nunca viu o projeto |
+| Antes de tornar o repositório público (F11) | `/security-review` | Procurar segredos, dados da máquina e caminhos pessoais em todo o histórico |
 | Mudar hook, permissão ou configuração do Claude Code | `update-config` | Sempre ler o `settings.json` antes de alterar |
 | Criar uma skill nova para o projeto | `anthropic-skills:skill-creator` | A skill nova entra em `.claude/skills/` e ganha uma linha neste arquivo |
 

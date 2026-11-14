@@ -20,6 +20,6 @@ Avaliar em sessão paralela me dá um ambiente ao vivo para dar o veredito Go/No
 ## Consequências
 
 - Nenhuma fase migra esta máquina para fora do GNOME. A migração acontece só na instalação nova.
-- A configuração do Niri em `~/.config/niri/` muda durante a construção e só é recolhida para o repositório na fase F7.
+- A configuração do Niri em `~/.config/niri/` muda durante a construção e só é recolhida para o repositório na fase F8.
 - Tudo o que a shell assume sobre o ambiente (variáveis, serviços, portais) precisa funcionar em uma sessão do Niri iniciada pela tela de login, não só dentro de uma janela aninhada.
 - Requisitos que acompanham todas as fases: teclado `us altgr-intl`, gestos de touchpad do Niri intactos e copiar e colar entre aplicativos Wayland e XWayland.

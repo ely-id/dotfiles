@@ -19,7 +19,9 @@ dotfiles/
 │       ├── tokens/         tokens.json e Theme.qml aprovados
 │       └── pecas/          Uma ficha por peça ou grupo de peças
 ├── wintermute-shell/       A shell
-└── niri/                   Configuração do Niri
+├── niri/                   Configuração do Niri
+├── terminal/               zsh, Starship, Ghostty e fastfetch
+└── plymouth/               Tema de boot
 ```
 
 ## `wintermute-shell/`
@@ -33,7 +35,19 @@ Recebe o código da shell a partir da fase F0. A organização interna será doc
 
 ## `niri/`
 
-Fica vazia até a fase F7. Quando a shell estiver pronta, recolho de `~/.config/niri/` tudo o que a instalação nova precisa: atalhos, entrada, telas, layout, regras de janela, animações e inicialização. Recolher no final evita versionar uma configuração que ainda muda a cada fase.
+Fica vazia até a fase F8. Quando a shell estiver pronta, recolho de `~/.config/niri/` tudo o que a instalação nova precisa: atalhos, entrada, telas, layout, regras de janela, animações e inicialização. Recolher no final evita versionar uma configuração que ainda muda a cada fase.
+
+## Tela de bloqueio e tela de login
+
+Entram na fase F7. Ainda não têm pasta porque o lugar depende de uma decisão dessa fase: se são parte da shell ou um componente separado, como acontece no projeto de origem. A decisão será registrada em `docs/decisoes/` antes de qualquer código.
+
+## `terminal/`
+
+Fica vazia até a fase F9. Recebe a configuração do zsh, do Starship, do Ghostty e do fastfetch, uma subpasta para cada um, depois de eu separar o que é genérico do que é pessoal (aliases de trabalho, caminhos, tokens).
+
+## `plymouth/`
+
+Fica vazia até a fase F9. Recebe o tema de boot do Plymouth, que hoje vive em um projeto separado nesta máquina.
 
 ## `docs/design/`
 
@@ -46,5 +60,6 @@ Fica vazia até a fase F7. Quando a shell estiver pronta, recolho de `~/.config/
 | Painel do projeto | `~/Documents/Journal/projeto-dotfiles/` | É acompanhamento pessoal de processo, não parte do produto |
 | Clone da Pond para estudo | `~/Projects/referencias/dotfiles-estudo/pond-interface/` | Material de leitura; não é meu código |
 | Pacote de entrega original | `~/Projects/referencias/dotfiles-estudo/pacote-entrega-original/` | Preservado como veio; a versão corrigida das fichas está em `docs/design/` |
+| Material de apoio do pacote | `~/Documents/pacote-entrega/` (`spec-pond-shell.md`, `armitage-shell/`) | Serve para adiantar o trabalho; não é fonte de valores |
 | PNGs de referência | dentro do pacote original, em `referencias/` | 40 MB de binários que inflariam o histórico para sempre |
 | Configuração local do Claude Code | `.claude/settings.local.json` | Permissões específicas desta máquina |

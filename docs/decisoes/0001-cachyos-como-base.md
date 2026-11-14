@@ -19,6 +19,6 @@ A Pond, que serve de referência para a interface, é uma distribuição complet
 
 ## Consequências
 
-- O instalador e o guia da fase F8 assumem CachyOS. Outras bases Arch podem funcionar, mas não são testadas.
-- O fix do TSC precisa ser documentado na fase F8 com sintoma, procedimento e forma de verificar. Esse detalhamento ainda não está escrito.
+- O instalador e o guia da fase F10 assumem CachyOS. Outras bases Arch podem funcionar, mas não são testadas.
+- O fix do TSC precisa ser documentado na fase F10 com sintoma, procedimento e forma de verificar. Esse detalhamento ainda não está escrito.
 - A lista de pacotes usa os repositórios do CachyOS como fonte.

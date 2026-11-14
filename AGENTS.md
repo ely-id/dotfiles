@@ -22,11 +22,14 @@ A atribuição ao Claude Code existe em um único lugar: a seção "Licenças e 
 | Lugar | O que guarda | Entra no git? |
 |---|---|---|
 | `wintermute-shell/` | A shell: código QML, tema, ícones, configuração | Sim |
-| `niri/` | Configuração do Niri, recolhida na fase F7 | Sim |
+| `niri/` | Configuração do Niri, recolhida na fase F8 | Sim |
+| `terminal/` | Configuração do terminal (zsh, Starship, Ghostty, fastfetch), recolhida na fase F9 | Sim |
+| `plymouth/` | Tema de boot do Plymouth, recolhido na fase F9 | Sim |
 | `docs/` | Documentação durável: estrutura, decisões, design | Sim |
 | `docs/design/` | Fichas das peças e tokens aprovados (fonte da verdade visual em texto) | Sim |
 | `~/Documents/Journal/projeto-dotfiles/` | Painel do projeto no Obsidian: escopo, fases, tarefas, sessões, handoffs, pendências | Não (vault pessoal) |
-| `~/Projects/referencias/dotfiles-estudo/` | Material de estudo: clone da Pond, pacote de entrega original, PNGs de referência | Não (somente leitura) |
+| `~/Projects/referencias/dotfiles-estudo/` | Material de estudo: clone da Pond e cópia do pacote de entrega com as PNGs de referência | Não (somente leitura) |
+| `~/Documents/pacote-entrega/` | Pacote de entrega completo, com o material de apoio: `spec-pond-shell.md` e `armitage-shell/` | Não (somente leitura) |
 
 O caminho do painel pode ser trocado pela variável de ambiente `DOTFILES_PAINEL`.
 
@@ -60,7 +63,7 @@ A sessão só está encerrada quando o painel descreve o estado real. Se o conte
 
 ## Fases, subfases e Go/NoGo
 
-- O projeto é dividido em fases (`B0`, `F0` a `F9`). A lista completa e o estado de cada uma estão em `PAINEL.md`.
+- O projeto é dividido em fases (`B0`, `F0` a `F11`). A lista completa e o estado de cada uma estão em `PAINEL.md`.
 - Estados possíveis: `planejada`, `em andamento`, `aguardando QA`, `go`, `no-go`, `bloqueada`.
 - Uma fase termina em `aguardando QA`, nunca em `go`. O veredito é meu: eu entro na sessão do Niri, sigo o roteiro do handoff e digo Go ou NoGo. O agente registra o veredito com a data e as minhas palavras, e nunca marca `go` por conta própria.
 - NoGo abre uma subfase com os ajustes apontados. A fase seguinte só começa depois do Go.
@@ -80,6 +83,18 @@ A sessão só está encerrada quando o painel descreve o estado real. Se o conte
 - A shell é sempre escura. As três variações (Chiba, Freeside, Sprawl) mudam só o acento.
 - Dados de exemplo são fictícios. Nenhum segredo, dado real da máquina ou caminho pessoal entra no código ou nos prints.
 
+## Fontes e ordem de confiança
+
+Quando duas fontes divergem, vale a que está mais acima. A divergência é registrada em `PENDENCIAS.md`; não se escolhe em silêncio.
+
+1. O que eu decidi: `ESCOPO.md`, os ajustes de escopo, as pendências resolvidas e os registros de `docs/decisoes/`.
+2. As fichas e os tokens em `docs/design/`.
+3. O meu arquivo do Figma.
+4. O código de origem no clone de estudo, para comportamento.
+5. O material de apoio do pacote de entrega: `spec-pond-shell.md` e a pasta `armitage-shell/` (scripts do Figma, `status.md`, notas).
+
+O item 5 existe para adiantar o trabalho e **não é autoridade**. A especificação foi escrita lendo o código sem executá-lo, a partir de uma versão anterior à do clone, e ela mesma admite diferença de até 1 px nas medidas calculadas. Os scripts e o `status.md` citam identificadores de outro arquivo do Figma. Por isso, tudo o que sair dali é conferido no código de origem ou no Figma antes de virar implementação. Usar esse material para encontrar rápido onde olhar é certo; copiar um valor dele sem conferir é errado.
+
 ## Código de origem externa
 
 A shell parte de uma cópia do código da interface da Pond (BSD-3-Clause). A decisão está em `docs/decisoes/0003-base-de-codigo-da-pond.md`. Na prática:
@@ -87,7 +102,7 @@ A shell parte de uma cópia do código da interface da Pond (BSD-3-Clause). A de
 - O material em `~/Projects/referencias/` é somente leitura. Nada ali é editado.
 - Não existe vínculo técnico com o repositório de origem: sem fork do GitHub, sem remoto `upstream`, sem submódulo, sem importar histórico.
 - O aviso de licença BSD-3 da origem é preservado. É a única menção obrigatória.
-- Identificadores, nomes e marca da origem são substituídos pelos da Wintermute ao longo das fases, e a fase F9 confere que não sobrou nenhum.
+- Identificadores, nomes e marca da origem são substituídos pelos da Wintermute ao longo das fases, e a fase F11 confere que não sobrou nenhum.
 
 ## Git
 

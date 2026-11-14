@@ -75,11 +75,18 @@ As fichas foram escritas antes de este repositório existir e citam materiais pe
 | "QML da Pond", `shell/...`, `minimap/...`, `Arquivo.qml:linha` | Arquivo do código de origem da shell | `~/Projects/referencias/dotfiles-estudo/pond-interface/shell/` |
 | `fonte/...` | Raiz do código de origem | `~/Projects/referencias/dotfiles-estudo/pond-interface/` |
 | `config/niri/...` | Configuração de exemplo do Niri na origem | `~/Projects/referencias/dotfiles-estudo/pond-interface/config/niri/` |
-| `spec` §N, `spec-pond-shell.md` | Especificação de comportamento da shell de origem | **Não recebi este arquivo.** Até ele aparecer, a fonte é o próprio código de origem |
-| `g2.src.js`, `g6.src.js`, `armitage-shell/figma/...` | Scripts que geraram os boards no Figma | **Não recebi.** O valor citado na ficha é o que vale; o board do Figma serve de conferência |
-| `armitage-shell/status.md` | Registro da correção do organizador recolhido | **Não recebi.** A correção está descrita na ficha `02-organizador` e no board `13:11395` |
+| `spec` §N, `spec-pond-shell.md` | Especificação de comportamento da shell de origem | `~/Documents/pacote-entrega/spec-pond-shell.md` |
+| `g2.src.js`, `g6.src.js`, `armitage-shell/figma/...` | Scripts que geraram os boards no Figma | `~/Documents/pacote-entrega/armitage-shell/figma/` |
+| `armitage-shell/status.md` | Registro da correção do organizador recolhido | `~/Documents/pacote-entrega/armitage-shell/status.md` |
+| `armitage-shell/icons/` | Os 111 ícones Lucide usados no design, com a licença | `~/Documents/pacote-entrega/armitage-shell/icons/` |
 
 As referências de linha (`NiriMsg.qml:380-507`) apontam para a versão do código de origem que existia quando as fichas foram escritas. No clone de estudo as linhas podem ter se deslocado: procuro pelo nome da função ou do bloco, não pelo número.
+
+## Material de apoio não é fonte de valores
+
+A especificação, os scripts do Figma e o `status.md` me ajudam a encontrar rápido onde olhar, mas não decidem nada. A especificação foi escrita lendo o código de origem sem executá-lo, em uma versão anterior à do clone de estudo, e admite diferença de até 1 px nas medidas calculadas. Os scripts e o `status.md` citam nós de outro arquivo do Figma, com identificadores diferentes dos desta página.
+
+A ordem de confiança é: o que eu decidi, depois as fichas e os tokens desta pasta, depois o meu arquivo do Figma, depois o código de origem e só então o material de apoio. Valor tirado do material de apoio é conferido no código ou no Figma antes de ser usado.
 
 ## Pendências de design
 

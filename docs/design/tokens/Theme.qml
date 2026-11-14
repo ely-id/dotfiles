@@ -311,7 +311,8 @@ Singleton {
     name = key;
   }
 
-  // Caminho proposto — A CONFIRMAR (a Pond usava ~/.config/pond-interface/theme.json).
+  // Caminho confirmado em 2026-11-14: ~/.config/wintermute-shell/theme.json.
+  // A mesma pasta recebe depois os atalhos e as preferências.
   readonly property string themeFilePath: StandardPaths.writableLocation(StandardPaths.ConfigLocation)
       + "/wintermute-shell/theme.json"
 

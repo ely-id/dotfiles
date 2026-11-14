@@ -10,6 +10,7 @@ Cada arquivo registra uma decisão: o contexto em que ela foi tomada, o que esco
 | [0004](0004-painel-no-obsidian.md) | Painel do projeto no Obsidian, fora do repositório | Aceita |
 | [0005](0005-referencias-fora-do-git.md) | Material de estudo e imagens de referência fora do git | Aceita |
 | [0006](0006-voz-e-atribuicao.md) | Primeira pessoa em tudo e atribuição apenas no README | Aceita |
+| [0007](0007-bloqueio-login-terminal-e-boot.md) | Tela de bloqueio, tela de login, terminal e boot entram no projeto | Aceita |
 
 ## Modelo
 

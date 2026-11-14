@@ -2,13 +2,13 @@
 
 Configuração do compositor Niri para a instalação nova.
 
-> **Estado:** esta pasta fica vazia até a fase F7.
+> **Estado:** esta pasta fica vazia até a fase F8.
 
 ## Por que só no final
 
 Durante a construção da shell, a configuração do Niri em `~/.config/niri/` muda a cada fase: atalhos novos para o launcher e a captura, regras de janela, reserva de espaço da barra lateral, anel de foco. Versionar essa configuração agora significaria corrigi-la a cada fase. Prefiro recolher tudo uma vez, quando a shell estiver pronta e a configuração estiver estável.
 
-## O que a varredura da fase F7 recolhe
+## O que a varredura da fase F8 recolhe
 
 - Atalhos de teclado, em um único arquivo fácil de editar.
 - Entrada: teclado `us altgr-intl`, touchpad e gestos.

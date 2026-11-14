@@ -1,6 +1,6 @@
 # dotfiles
 
-Meus dotfiles para uma instalação do CachyOS com o compositor Niri e a **Wintermute Shell**, uma shell de desktop em Quickshell/QML com barra lateral, organizador de workspaces, painéis, launcher, captura de tela e histórico da área de transferência.
+Meus dotfiles para uma instalação do CachyOS com o compositor Niri e a **Wintermute Shell**, uma shell de desktop em Quickshell/QML com barra lateral, organizador de workspaces, painéis, launcher, captura de tela e histórico da área de transferência. O repositório também reúne a tela de bloqueio e de login, a configuração do terminal e o tema de boot.
 
 > **Estado:** em construção. A shell ainda não está neste repositório e não existe instalador. Este README será reescrito quando o projeto chegar à fase de publicação.
 
@@ -14,6 +14,8 @@ Vou reinstalar o sistema e quero que a migração seja consciente: construo e va
 dotfiles/
 ├── wintermute-shell/   A shell (Quickshell/QML)
 ├── niri/               Configuração do Niri
+├── terminal/           zsh, Starship, Ghostty e fastfetch
+├── plymouth/           Tema de boot
 └── docs/
     ├── estrutura.md    Mapa do repositório e onde configurar cada coisa
     ├── decisoes/       Decisões do projeto e o motivo de cada uma

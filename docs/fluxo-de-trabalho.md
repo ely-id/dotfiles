@@ -54,3 +54,17 @@ A regra que sustenta tudo: uma sessão de trabalho só termina quando o painel d
 ## Decisões
 
 Toda decisão com consequência duradoura ganha um registro em [decisoes/](decisoes/README.md), com o contexto, a escolha e o motivo. Esses registros ficam no repositório porque explicam o produto, não o processo.
+
+## Duas ferramentas, um protocolo
+
+Trabalho com o Claude Code e com o Antigravity, nunca as duas ao mesmo tempo. As duas seguem o mesmo `AGENTS.md`, usam as mesmas skills (`/retomar`, `/encerrar-sessao`, `/qa-fase`) e recebem o mesmo aviso de início de sessão. A organização está em [decisoes/0010](decisoes/0010-ferramental-de-agente-em-agents.md) e o mapa de skills em `.agents/SKILLS.md`.
+
+Antes da primeira sessão no Antigravity numa máquina:
+
+1. Abro `~/Projects/dotfiles` como projeto e adiciono `~/Documents/Journal/projeto-dotfiles` como segunda pasta. Sem o painel no projeto, a sessão não consegue registrar nada.
+2. Rodo `.agents/scripts/instalar-skills-externas.sh --simular` para ver o que ele encontra nos plugins do Claude Code, e depois sem `--simular` para copiar.
+3. Em Settings › Customizations, confiro que aparecem as três skills do projeto, a regra `antigravity`, os hooks `estado-do-projeto` e `protecao-de-arquivos` e os servidores `context7` e `figma`. O Figma pede login na primeira vez.
+4. Abro uma conversa nova, digito `/retomar` e confiro que o painel chegou no contexto sem eu colar nada.
+5. Peço para acrescentar uma linha ao `ESCOPO.md` e confiro que a escrita é recusada pelo hook.
+
+Trocar de ferramenta é seguro em qualquer fronteira de sessão: o que uma sessão deixa no painel é o que a próxima lê, venha de onde vier.

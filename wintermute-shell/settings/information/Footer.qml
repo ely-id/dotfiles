@@ -58,7 +58,7 @@ Item {
   }
   Label {
     x:98; capY:62; text:"Early\nPreview"
-    font.family:Shell.Theme.titleFontFamily; font.styleName:"Book"; font.pixelSize:17
+    font.family:Shell.Theme.titleFontFamily; font.pixelSize:17
     font.letterSpacing:0
     lineHeightMode:Text.FixedHeight; lineHeight:17
   }

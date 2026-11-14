@@ -23,7 +23,6 @@ Item {
       y: root.needsInput ? 23 - baselineOffset + titleMetrics.capitalHeight : 20
       text: "Pair Device"; color: Shell.Theme.colors.text
       font.family: Shell.Theme.titleFontFamily; font.pixelSize: 20
-      font.styleName: "Book"
       FontMetrics { id: titleMetrics; font: title.font }
     }
     Text {

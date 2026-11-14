@@ -55,7 +55,6 @@ Shell.PanelBackground {
     font.family: Shell.Theme.titleFontFamily
     font.styleName: "Regular"
     font.pixelSize: 39
-    font.letterSpacing: -1.17
   }
 
   Item {

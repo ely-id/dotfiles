@@ -68,7 +68,6 @@ Item {
             color: button.accent
             opacity: button.highlighted ? 0.7 : 0
             font.family: Shell.Theme.titleFontFamily
-            font.styleName: "Book"
             font.pixelSize: 20
             FontMetrics { id: metrics; font: label.font }
           }

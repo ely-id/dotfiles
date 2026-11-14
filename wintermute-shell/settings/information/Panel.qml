@@ -33,7 +33,7 @@ Settings.Modal {
         color:"transparent"; border.width:1; border.color:Qt.rgba(1, 1, 1, 0.15)
         Information.Label {
           x:0; width:24; capY:8; text:row.index+1
-          font.family:"IBM Plex Mono"; font.weight:Font.DemiBold; font.letterSpacing:-0.22
+          font.family:Shell.Theme.monoFontFamily; font.weight:Font.DemiBold
           horizontalAlignment:Text.AlignHCenter; color:"#80ffffff"
         }
       }
@@ -47,7 +47,7 @@ Settings.Modal {
         objectName:"informationValue-" + row.modelData.key
         x:130; capY:6; width:390
         text:Information.State.value(row.modelData.key)
-        font.family:Shell.Theme.titleFontFamily; font.styleName:"Book"; font.pixelSize:17
+        font.family:Shell.Theme.titleFontFamily; font.pixelSize:17
         font.letterSpacing:0; color:Shell.Theme.colors.text; elide:Text.ElideRight
         ToolTip.visible:valueHover.hovered && truncated
         ToolTip.text:text
@@ -79,7 +79,7 @@ Settings.Modal {
     }
     Information.Label {
       x:54; capY:26; text:"Manual"; color:Shell.Theme.colors.text
-      font.family:Shell.Theme.titleFontFamily; font.styleName:"Book"; font.pixelSize:17; font.letterSpacing:0
+      font.family:Shell.Theme.titleFontFamily; font.pixelSize:17; font.letterSpacing:0
     }
     HoverHandler { id:manualHover; cursorShape:Qt.PointingHandCursor }
     TapHandler { onTapped:Settings.State.openPage("manual") }

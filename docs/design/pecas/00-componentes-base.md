@@ -107,4 +107,4 @@ Ver ficha `02-organizador.md`. Resumo na biblioteca:
 ## A CONFIRMAR
 
 - Valor exato do blur no niri (`Theme.glassBlur` 40 é estimativa do Figma).
-- Nome real dos cortes da família Geist no sistema (Medium / SemiBold / Regular). Se o pacote variable só expuser outros nomes, pergunte antes de substituir.
+- ~~Nome real dos cortes da família Geist no sistema (Medium / SemiBold / Regular).~~ Conferido em 2026-11-14 (P-02): `Geist` e `Geist Mono` estão instaladas com nove pesos estáticos, e Regular, Medium e SemiBold têm exatamente esses nomes (`Font.Normal`, `Font.Medium` e `Font.DemiBold` no QML). `Geist Serif` só tem o corte Regular, além de três cortes decorativos que não uso; o Qt escolhe o Regular quando recebe só o nome da família.

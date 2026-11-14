@@ -53,7 +53,7 @@ Settings.Modal {
         x: 20; anchors.verticalCenter: parent.verticalCenter
         visible: !!text; text: row.modelData.offset || ""
         color: Shell.Theme.colors.text; opacity: 0.4
-        font.family: "JetBrains Mono"; font.pixelSize: 14
+        font.family: Shell.Theme.monoFontFamily; font.pixelSize: 14
       }
       Text {
         x: offset.visible ? offset.x + offset.width + 12 : 20
@@ -149,7 +149,7 @@ Settings.Modal {
         anchors.centerIn: parent
         text: "Shortcut"; color: Shell.Theme.colors.text; opacity: shortcutHover.hovered ? 1 : 0.5
         font.family: Shell.Theme.fontFamily; font.weight: Font.DemiBold
-        font.pixelSize: 10; font.letterSpacing: 0.1
+        font.pixelSize: 10
       }
       HoverHandler { id: shortcutHover }
     },

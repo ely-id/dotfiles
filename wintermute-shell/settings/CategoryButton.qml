@@ -143,7 +143,6 @@ Item {
       font.family: Shell.Theme.titleFontFamily
       font.weight: Font.Normal
       font.pixelSize: 32
-      font.letterSpacing: -0.64
     }
   }
 

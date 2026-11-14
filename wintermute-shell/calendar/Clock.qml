@@ -74,11 +74,9 @@ Shell.Card {
       // An unpadded hour leaves room for AM/PM beside every possible time.
       text: Qt.formatTime(root.previewTime, "h:mm AP").split(" ")[0]
       color: Shell.Theme.sidebarForeground
-      font.family: "Advent Pro"
+      font.family: Shell.Theme.titleFontFamily
       font.weight: Font.Normal
-      font.variableAxes: ({ "wdth": 100 })
       font.pixelSize: 39
-      font.letterSpacing: -1.17
       verticalAlignment: Text.AlignVCenter
     }
 
@@ -95,7 +93,6 @@ Shell.Card {
       font.family: Shell.Theme.fontFamily
       font.weight: Font.Medium
       font.pixelSize: 11
-      font.letterSpacing: 0.11
     }
 
     Rectangle {

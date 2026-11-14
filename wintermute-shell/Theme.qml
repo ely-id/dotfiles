@@ -205,10 +205,16 @@ Singleton {
   // Números e atalhos: Geist Mono.
   // Letter-spacing: os scripts do Figma não definem (fica 0). NÃO herdar
   // os tracking da Pond Gramercy / Advent Pro / IBM Plex.
-  readonly property string fontFamily: "Geist"
+  // Se a Geist não estiver instalada, o texto cai na Inter em vez de cair na
+  // fonte padrão do sistema. Geist Serif só existe no corte Regular; conferi
+  // que o Qt escolhe o Regular, e não os cortes decorativos, quando recebe só
+  // o nome da família.
+  readonly property string fontFamilyPreferred: "Geist"
+  readonly property string fontFamilyFallback: "Inter"
+  readonly property string fontFamily: Qt.fontFamilies().indexOf(fontFamilyPreferred) !== -1
+      ? fontFamilyPreferred : fontFamilyFallback
   readonly property string titleFontFamily: "Geist Serif"
   readonly property string monoFontFamily: "Geist Mono"
-  readonly property string fontFamilyFallback: "Inter"
 
   readonly property int fontBody: 13            // Medium, caixa ~16–20 conforme o contexto
   readonly property int fontLabel: 15           // Medium em rótulos; Regular nas linhas dos Ajustes
@@ -383,6 +389,7 @@ Singleton {
   readonly property int sidebarHoverDuration: hoverDuration
   readonly property int mediaControlSize: 20
 
-  // Terceira família de fonte da origem. As fontes são acertadas na F0-T05.
-  readonly property string plexFontFamily: "IBM Plex Mono"
+  // A origem tinha uma terceira família, monoespaçada, com este nome. Aponta
+  // para a Geist Mono até as peças passarem a ler monoFontFamily.
+  readonly property string plexFontFamily: monoFontFamily
 }

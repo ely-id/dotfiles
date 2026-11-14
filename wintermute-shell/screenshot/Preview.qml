@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell.Widgets
 import "." as Screenshot
+import ".." as Shell
 
 Item {
   id: root
@@ -157,7 +158,7 @@ Item {
       anchors.centerIn: parent
       text: "Copy’d"
       color: "#3D2C52"
-      font { family: "Onest"; pixelSize: 13; weight: Font.Medium }
+      font { family: Shell.Theme.fontFamily; pixelSize: 13; weight: Font.Medium }
     }
   }
 }

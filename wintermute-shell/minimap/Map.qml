@@ -435,7 +435,6 @@ Shell.Card {
                 font.family: Shell.Theme.plexFontFamily
                 font.weight: Font.Medium
                 font.pixelSize: 11
-                font.letterSpacing: 0.11
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
               }

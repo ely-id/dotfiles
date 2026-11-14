@@ -44,7 +44,6 @@ Rectangle {
     color: Shell.Theme.colors.text
     font.family: Shell.Theme.titleFontFamily
     font.pixelSize: 32
-    font.letterSpacing: -0.64
   }
   Flickable {
     id: body

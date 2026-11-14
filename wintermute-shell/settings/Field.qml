@@ -30,7 +30,7 @@ Rectangle {
       anchors.centerIn: parent
       text: root.step; color: Shell.Theme.colors.text
       font.family: Shell.Theme.plexFontFamily; font.weight: Font.DemiBold
-      font.pixelSize: 11; font.letterSpacing: -0.22
+      font.pixelSize: 11
     }
   }
   Text {

@@ -16,7 +16,7 @@ dotfiles/
 │   ├── fluxo-de-trabalho.md
 │   ├── decisoes/           Um arquivo por decisão, numerado
 │   └── design/
-│       ├── tokens/         tokens.json e Theme.qml aprovados
+│       ├── tokens/         tokens.json aprovado
 │       └── pecas/          Uma ficha por peça ou grupo de peças
 ├── wintermute-shell/       A shell
 ├── niri/                   Configuração do Niri

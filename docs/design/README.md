@@ -7,10 +7,11 @@ Esta pasta é a fonte da verdade visual da Wintermute Shell em formato de texto.
 | Caminho | Conteúdo |
 |---|---|
 | `tokens/tokens.json` | Paleta, vidro, tipografia e os contrastes medidos das três variações |
-| `tokens/Theme.qml` | O mesmo conjunto como singleton QML, pronto para a shell ler |
 | `pecas/` | Uma ficha por peça ou grupo: medidas, estados, comportamento e pendências |
 
-Na fase F0, o `Theme.qml` passa a morar em `wintermute-shell/` e este diretório mantém só o `tokens.json` como registro do que foi aprovado.
+O mesmo conjunto existe como singleton QML em [`wintermute-shell/Theme.qml`](../../wintermute-shell/Theme.qml), que é o arquivo que a shell lê. Ele morava aqui até a fase F0; este diretório mantém o `tokens.json` como registro do que foi aprovado.
+
+Uma diferença de nome entre os dois: o token `onAccent` do `tokens.json` e das fichas se chama `textOnAccent` no `Theme.qml`. O QML lê um nome que começa com `on` seguido de maiúscula como tratador de sinal, e o arquivo não carregava com o nome original.
 
 ## Regras fixas do visual
 

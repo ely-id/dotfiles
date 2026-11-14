@@ -13,6 +13,7 @@ Cada arquivo registra uma decisão: o contexto em que ela foi tomada, o que esco
 | [0007](0007-bloqueio-login-terminal-e-boot.md) | Tela de bloqueio, tela de login, terminal e boot entram no projeto | Aceita |
 | [0008](0008-o-que-a-shell-traz-de-fora.md) | O que a shell traz de fora da pasta `shell/` da origem | Aceita |
 | [0009](0009-compatibilidade-do-tema-ate-a-f6.md) | Tema Armitage único, com uma camada de compatibilidade até a F6 | Aceita |
+| [0010](0010-ferramental-de-agente-em-agents.md) | Ferramental de agente comum em `.agents/`, para o Claude Code e o Antigravity | Aceita |
 
 ## Modelo
 

@@ -1,0 +1,25 @@
+{
+  "estado-do-projeto": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "python3 ./.agents/hooks/antigravity-inicio.py",
+        "timeout": 15
+      }
+    ]
+  },
+  "protecao-de-arquivos": {
+    "PreToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ./.agents/hooks/antigravity-protecao.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

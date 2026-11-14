@@ -6,11 +6,17 @@ dotfiles/
 ├── LICENSE                 BSD-3-Clause
 ├── AGENTS.md               Contrato de trabalho para agentes de código
 ├── CLAUDE.md               Complemento do contrato para o Claude Code
+├── .agents/                Ferramental de agente comum ao Claude Code e ao Antigravity
+│   ├── skills/             Skills do projeto (/retomar, /encerrar-sessao, /qa-fase), a fonte
+│   ├── hooks/              Aviso de início de sessão e os adaptadores do Antigravity
+│   ├── scripts/            Sincronização das skills e cópia das skills externas
+│   ├── rules/              Regra específica do Antigravity
+│   ├── hooks.json          Hooks do Antigravity
+│   ├── mcp_config.json     Servidores MCP do Antigravity (Context7 e Figma)
+│   └── SKILLS.md           Quando usar cada skill, nas duas ferramentas
 ├── .claude/                Configuração do Claude Code para este projeto
 │   ├── settings.json       Hook de início de sessão, bloqueios e atribuição desligada
-│   ├── hooks/              Scripts executados pelos hooks
-│   ├── skills/             Skills do projeto (/retomar, /encerrar-sessao, /qa-fase)
-│   └── SKILLS.md           Quando usar cada skill
+│   └── skills/             Cópia de .agents/skills/, refeita pelo script de sincronização
 ├── docs/
 │   ├── estrutura.md        Este arquivo
 │   ├── fluxo-de-trabalho.md
@@ -63,3 +69,5 @@ Fica vazia até a fase F9. Recebe o tema de boot do Plymouth, que hoje vive em u
 | Material de apoio do pacote | `~/Documents/pacote-entrega/` (`spec-pond-shell.md`, `armitage-shell/`) | Serve para adiantar o trabalho; não é fonte de valores |
 | PNGs de referência | dentro do pacote original, em `referencias/` | 40 MB de binários que inflariam o histórico para sempre |
 | Configuração local do Claude Code | `.claude/settings.local.json` | Permissões específicas desta máquina |
+| Permissões do Antigravity | Configuração global do Antigravity | A ferramenta não tem arquivo de permissão por projeto; os bloqueios do projeto estão no hook de `.agents/hooks.json` |
+| Skills externas no Antigravity | `~/.gemini/config/skills/` | São de terceiros, com licenças próprias; `.agents/scripts/instalar-skills-externas.sh` copia dos plugins do Claude Code |

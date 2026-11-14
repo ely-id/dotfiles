@@ -125,4 +125,10 @@ A shell parte de uma cópia do código da interface da Pond (BSD-3-Clause). A de
 
 ## Ferramentas de agente
 
-A configuração do Claude Code fica em `.claude/` e o mapa de quando usar cada skill está em `.claude/SKILLS.md`.
+Trabalho neste repositório com o Claude Code e com o Antigravity, uma ferramenta por vez. O protocolo é o mesmo nas duas, e o que é comum fica em `.agents/` (decisão `0010`):
+
+- `.agents/skills/`: as skills do projeto, `/retomar`, `/encerrar-sessao` e `/qa-fase`. É a fonte. `.claude/skills/` é uma cópia para o Claude Code, refeita por `.agents/scripts/sincronizar-skills.sh`; skill se edita só em `.agents/skills/`, e a cópia entra no mesmo commit.
+- `.agents/hooks/estado-do-projeto.sh`: o aviso de início de sessão, chamado pelas duas ferramentas.
+- `.agents/SKILLS.md`: quando usar cada skill, e o que existe em cada ferramenta.
+
+O que é de uma ferramenta só fica com ela: `CLAUDE.md` e `.claude/settings.json` para o Claude Code; `.agents/rules/antigravity.md`, `.agents/hooks.json` e `.agents/mcp_config.json` para o Antigravity.

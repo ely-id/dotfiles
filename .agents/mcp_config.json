@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "context7": {
+      "serverUrl": "https://mcp.context7.com/mcp"
+    },
+    "figma": {
+      "serverUrl": "https://mcp.figma.com/mcp"
+    }
+  }
+}

@@ -9,7 +9,8 @@
 ## Pilha (vale também para Bluetooth e Som)
 
 - Cartão da frente: **316** de largura, raio 16, vidro Armitage.
-- Carta de trás (quando há página empilhada): **284** de largura, deslocada **16 px**, conteúdo a 50% com blur 8.
+- Carta de trás (quando há página empilhada): **284** de largura, deslocada **16 px** para a direita, em `(16, 0)` da pilha (aparecem **32 px** acima da frente), raio **16**, mesmo vidro e mesmas sombras da frente. O conteúdo fica na escala original, cortado em 284, a **50%** de opacidade e com **blur 8**, inclusive no trecho que aparece acima da frente. Conferi em `prelude2.js` (`stack`) e no print `04-paineis-wifi-bluetooth-chiba.png`; a origem usava topo a 16, raio 14,38, conteúdo reduzido a 284/316 e blur só sob a frente (2026-11-15, S07).
+- A base da carta de trás fica rente à base da frente. No Figma ela aparece abaixo da frente com a altura natural da página, mas parece artefato do gerador; **A CONFIRMAR** em P-40.
 - Botão fechar 40×40 pendurado em `(296, folga − 20)`. Com página empilhada, o X vira “voltar”. Folga do verso = 32; sem verso = 22 (`prelude2.js` `stack`).
 - Abrir: escala 0,9→1 em 220 ms, origem no canto inferior esquerdo, InOutCubic.
 - Trocar página: 350 ms, curva `[0.19, 1, 0.22, 1]`. Fechar: 200 ms, mesma curva.

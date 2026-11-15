@@ -11,7 +11,7 @@ Quatro botões numa fileira, y 4, altura 40, ícone 16 no centro:
 
 | Botão | x | largura | Cantos (TL, TR, BR, BL) | Ação |
 |---|---|---|---|---|
-| Wi-Fi | 4 | 38 | 12, 4, 4, 12 | abre o painel Wi-Fi (ou Bluetooth, conforme o que a Pond agrupa — ver *A CONFIRMAR*) |
+| Wi-Fi | 4 | 38 | 12, 4, 4, 12 | abre o painel Wi-Fi (Bluetooth segue agrupado no fluxo da origem, sem 5º botão — P-06) |
 | Som | 42 | 36 | 4, 4, 4, 4 | abre o painel de som |
 | Ajustes | 78 | 36 | 4, 4, 4, 4 | abre os Ajustes |
 | Recolher | 114 | 38 | 4, 12, 12, 4 | recolhe a barra |
@@ -34,6 +34,6 @@ O cartão vai a 156×80 (300 ms / mediaReveal? a Pond cresce o cartão no hover 
 - Só um de Wi-Fi / som / Bluetooth aberto (`Sidebar.qml:37-67`).
 - OSD de volume aparece ao girar o volume (ficha 10).
 
-## A CONFIRMAR
+## Decisões confirmadas
 
-- Na Pond o primeiro botão abre Wi-Fi e o Bluetooth vive no painel de Wi-Fi ou num fluxo próprio (`spec` §3.14–3.17). O Figma mostra o ícone `wifi` nesse slot. Manter o agrupamento da Pond (não inventar um quinto botão).
+- **P-06 (2026-11-15, S06):** confirmado com 4 botões; o primeiro botão abre o Wi-Fi e o Bluetooth permanece agrupado como na origem, sem quinto botão.

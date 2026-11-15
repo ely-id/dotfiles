@@ -75,6 +75,6 @@ Fonte: `g2.src.js` `orgCollapsed` + correção documentada em `armitage-shell/st
 - Janelas flutuantes entram na lista (spec §4.8).
 - O “+” e o auto-abrir **deixam de depender do Vicinae**.
 
-## A CONFIRMAR
+## Decisões confirmadas
 
-- Os 4 formatos de loader da Pond (`id % 4`, SVGs em `assets/terminal-loaders/`) foram desenhados no Figma como ícones Lucide fixos (ampulheta, alerta, broto, check). Manter as 4 formas da Pond recoloridas, ou padronizar nos Lucide da referência? Pergunte se for implementar o estado 11.
+- **P-05 (2026-11-15, S06):** os indicadores de terminais com agente usam os 4 ícones Lucide do Figma (`hourglass` em `accentText` para Trabalhando, `circle-alert` em `attentionText` para Atenção, `sprout` em `warning` para Não lido e `circle-check` em `successText` para Lido), em vez dos 4 loaders SVG da Pond.

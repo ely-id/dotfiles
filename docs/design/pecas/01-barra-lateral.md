@@ -14,7 +14,7 @@
 - Altura máxima do organizador = espaço que sobra, mínimo 64 (`Sidebar.qml:159-163`). Sem rolagem: se não couber, corta (spec §4.8).
 - Recolher: botão do canto ou atalho (Manual: Super+B). `collapseProgress` em 300 ms (`Motion`). Largura 156→48 nos primeiros 56%; altura no restante (`Theme.collapseWidth` / `collapseHeight`).
 - Painéis (Wi-Fi / som / Bluetooth): só um aberto. Troca espera 200 ms. Posição: `x = 10 + largura do cartão + 6`, 10 px do fundo.
-- Namespace da layer: o da Pond é `pond-sidebar` — trocar para um nome Wintermute (proposta: `wintermute-sidebar`). **A CONFIRMAR o identifier** se isso afetar o niri.
+- Namespace da layer: `wintermute-sidebar` (trocado de `pond-sidebar`; confirmado em 2026-11-15, P-04).
 
 ## Exclusive zone
 

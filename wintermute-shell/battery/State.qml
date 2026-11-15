@@ -11,22 +11,32 @@ Singleton {
   readonly property real percentage: present ? Math.max(0, Math.min(100, device.percentage * 100)) : 0
   readonly property bool charging: present && (device.state === UPowerDeviceState.Charging || !UPower.onBattery)
   readonly property string description: present
-      ? "Battery " + Math.round(percentage) + "%, " + UPowerDeviceState.toString(device.state) : ""
+      ? "Bateria " + Math.round(percentage) + "%, " + UPowerDeviceState.toString(device.state) : ""
   readonly property int level: Math.round(percentage)
   readonly property bool low: present && !charging && level <= 10
-  readonly property color lowColor: level <= 3 ? "#FD6164" : level <= 5 ? "#FF9F67" : "#FFDC67"
-  readonly property color lowSurface: level <= 3 ? "#3E2222" : level <= 5 ? "#342A24" : "#343024"
   readonly property int alertLevel: !low ? 0 : level <= 3 ? 3 : level <= 5 ? 5 : 10
   property int alert: 0
   property int alerted: 0
-  // No pop-up da bateria (ficha 08) o terceiro perfil usa rocket; na tela
-  // inicial de Ajustes (ficha 13) usa zap. Mantenho rocket nos dois lugares
-  // até a definição da P-07 na F3/F4.
+  // Perfis de energia (fichas 08 e 13). O Desempenho usa `zap` nos dois lugares (P-07).
   readonly property var profiles: [
-    { profile: PowerProfile.PowerSaver, name: "Eco", icon: "leaf", accent: "#CBE25B" },
-    { profile: PowerProfile.Balanced, name: "Balanced", icon: "gauge", accent: "#E99FFF" },
-    { profile: PowerProfile.Performance, name: "Performance", icon: "rocket", accent: "#FFE51D" }
+    { key: "power-saver", profile: PowerProfile.PowerSaver, name: "Economia", icon: "leaf", accent: "#CBE25B" },
+    { key: "balanced", profile: PowerProfile.Balanced, name: "Equilibrado", icon: "gauge", accent: "#E99FFF" },
+    { key: "performance", profile: PowerProfile.Performance, name: "Desempenho", icon: "zap", accent: "#FFE51D" }
   ]
+  readonly property bool chargingNow: present && device.state === UPowerDeviceState.Charging
+  readonly property real changeRate: present ? device.changeRate : 0
+  readonly property real timeToFull: present ? device.timeToFull : 0
+  readonly property real timeToEmpty: present ? device.timeToEmpty : 0
+  readonly property string selectedProfile:
+      profiles.find(entry => entry.profile === PowerProfiles.profile)?.key ?? ""
+  function profileAvailable(key) {
+    return key !== "performance" || PowerProfiles.hasPerformanceProfile;
+  }
+  function setProfile(key) {
+    const entry = profiles.find(candidate => candidate.key === key);
+    if (entry && profileAvailable(key))
+      PowerProfiles.profile = entry.profile;
+  }
 
   onChargingChanged: if (charging) { alerted = 0; alert = 0; }
   onAlertLevelChanged: {

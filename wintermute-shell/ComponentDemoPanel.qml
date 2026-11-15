@@ -975,6 +975,27 @@ PanelWindow {
                   Demo.AudioSpecimen { tab: "input"; height: 258 }
                 }
               }
+
+              SectionBlock {
+                title: "Bateria (ficha 08, board 13:14610) · cartão real com estado fictício"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Pop-up 280×232 · carregando, perfil Equilibrado"
+                  stageWidth: 280; stageHeight: 232
+                  Demo.BatterySpecimen { kind: "popup" }
+                }
+                Specimen {
+                  caption: "Pop-up · 9% na bateria, perfil Economia"
+                  stageWidth: 280; stageHeight: 232
+                  Demo.BatterySpecimen { kind: "popup"; percentage: 9; charging: false; profile: "power-saver" }
+                }
+                Specimen {
+                  caption: "Alerta de bateria baixa 176×40 (só com a barra recolhida)"
+                  stageWidth: 176; stageHeight: 40
+                  Demo.BatterySpecimen { kind: "alert"; percentage: 9; charging: false }
+                }
+              }
             }
 
             // =================================================================

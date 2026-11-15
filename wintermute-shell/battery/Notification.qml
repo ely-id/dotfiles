@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import "." as Battery
@@ -16,6 +15,7 @@ PanelWindow {
   implicitWidth: card.width + 68
   implicitHeight: card.height + 145
   mask: Region { item: card }
+  BackgroundEffect.blurRegion: Shell.Theme.translucent ? card.blurRegion : null
 
   anchors { left: true; top: true }
   margins {
@@ -27,62 +27,10 @@ PanelWindow {
   WlrLayershell.namespace: "pond-battery-alert-" + (screen ? screen.name : "unknown")
   WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
-  Item {
+  Battery.AlertCard {
     id: card
     x: 34
     y: 14
-    width: 140
-    height: 34
-
-    Shell.Shadow {
-      anchors.fill: parent
-      cornerRadius: 8
-      shadows: Shell.PanelStyle.controlShadows
-    }
-
-    Rectangle {
-      anchors.fill: parent
-      radius: 8
-      color: Battery.State.lowSurface
-    }
-
-    FontMetrics { id: metrics; font: label.font }
-
-    Text {
-      id: label
-      x: 12
-      y: (parent.height - metrics.capitalHeight) / 2 + metrics.capitalHeight - baselineOffset
-      text: "Battery at " + Battery.State.level + "%"
-      color: Battery.State.lowColor
-      font.family: Shell.Theme.fontFamily
-      font.weight: Font.Medium
-      font.pixelSize: 13
-    }
-
-    Rectangle {
-      x: 111
-      y: 5
-      width: 24
-      height: 24
-      radius: 4
-      color: dismiss.hovered ? Qt.alpha(Battery.State.lowColor, 0.1) : "transparent"
-    }
-
-    Shell.IconButton {
-      id: dismiss
-      x: 111
-      y: 5
-      iconSource: Qt.resolvedUrl("../icons/x.svg")
-      iconWidth: 16
-      iconHeight: 16
-      restingOpacity: 0.3
-      animateGlyphOpacity: false
-      layer.enabled: true
-      layer.effect: MultiEffect { colorization: 1; colorizationColor: Battery.State.lowColor }
-      onClicked: Battery.State.alert = 0
-      Accessible.role: Accessible.Button
-      Accessible.name: "Dismiss"
-      Accessible.onPressAction: Battery.State.alert = 0
-    }
+    onDismissed: Battery.State.alert = 0
   }
 }

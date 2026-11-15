@@ -364,31 +364,8 @@ Singleton {
   }
   readonly property bool translucent: colors.translucent
 
-  readonly property color sidebarCardFill: colors.sidebarCardFill
-  readonly property color sidebarCardHoverFill: colors.sidebarCardHoverFill
   readonly property color sidebarInnerOutline: colors.sidebarInnerOutline
-  readonly property color sidebarBackground: colors.sidebarBackground
-  readonly property color sidebarBorder: colors.sidebarBorder
   readonly property color sidebarDivider: colors.sidebarDivider
   readonly property color sidebarForeground: colors.sidebarForeground
-  readonly property color mediaHoverBackground: "#262626"
-  readonly property color workspaceLauncherActive: colors.workspaceLauncherActive
-  readonly property color workspaceActiveIndicatorColor: colors.workspaceActiveIndicatorColor
-  readonly property color workspaceIconOutline: colors.workspaceIconOutline
-  readonly property color workspaceControlHover: colors.workspaceControlHover
-  readonly property color workspacePlaceholderColor: colors.workspacePlaceholderColor
-  readonly property color workspaceDropFill: colors.workspaceDropFill
-  readonly property color workspaceNumberBackground: colors.workspaceNumberBackground
-  readonly property color workspaceNumberDragBackground: colors.workspaceNumberDragBackground
-  readonly property color workspaceDragBackground: colors.workspaceDragBackground
-  readonly property real workspaceDragGlyphScale: translucent ? 13.913043975830078 / 16 : 1
-
-  // Medidas e tempos da origem que o desenho Armitage troca por outros nomes.
-  readonly property int sidebarTimeExpandedHeight: 58   // o relógio Armitage usa clockExpandedHeight (F2)
   readonly property int sidebarHoverDuration: hoverDuration
-  readonly property int mediaControlSize: 20
-
-  // A origem tinha uma terceira família, monoespaçada, com este nome. Aponta
-  // para a Geist Mono até as peças passarem a ler monoFontFamily.
-  readonly property string plexFontFamily: monoFontFamily
 }

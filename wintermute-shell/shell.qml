@@ -14,6 +14,7 @@ import "wallpaper/desktop" as Wallpaper
 ShellRoot {
   id: root
   property bool expanded: true
+  property bool sidebarDemoCards: false
   property bool testPanelOpen: false
   property bool demoPanelOpen: false
 
@@ -66,6 +67,7 @@ ShellRoot {
   IpcHandler {
     target: "sidebar"
     function toggle() { root.expanded = !root.expanded; }
+    function demoCards() { root.sidebarDemoCards = !root.sidebarDemoCards; }
   }
 
   IpcHandler {
@@ -97,6 +99,7 @@ ShellRoot {
         id: sidebar
         screen: modelData
         expanded: root.expanded
+        demoCards: root.sidebarDemoCards
         onToggleRequested: root.expanded = !root.expanded
       }
       Notifications.ToastWindow { id: toast; bar: sidebar }
@@ -114,6 +117,8 @@ ShellRoot {
       ComponentDemoPanel {
         panelScreen: modelData
         opened: root.demoPanelOpen
+        sidebarDemoCards: root.sidebarDemoCards
+        onToggleSidebarDemoCards: root.sidebarDemoCards = !root.sidebarDemoCards
         onCloseRequested: root.demoPanelOpen = false
       }
     }

@@ -74,35 +74,11 @@ QtObject {
   property color inlineFill: Qt.tint(Qt.alpha("#F9EFFF", 0.1), sidebarClearFill)
   property color inlineHoverFill: Qt.tint(Qt.alpha("#F9EFFF", 0.1), sidebarHoverFill)
 
-  property color sidebarCardFill: Qt.rgba(0, 0, 0, 0.12)
   property color sidebarCardOutline: Qt.alpha("#F9EFFF", 0.1)
   property color sidebarHoverFill: Qt.rgba(1, 1, 1, 0.04)
-  property color sidebarCardHoverFill: Qt.tint(sidebarCardFill, sidebarHoverFill)
   property color sidebarClearFill: Qt.rgba(1, 1, 1, 0)
-  property color sidebarBackground: "#1D1D1D"
-  property color sidebarBorder: "#303030"
   property color sidebarDivider: sidebarCardOutline
   property color sidebarForeground: "#F8F9F9"
   property color sidebarInnerOutline: Qt.rgba(1, 1, 1, 0.20)
-  property color sidebarSliderTrack: sidebarInnerOutline
-  property color sidebarButtonSelected: Qt.alpha("#F9EFFF", 0.1)
-  property color sidebarButtonHover: sidebarButtonSelected
-  property color sidebarButtonRest: Qt.alpha(sidebarButtonSelected, 0)
   property color feedbackDotOff: sidebarInnerOutline
-  property color clockChipBorder: sidebarInnerOutline
-  property color installHover: sidebarHoverFill
-
-  property color workspaceLauncherActive: sidebarHoverFill
-  property color workspaceActiveIndicatorColor: sidebarHoverFill
-  property color workspaceCollapsedActive: Qt.rgba(1, 1, 1, 0.08)
-  property color workspaceActiveRing: workspaceIconOutline
-  property color workspaceIconOutline: sidebarCardOutline
-  property color workspaceControlHover: Qt.rgba(1, 1, 1, 0.10)
-  property color workspacePlaceholderColor: Qt.rgba(1, 1, 1, 0.30)
-  property color workspaceDropFill: Qt.rgba(1, 1, 1, 0.20)
-  property color workspaceDropStroke: workspaceDropFill
-  property color workspaceNumberText: "white"
-  property color workspaceNumberBackground: "#5B5B5B"
-  property color workspaceNumberDragBackground: "#787878"
-  property color workspaceDragBackground: "#53525D"
 }

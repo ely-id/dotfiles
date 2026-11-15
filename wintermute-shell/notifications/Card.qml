@@ -3,8 +3,17 @@ import Quickshell.Widgets
 import "." as Notifications
 import ".." as Shell
 
+// Cartão de notificação (ficha 10), em três usos:
+//  - item da central (`panelRow`): sem superfície própria, hover `hover` r10 com inset 4;
+//  - toast / notificação sozinha: vidro Armitage r16, 288 (toast) ou 280 de largura;
+//  - prévia no cartão da barra (`inlinePreview`): 140 de largura, r12, `control` + `border`.
+// Anatomia: ícone 16 em (16,16), nome do app 13 muted em x 40, hora 11 muted à direita, corpo 13 Medium
+// em y 40 (36 na prévia), largura = cartão − 32, entrelinha 16 e até 3 linhas.
+// Altura = 40 + linhas × 16 + 16 (prévia: 36 + linhas × 16 + 20). No hover, o X de 24×24 aparece em
+// (largura − 40, 13) e a hora recua 32 para dar lugar a ele.
 Item {
   id: root
+  property var service: Notifications.State
   property var notification: ({})
   property bool inlinePreview: false
   property bool showDivider: false
@@ -14,42 +23,50 @@ Item {
   signal activated
   signal dismissed
   readonly property bool hovered: pointer.containsMouse || closeButton.hovered || extraHovered
-  readonly property real surfaceWidth: inlinePreview ? width : 280
+  readonly property bool closeShown: closeEnabled && hovered && !inlinePreview
   readonly property alias surface: surface
   readonly property int padding: inlinePreview ? 12 : 16
-  readonly property int iconSize: inlinePreview ? 14 : 16
-  readonly property int lineHeight: inlinePreview ? 19 : 16
+  readonly property int headerTop: inlinePreview ? 12 : 16
+  readonly property int lineHeight: 16
+  readonly property int bodyTop: inlinePreview ? 36 : 40
+  readonly property int bodyLines: Math.max(1, Math.min(3,
+      Math.round(bodyText.implicitHeight / lineHeight)))
   readonly property real targetHeight: inlinePreview
-      ? Math.min(103, 40 + bodyText.height + 12)
-      : Math.max(76, Math.min(108, bodyText.y + bodyText.height + 16))
+      ? bodyTop + bodyLines * lineHeight + 20
+      : bodyTop + bodyLines * lineHeight + 16 + (showDivider ? 1 : 0)
   property real animatedHeight: targetHeight
-  implicitWidth: 288
+  implicitWidth: Notifications.Style.interactiveWidth
   implicitHeight: animatedHeight
-  Behavior on animatedHeight { Shell.Motion {} }
+  Behavior on animatedHeight { Shell.Motion { duration: Notifications.Style.panelDuration } }
 
   Rectangle {
     id: surface
-    width: root.surfaceWidth
+    width: root.width
     height: root.height
-    radius: 16
+    radius: root.inlinePreview ? 12 : Notifications.Style.radius
     color: root.inlinePreview
-        ? (root.hovered ? Shell.Theme.colors.inlineHoverFill : Shell.Theme.colors.inlineFill)
-        : root.panelRow && Shell.Theme.translucent ? "transparent" : Shell.PanelStyle.panelSurface
+        ? (root.hovered ? Shell.Theme.pressed : Shell.Theme.control) : "transparent"
+    border.width: root.inlinePreview ? 1 : 0
+    border.color: Shell.Theme.border
     antialiasing: true
+    Shell.GradientFill {
+      visible: !root.inlinePreview && !root.panelRow
+      radius: surface.radius
+    }
     Shell.PanelBorder {
-      visible: Shell.Theme.translucent && !root.inlinePreview && !root.panelRow
+      visible: !root.inlinePreview && !root.panelRow
       radius: surface.radius
     }
     Behavior on color {
-      enabled: !root.inlinePreview
-      ColorAnimation { duration: 120; easing.type: Easing.OutCubic }
+      enabled: root.inlinePreview
+      ColorAnimation { duration: Shell.Theme.hoverDuration; easing.type: Easing.OutCubic }
     }
   }
 
   Rectangle {
     x: 4
     y: 4
-    width: root.surfaceWidth - 8
+    width: root.width - 8
     height: Math.max(0, root.height - 8)
     radius: 10
     color: Notifications.Style.hover
@@ -60,70 +77,69 @@ Item {
 
   IconImage {
     visible: !root.inlinePreview
-    x: root.padding
+    x: 16
     y: 16
     implicitSize: width
-    width: root.iconSize
+    width: 16
     height: width
-    source: Notifications.State.iconSource(root.notification || ({}))
+    source: root.service.iconSource(root.notification || ({}))
     asynchronous: true
     smooth: true
   }
 
   Text {
     id: timeText
-    x: root.surfaceWidth - root.padding - width
-    y: root.inlinePreview ? 16 + headerMetrics.capitalHeight - baselineOffset : 16
-    height: root.inlinePreview ? 14 : 16
-    text: !root.notification ? "" : root.inlinePreview
-        ? Notifications.State.relativeTimeLabel(root.notification.timestamp)
-        : Notifications.State.timeLabel(root.notification.timestamp || 0)
-    color: Notifications.Style.foreground
-    opacity: 0.5
+    x: root.width - root.padding - width - (root.closeShown ? 32 : 0)
+    y: root.headerTop
+    height: 16
+    text: root.notification ? root.service.relativeTimeLabel(root.notification.timestamp) : ""
+    color: Shell.Theme.muted
     font.family: Shell.Theme.fontFamily
-    font.pixelSize: 13
+    font.weight: Font.Medium
+    font.pixelSize: Shell.Theme.fontCaption
+    font.letterSpacing: 0
     verticalAlignment: Text.AlignVCenter
-    FontMetrics { id: headerMetrics; font: timeText.font }
+    Behavior on x { Shell.HoverAnimation {} }
   }
 
   Text {
-    x: root.padding + (root.inlinePreview ? 0 : root.iconSize + 4)
-    y: timeText.y
+    x: root.inlinePreview ? root.padding : 40
+    y: root.headerTop
     width: Math.max(0, timeText.x - x - 8)
-    height: timeText.height
-    text: Notifications.State.title(root.notification)
-    color: Notifications.Style.foreground
-    opacity: 0.5
+    height: 16
+    text: root.service.title(root.notification)
+    color: Shell.Theme.muted
     elide: Text.ElideRight
     font.family: Shell.Theme.fontFamily
-    font.pixelSize: 13
+    font.weight: Font.Medium
+    font.pixelSize: root.inlinePreview ? Shell.Theme.fontCaption : Shell.Theme.fontBody
+    font.letterSpacing: 0
     verticalAlignment: Text.AlignVCenter
   }
 
   Text {
     id: bodyText
     x: root.padding
-    y: root.inlinePreview ? 40 + bodyMetrics.capitalHeight - baselineOffset : 44
-    width: root.surfaceWidth - root.padding * 2
-    height: Math.min(root.lineHeight * 3, Math.max(root.lineHeight,
-        root.inlinePreview ? implicitHeight : Math.round(implicitHeight / root.lineHeight) * root.lineHeight))
-    text: Notifications.State.message(root.notification)
-    color: Notifications.Style.foreground
+    y: root.bodyTop
+    width: root.width - root.padding * 2
+    height: root.bodyLines * root.lineHeight
+    text: root.service.message(root.notification)
+    color: Shell.Theme.text
     wrapMode: Text.Wrap
     maximumLineCount: 3
     elide: Text.ElideRight
     font.family: Shell.Theme.fontFamily
     font.weight: Font.Medium
-    font.pixelSize: 13
+    font.pixelSize: Shell.Theme.fontBody
+    font.letterSpacing: 0
     lineHeightMode: Text.FixedHeight
     lineHeight: root.lineHeight
-    FontMetrics { id: bodyMetrics; font: bodyText.font }
   }
 
   Rectangle {
     x: 16
     y: root.height - 1
-    width: root.surfaceWidth - 32
+    width: root.width - 32
     height: 1
     color: Notifications.Style.divider
     visible: root.showDivider
@@ -140,10 +156,10 @@ Item {
 
   Notifications.CloseButton {
     id: closeButton
-    x: root.surfaceWidth - 16
-    y: 16
+    x: root.width - 40
+    y: 13
     z: 2
-    opacity: root.closeEnabled && root.hovered ? 1 : 0
+    opacity: root.closeShown ? 1 : 0
     visible: opacity > 0.001
     enabled: opacity > 0.5
     Behavior on opacity { Shell.HoverAnimation {} }

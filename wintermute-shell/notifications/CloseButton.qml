@@ -1,8 +1,9 @@
 import QtQuick
-import QtQuick.Effects
 import "." as Notifications
 import ".." as Shell
 
+// Botão fechar das notificações (ficha 10): 24×24 r6 `pressed` com X de 16; no hover vira
+// `borderStrong`. A variante compacta (16×16) fica na borda da prévia do cartão da barra.
 Rectangle {
   id: root
 
@@ -12,8 +13,8 @@ Rectangle {
 
   implicitWidth: compact ? 16 : Notifications.Style.closeSize
   implicitHeight: implicitWidth
-  radius: 4
-  color: compact ? "#555555" : pointer.containsMouse
+  radius: compact ? 4 : 6
+  color: compact ? Shell.Theme.borderMuted : pointer.containsMouse
       ? Notifications.Style.closeHover : Notifications.Style.closeFill
   antialiasing: true
 
@@ -30,11 +31,6 @@ Rectangle {
     width: root.compact ? 12 : Notifications.Style.closeIconSize
     height: width
     source: Qt.resolvedUrl("../icons/x.svg")
-    layer.enabled: Shell.Theme.translucent && !root.compact
-    layer.effect: MultiEffect {
-      colorization: 1
-      colorizationColor: pointer.containsMouse ? Shell.Theme.colors.dismissHoverGlyph : Shell.Theme.colors.dismissGlyph
-    }
     sourceSize: Qt.size(width * 2, height * 2)
     fillMode: Image.PreserveAspectFit
     smooth: true

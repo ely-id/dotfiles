@@ -10,31 +10,34 @@ import ".." as Shell
 //     + até 3 ícones de app 16×16 em (72,16), (96,16), (120,16) (2º e 3º a 40%).
 // Recolhido (48×48, r16):
 //   bell 16 no centro (16,16) + ponto não lido 6×6 accent em (28,14) quando não vazio.
-// Chegando (ficha 10): cresce de 48 para 156 em 300 ms e mostra prévia 140×104 r12.
+// Chegando (ficha 10): cresce de 48 para 156 em 300 ms e mostra prévia 140×104 r12 em (8,44).
 Item {
   id: root
   property real collapseProgress: 0
+  // Estado das notificações; a vitrine troca por um fictício.
+  property var service: Notifications.State
   // Propriedades opcionais para amostra visual no painel de demonstração
   property int previewCount: -1
   property var previewIcons: []
+  property bool demoArrival: false
 
   readonly property alias blurRegion: background.blurRegion
   onYChanged: blurRegion.changed()
   readonly property int effectiveCount: previewCount >= 0
-      ? previewCount : Notifications.State.notificationCount
+      ? previewCount : service.notificationCount
   readonly property bool empty: effectiveCount === 0
   readonly property real widthProgress: Shell.Theme.collapseWidth(collapseProgress)
   readonly property real heightProgress: Shell.Theme.collapseHeight(collapseProgress)
   signal panelRequested
 
-  property real transientProgress: (previewCount < 0 && Notifications.State.transientVisible) ? 1 : 0
+  property real transientProgress: (demoArrival || (previewCount < 0 && service.transientVisible)) ? 1 : 0
   readonly property real inlineAmount: transientProgress * (1 - heightProgress)
   readonly property real previewOpacity: inlineAmount >= 0.54 ? 1 : 0
-  readonly property var notification: Notifications.State.currentTransient
+  readonly property var notification: service.currentTransient
 
   implicitWidth: Shell.Theme.lerp(Shell.Theme.sidebarCardExpandedWidth,
       Shell.Theme.sidebarCardCollapsedWidth, widthProgress)
-  implicitHeight: 48 + (47 + preview.height - 48) * inlineAmount
+  implicitHeight: 48 + (44 + preview.height + 8 - 48) * inlineAmount
   Behavior on transientProgress { Shell.Motion {} }
 
   Shell.Card {
@@ -136,7 +139,7 @@ Item {
             spacing: 8
             visible: root.previewIcons.length === 0
             Repeater {
-              model: Notifications.State.recentApps
+              model: root.service.recentApps
               delegate: IconImage {
                 required property var modelData
                 required property int index
@@ -155,17 +158,20 @@ Item {
       }
     }
 
+    // Prévia (ficha 10): 140 de largura em (8,44), r12.
     Notifications.Card {
       id: preview
-      y: 47 + (1 - root.previewOpacity) * 4
-      width: root.width
+      service: root.service
+      x: 8
+      y: 44 + (1 - root.previewOpacity) * 4
+      width: root.width - 16
       inlinePreview: true
       notification: root.notification
       closeEnabled: false
       extraHovered: inlineClose.hovered
       opacity: root.previewOpacity
       enabled: root.notification !== null && root.inlineAmount > 0.5
-      onActivated: Notifications.State.activate(root.notification)
+      onActivated: root.service.activate(root.notification)
     }
   }
 
@@ -187,6 +193,6 @@ Item {
     opacity: preview.hovered && root.inlineAmount > 0.7 ? 1 : 0
     visible: opacity > 0.001
     enabled: opacity > 0.5
-    onClicked: Notifications.State.remove(root.notification)
+    onClicked: root.service.remove(root.notification)
   }
 }

@@ -174,6 +174,9 @@ Singleton {
   }
 
   function iconSource(notification) {
+    // Notificações da própria shell podem trazer um ícone Lucide pelo nome.
+    if (notification.iconName)
+      return Qt.resolvedUrl("../icons/" + notification.iconName + ".svg");
     const rawIcon = String(notification.appIcon || "");
     if (rawIcon.startsWith("file:") || rawIcon.startsWith("image:")
         || rawIcon.startsWith("qrc:"))
@@ -203,37 +206,29 @@ Singleton {
     return Quickshell.iconPath(fallback, "application-x-executable");
   }
 
+  // Linha de cima do cartão (ficha 10): o nome do aplicativo, ao lado do ícone.
   function title(notification) {
     if (!notification)
       return "";
-    return notification.summary ? String(notification.summary)
-                                : String(notification.appName || "");
+    return notification.appName ? String(notification.appName)
+                                : String(notification.summary || "");
   }
 
+  // Corpo do cartão: resumo e texto juntos ("Elo: o mercado chega às 18h"), ou só o que existir.
   function message(notification) {
     if (!notification)
       return "";
-    return notification.body ? String(notification.body)
-                             : String(notification.summary || "");
+    const summary = String(notification.summary || "");
+    const body = String(notification.body || "");
+    return summary && body ? summary + ": " + body : body || summary;
   }
 
   function relativeTimeLabel(timestamp) {
     const minutes = Math.max(0, Math.floor((clock.date.getTime() - timestamp) / 60000));
-    if (minutes < 1) return "Now";
-    if (minutes < 60) return minutes + "m";
-    if (minutes < 1440) return Math.floor(minutes / 60) + "h";
-    return Math.floor(minutes / 1440) + "d";
-  }
-
-  function timeLabel(timestamp) {
-    const date = new Date(Number(timestamp));
-    let hours = date.getHours();
-    const suffix = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    if (hours === 0)
-      hours = 12;
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return hours + ":" + minutes + " " + suffix;
+    if (minutes < 1) return "agora";
+    if (minutes < 60) return minutes + " min";
+    if (minutes < 1440) return Math.floor(minutes / 60) + " h";
+    return Math.floor(minutes / 1440) + " d";
   }
 
   function togglePanel(outputName) {

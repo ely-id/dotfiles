@@ -1012,6 +1012,32 @@ PanelWindow {
                   Demo.CalendarSpecimen { browseMonths: 1 }
                 }
               }
+
+              SectionBlock {
+                title: "Notificações (ficha 10, board 13:14610) · peças reais com dados fictícios"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Central 280 · 3 itens (passe o mouse num item para ver o X)"
+                  stageWidth: 280; stageHeight: 316
+                  Demo.NotificationSpecimen { kind: "center" }
+                }
+                Specimen {
+                  caption: "Notificação sozinha 280×88"
+                  stageWidth: 280; stageHeight: 88
+                  Demo.NotificationSpecimen { kind: "single" }
+                }
+                Specimen {
+                  caption: "Toast (barra recolhida) 288×88"
+                  stageWidth: 288; stageHeight: 88
+                  Demo.NotificationSpecimen { kind: "toast" }
+                }
+                Specimen {
+                  caption: "Chegando no cartão da barra 156×156 · prévia 140×104"
+                  stageWidth: 156; stageHeight: 156
+                  Demo.NotificationSpecimen { kind: "arrival" }
+                }
+              }
             }
 
             // =================================================================

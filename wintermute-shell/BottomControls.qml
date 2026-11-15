@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Effects
 import Quickshell
-import Quickshell.Wayland
 import "audio" as Audio
 import "wifi" as Wifi
 
@@ -36,14 +35,7 @@ Card {
   property bool soundOpen: false
   property bool settingsOpen: false
   property bool wifiHoverRetained: false
-  property bool keyboardVolumeVisible: false
-  readonly property var activeToplevel: ToplevelManager.activeToplevel
-  readonly property bool fullscreenCovered: activeToplevel !== null && activeToplevel.fullscreen
-      && QsWindow.window !== null && activeToplevel.screens.some(s => s.name === QsWindow.window.screen.name)
   readonly property bool collapsed: collapseProgress >= 0.56
-  readonly property bool besideSidebar: collapsed && !fullscreenCovered
-  readonly property bool collapsedVolumeVisible: previewReveal === ""
-      && (collapsed || fullscreenCovered) && keyboardVolumeVisible && !soundOpen
 
   property bool hoverHeightRetained: false
   property string displayedReveal: ""
@@ -73,7 +65,7 @@ Card {
   Component.onDestruction: Wifi.State.setRateConsumer(root, false)
   readonly property bool soundSliderRequested: !soundOpen && !wifiPresentationRequested
       && collapseProgress <= 0.001
-      && (soundHovered || keyboardVolumeVisible)
+      && soundHovered
   readonly property int openExpandedHeight:
       (previewReveal !== "" || hoverHeightRetained) ? 80 : 48
 
@@ -85,13 +77,6 @@ Card {
   onSoundButtonHoveredChanged: {
     if (soundButtonHovered)
       wifiHoverRetained = false;
-  }
-
-  onSoundOpenChanged: {
-    if (soundOpen) {
-      keyboardVolumeVisible = false;
-      keyboardVolumeTimer.stop();
-    }
   }
 
   onRequestedRevealChanged: Qt.callLater(syncReveal)
@@ -131,56 +116,6 @@ Card {
     visible: opacity > 0.001
     opacity: root.soundSliderContentVisible && root.collapseProgress <= 0.001 ? 1 : 0
     onMoved: if (root.previewReveal === "") Audio.State.setOutputVolume(compactSoundSlider.value)
-  }
-
-  LazyLoader {
-    active: root.collapsedVolumeVisible
-    PanelWindow {
-      id: volumeWindow
-      readonly property real cardX: root.besideSidebar ? Theme.sidebarOuterMargin + root.width + 4
-          : Math.round((screen.width + Theme.sidebarOuterMargin
-              + Theme.sidebarCardCollapsedWidth - Theme.sidebarCardExpandedWidth) / 2)
-      readonly property real cardBottom: root.besideSidebar ? Math.round(Theme.sidebarOuterMargin + root.height - 46 - 36) : 40
-      screen: root.QsWindow.window ? root.QsWindow.window.screen : null
-      color: "transparent"
-      BackgroundEffect.blurRegion: volumeCard.blurRegion
-      implicitWidth: cardX + Theme.sidebarCardExpandedWidth + 67
-      implicitHeight: cardBottom + 36 + 67
-      anchors { left: true; bottom: true }
-      WlrLayershell.layer: WlrLayer.Overlay
-      WlrLayershell.namespace: "pond-volume"
-      WlrLayershell.exclusionMode: ExclusionMode.Ignore
-      mask: Region {}
-
-      Item {
-        x: volumeWindow.cardX
-        y: 67
-        width: Theme.sidebarCardExpandedWidth
-        height: 36
-        Shadow {
-          anchors.fill: parent
-          cornerRadius: Theme.sidebarCardRadius
-          shadows: Theme.glassShadows
-        }
-        Card {
-          id: volumeCard
-          anchors.fill: parent
-          radius: Theme.sidebarCardRadius
-        }
-        Slider {
-          x: 12
-          y: 0
-          width: 132
-          height: 36
-          compact: true
-          externalValue: Audio.State.outputVolume
-          muted: Audio.State.outputMuted
-          trackColor: Theme.track
-          interactive: false
-          hoverEnabled: false
-        }
-      }
-    }
   }
 
   Behavior on height {
@@ -375,16 +310,4 @@ Card {
     onTriggered: if (root.requestedReveal === "") root.hoverHeightRetained = false
   }
 
-  Timer {
-    id: keyboardVolumeTimer
-    interval: Theme.osdHoldDuration
-    onTriggered: root.keyboardVolumeVisible = false
-  }
-
-  function showKeyboardVolume() {
-    if (soundOpen)
-      return;
-    keyboardVolumeVisible = true;
-    keyboardVolumeTimer.restart();
-  }
 }

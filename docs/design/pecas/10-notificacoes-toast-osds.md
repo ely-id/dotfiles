@@ -27,7 +27,9 @@ Motion das notificações: 180 ms.
 ## OSDs
 
 - Brilho e volume: **156×36** raio 16. Ícone 16 em (12,10) + **10** pontos 6×6 a cada 10 px, começando em x 42, y 15. Acasos acesos = `text`; apagados = `dot`.
-- Teclado: **156×76** raio 12. Duas linhas (layout atual com rádio marcado, o outro `muted`). Abre com Mod+K na Pond (`KeyboardFeedback.qml`) — herdar o atalho, salvo se eu definir um bind novo.
+- **Níveis (P-08, 2026-11-15):** brilho e volume não têm 10 níveis reais (o brilho daqui tem 100, o volume é contínuo). O desenho de 10 pontos fica, o valor é arredondado para o ponto mais próximo e, se for maior que zero, acende pelo menos 1 ponto. No mudo o volume mostra `volume-x` e 0 pontos. As teclas de brilho e de volume andam de 10% em 10%, então cada tecla move um ponto.
+- O OSD de volume é este mesmo cartão com `volume-2`, no lugar onde a origem mostrava o slider compacto ao mexer no volume pelo teclado. Só um OSD aparece de cada vez: o de brilho e o de volume se substituem.
+- Teclado: **156×76** raio 12. Duas linhas (layout atual com rádio marcado e nome em `text`, o outro `muted`), 16 de padding e 12 entre as linhas. Abre com Mod+K na Pond (`KeyboardFeedback.qml`) — herdar o atalho, salvo se eu definir um bind novo.
 - Ficam visíveis **1200 ms** depois do último evento.
 
 ## A CONFIRMAR

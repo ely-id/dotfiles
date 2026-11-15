@@ -1,8 +1,10 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import "audio" as Audio
 import "settings/appearance" as Appearance
 
+// OSD de brilho (ficha 10): 156×36, visível Theme.osdHoldDuration (1200 ms) depois do último evento.
 Item {
   id: root
   required property var screen
@@ -23,44 +25,12 @@ Item {
       dismissTimer.restart();
     }
   }
-  Timer { id: dismissTimer; interval: 1200; onTriggered: feedback.active = false }
-
-  component Indicator: Card {
-    id: card
-    required property real value
-    width: Theme.sidebarCardExpandedWidth
-    height: 36
-    radius: PanelStyle.radius
-    classicColor: PanelStyle.surface
-    Accessible.role: Accessible.ProgressBar
-    Accessible.name: "Brightness " + Math.round(value * 100) + "%"
-
-    Row {
-      anchors.centerIn: parent
-      spacing: 9
-      Image {
-        width: 16
-        height: 16
-        source: "icons/sun.svg"
-        sourceSize: Qt.size(32, 32)
-      }
-      Row {
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: 5
-        Repeater {
-          model: 10
-          Rectangle {
-            required property int index
-            width: 6
-            height: 6
-            radius: 3
-            color: index < Math.round(Theme.clamp01(card.value) * 10) ? Theme.colors.text
-                : Theme.colors.feedbackDotOff
-          }
-        }
-      }
-    }
+  // Só um OSD de cada vez: o de volume toma o lugar deste.
+  Connections {
+    target: Audio.State
+    function onKeyboardOutputVolumeChanged(value) { feedback.active = false; }
   }
+  Timer { id: dismissTimer; interval: Theme.osdHoldDuration; onTriggered: feedback.active = false }
 
   LazyLoader {
     id: feedback
@@ -82,11 +52,12 @@ Item {
       Shadow {
         visible: root.collapsed
         anchors.fill: indicator
-        cornerRadius: PanelStyle.radius
-        shadows: PanelStyle.controlShadows
+        cornerRadius: Theme.radiusCard
+        shadows: Theme.glassShadows
       }
-      Indicator {
+      OsdCard {
         id: indicator
+        iconName: "sun"
         x: root.collapsed ? 67 : 0
         y: root.collapsed ? 67 : 0
         value: root.value

@@ -1038,6 +1038,37 @@ PanelWindow {
                   Demo.NotificationSpecimen { kind: "arrival" }
                 }
               }
+
+              SectionBlock {
+                title: "OSDs (ficha 10, board 13:14610) · 10 pontos, 1200 ms depois do último evento"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Brilho 70% · 7 pontos"
+                  stageWidth: 156; stageHeight: 36
+                  OsdCard { iconName: "sun"; value: 0.7 }
+                }
+                Specimen {
+                  caption: "Volume 60% · 6 pontos"
+                  stageWidth: 156; stageHeight: 36
+                  OsdCard { iconName: "volume-2"; value: 0.6 }
+                }
+                Specimen {
+                  caption: "Brilho 3% · mínimo de 1 ponto (P-08)"
+                  stageWidth: 156; stageHeight: 36
+                  OsdCard { iconName: "sun"; value: 0.03 }
+                }
+                Specimen {
+                  caption: "Volume no mudo · 0 pontos"
+                  stageWidth: 156; stageHeight: 36
+                  OsdCard { iconName: "volume-x"; value: 0 }
+                }
+                Specimen {
+                  caption: "Teclado 156×76 · layout atual com rádio marcado"
+                  stageWidth: 156; stageHeight: 76
+                  KeyboardLayoutCard { layouts: ["Português (BR)", "English (US)"]; activeIndex: 0 }
+                }
+              }
             }
 
             // =================================================================

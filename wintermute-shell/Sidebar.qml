@@ -87,13 +87,6 @@ PanelWindow {
       else if (command === "toggle" || !bluetoothPanel.opened) root.togglePanel("bluetooth");
     }
   }
-  Connections {
-    target: Audio.State
-    function onKeyboardOutputVolumeChanged(value) {
-      if (NiriMsg.focusedOutputName === "" || root.screen.name === NiriMsg.focusedOutputName)
-        controls.showKeyboardVolume();
-    }
-  }
 
   color: "transparent"
   BackgroundEffect.blurRegion: cardBlur
@@ -253,6 +246,11 @@ PanelWindow {
       collapsed: root.collapseProgress > 0.5
     }
     BrightnessFeedback {
+      screen: root.screen
+      collapseProgress: root.collapseProgress
+      expandedBottomMargin: Theme.sidebarOuterMargin + controls.height + 8
+    }
+    VolumeFeedback {
       screen: root.screen
       collapseProgress: root.collapseProgress
       expandedBottomMargin: Theme.sidebarOuterMargin + controls.height + 8

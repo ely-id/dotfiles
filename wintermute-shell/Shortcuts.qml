@@ -12,8 +12,8 @@ Scope {
 
   IpcHandler {
     target: "volume"
-    function increase(): void { Audio.State.adjustOutputVolume(0.02); }
-    function decrease(): void { Audio.State.adjustOutputVolume(-0.02); }
+    function increase(): void { Audio.State.adjustOutputVolume(0.10); }
+    function decrease(): void { Audio.State.adjustOutputVolume(-0.10); }
     function muteOutput(): void { Audio.State.toggleOutputMute(); }
     function muteInput(): void { Audio.State.toggleInputMute(); }
   }
@@ -25,8 +25,8 @@ Scope {
   }
   IpcHandler {
     target: "brightness"
-    function increase(): void { root.adjustBrightness(0.05); }
-    function decrease(): void { root.adjustBrightness(-0.05); }
+    function increase(): void { root.adjustBrightness(0.10); }
+    function decrease(): void { root.adjustBrightness(-0.10); }
   }
 
   function adjustBrightness(delta) {

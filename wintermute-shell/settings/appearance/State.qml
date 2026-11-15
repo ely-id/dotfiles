@@ -22,7 +22,7 @@ Singleton {
   property string error: ""
   signal keyboardBrightnessChanged(string outputName, real value)
   readonly property bool pickingWallpaper: picker.running
-  readonly property bool busy: action.running || launcherTheme.running || picker.running
+  readonly property bool busy: action.running || picker.running
   readonly property bool active: Settings.State.opened && Settings.State.page === "appearance"
   readonly property bool wallpapersActive: Settings.State.opened && Settings.State.page === "wallpaper"
   readonly property bool brightnessAvailable: display.brightness !== undefined && display.brightness !== null
@@ -82,12 +82,6 @@ Singleton {
       else if (root.active) root.refresh();
     }
   }
-  Process {
-    id: launcherTheme
-    onExited: exitCode => {
-      if (exitCode !== 0) root.error = "Theme saved, but the launcher theme could not be updated.";
-    }
-  }
   FileView {
     path: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/background"
     printErrors: false
@@ -122,9 +116,6 @@ Singleton {
       const result = JSON.parse(text);
       if (result.error) error = result.error;
       if (result.theme) {
-        const themed = ["chiba", "freeside", "sprawl"].includes(result.theme);
-        launcherTheme.command = ["vicinae", "theme", "set", themed ? "pond-" + result.theme : "default"];
-        launcherTheme.running = true;
         Shell.Theme.setName(result.theme);
         Shell.Theme.reload();
       }

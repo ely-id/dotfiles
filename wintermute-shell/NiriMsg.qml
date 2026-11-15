@@ -14,6 +14,11 @@ Singleton {
   property bool overviewOpen: false
   property var dragOrigin: null
   property bool _workspaceLauncherOpen: false
+  // Marcador até a F5 construir o launcher próprio (ficha 14): registra quando
+  // o "+" do organizador ou o foco num workspace vazio pediria o launcher, sem
+  // chamar o Vicinae externo.
+  property bool launcherPlaceholderOpen: false
+  property int launcherWorkspaceId: -1
   property var _windows: ({})
   property var _appInfoCache: ({})
   property ListModel workspaceRows: ListModel {}
@@ -34,11 +39,25 @@ Singleton {
     Quickshell.execDetached(["niri", "msg", "action", "focus-workspace", String(index)]);
   }
 
+  function _openLauncherPlaceholder(workspaceId, reason) {
+    _workspaceLauncherOpen = true;
+    launcherPlaceholderOpen = true;
+    launcherWorkspaceId = workspaceId !== undefined ? Number(workspaceId) : -1;
+    console.info("[Wintermute] Marcador do launcher (F5): abrir no workspace "
+        + launcherWorkspaceId + " (" + reason + ")");
+  }
+
+  function _closeLauncherPlaceholder(reason) {
+    _workspaceLauncherOpen = false;
+    launcherPlaceholderOpen = false;
+    console.info("[Wintermute] Marcador do launcher (F5): fechar (" + reason + ")");
+  }
+
   function openLauncher(workspaceId) {
     const workspace = workspaces.find(workspace => workspace.id === workspaceId);
     if (!workspace) return;
     _move(workspace.isFocused ? [] : [{ FocusWorkspace: { reference: { Id: workspaceId } } }], success => {
-      if (success) Quickshell.execDetached(["vicinae", "open"]);
+      if (success) _openLauncherPlaceholder(workspaceId, "botão + do organizador");
     });
   }
 
@@ -246,8 +265,7 @@ Singleton {
       }));
       if (a.focused && target && !target.isFocused && !dragOrigin && !overviewOpen
           && !Object.values(_windows).some(w => w.workspaceId === a.id)) {
-        _workspaceLauncherOpen = true;
-        Quickshell.execDetached(["vicinae", "open"]);
+        _openLauncherPlaceholder(a.id, "workspace vazio focado");
       }
     } else if (ev.WorkspaceActiveWindowChanged) {
       const a = ev.WorkspaceActiveWindowChanged;
@@ -295,8 +313,7 @@ Singleton {
     const focusedWorkspace = workspaces.find(w => w.isFocused);
     if (_workspaceLauncherOpen && (overviewOpen || (focusedWorkspace
         && Object.values(_windows).some(w => w.workspaceId === focusedWorkspace.id)))) {
-      _workspaceLauncherOpen = false;
-      Quickshell.execDetached(["vicinae", "close"]);
+      _closeLauncherPlaceholder(overviewOpen ? "overview aberto" : "janela aberta no workspace");
     }
     _recompute();
   }

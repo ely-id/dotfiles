@@ -14,41 +14,18 @@ Settings.Modal {
 
   property string previewTheme: ""
   readonly property var themes: [
-    { key: "north", label: "North", x: 247, y: 2, turn: 0, hoverFill: Qt.alpha("#B4C7E8", 0.3),
-      hoverGlyph: "#B4C7E8", activeFill: "#B4C7E8", activeGlyph: "#2F465C", labelColor: "#B4C7E8" },
-    { key: "daylight", label: "Daylight", x: 149, y: 101, turn: 0, hoverFill: "transparent",
-      hoverGlyph: "#F5E4C8", activeFill: "transparent", activeGlyph: "#FFF2DD" },
-    { key: "unthemed", label: "Unthemed", x: 247, y: 101, turn: 90, hoverFill: "#4C4C4C",
-      hoverGlyph: "white", activeFill: Qt.rgba(1, 1, 1, 0.8), activeGlyph: "#282828" },
-    { key: "hazel", label: "Hazel", x: 345, y: 101, turn: 90, hoverFill: Qt.alpha("#D3A95A", 0.3),
-      hoverGlyph: "#EBC98B", activeFill: "#EBC98B", activeGlyph: "#3C2E24", labelColor: "#EBC98B" },
-    { key: "wisteria", label: "Wisteria", x: 247, y: 199, turn: 45, hoverFill: Qt.alpha("#D1C9FF", 0.3),
-      hoverGlyph: "#D1C9FF", activeFill: "#D1C9FF", activeGlyph: "#38224D", labelColor: "#D1C9FF" }
+    { key: "chiba", label: "Chiba", x: 70, y: 88, accent: "#52C2F6", labelColor: "#75CEF8" },
+    { key: "freeside", label: "Freeside", x: 230, y: 88, accent: "#7F89E1", labelColor: "#B7BDEE" },
+    { key: "sprawl", label: "Sprawl", x: 390, y: 88, accent: "#F4A846", labelColor: "#F6B867" }
   ]
   function themeLabel(key) { return themes.find(theme => theme.key === key)?.label ?? ""; }
 
   Item {
-    width: root.width; height: 320
+    width: root.width; height: 240
     Text {
-      x: 60; y: 135; height: 25
-      text: "Theme:"; font.family: Shell.Theme.fontFamily; font.pixelSize: 15
-      color: Shell.Theme.colors.text; opacity: 0.7; verticalAlignment: Text.AlignVCenter
-    }
-    Text {
-      x: 469; y: 135; height: 25
-      text: root.themeLabel(Shell.Theme.name)
-      font.family: Shell.Theme.fontFamily; font.pixelSize: 15
-      color: root.themes.find(theme => theme.key === Shell.Theme.name)?.labelColor
-          ?? Qt.alpha(Shell.Theme.colors.selection, 0.7)
-      verticalAlignment: Text.AlignVCenter
-    }
-    Text {
-      x: 469; y: 159; height: 25
-      text: root.previewTheme !== Shell.Theme.name ? root.themeLabel(root.previewTheme) : ""
-      font.family: Shell.Theme.fontFamily; font.pixelSize: 15
-      color: Qt.alpha(Shell.Theme.colors.text, 0.7); verticalAlignment: Text.AlignVCenter
-      opacity: text ? 1 : 0
-      Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+      x: 30; y: 64; height: 20
+      text: "Variation"; font.family: Shell.Theme.fontFamily; font.pixelSize: 13; font.weight: Font.Medium
+      color: Shell.Theme.muted; verticalAlignment: Text.AlignVCenter
     }
     Repeater {
       model: root.themes
@@ -68,7 +45,7 @@ Settings.Modal {
   }
   Column {
     id: fields
-    x: 30; y: 320; width: root.width - 60; spacing: 8
+    x: 30; y: 260; width: root.width - 60; spacing: 8
     Accordion {
       objectName: "wallpaperSection"
       width: parent.width; title: "Wallpaper"

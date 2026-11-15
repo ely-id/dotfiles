@@ -1,23 +1,16 @@
 import QtQuick
 import QtQuick.Effects
+import "../.." as Shell
 
 Item {
   id: root
   required property var theme
   property bool selected: false
   readonly property bool hovered: pointer.containsMouse || activeFocus
-  readonly property Gradient fill: theme.key === "daylight" ? daylightFill : null
-  // Retarget from the current values when hover or selection interrupts motion.
-  property real emphasis: hovered || selected ? 1 : 0
-  property real selection: selected ? 1 : 0
-  property color glyph: selected ? theme.activeGlyph : hovered ? theme.hoverGlyph : "white"
-  Behavior on emphasis { NumberAnimation { duration: 250; easing.type: Easing.InOutCubic } }
-  Behavior on selection { NumberAnimation { duration: 250; easing.type: Easing.InOutCubic } }
-  Behavior on glyph { ColorAnimation { duration: 250; easing.type: Easing.InOutCubic } }
   signal clicked
-  implicitWidth: 90; implicitHeight: 90
+  implicitWidth: 120; implicitHeight: 116
   activeFocusOnTab: true
-  Accessible.role: Accessible.Button
+  Accessible.role: Accessible.RadioButton
   Accessible.name: theme.label
   Accessible.checkable: true
   Accessible.checked: selected
@@ -25,41 +18,50 @@ Item {
   Keys.onReturnPressed: clicked()
   Keys.onSpacePressed: clicked()
 
-  Gradient {
-    id: daylightFill
-    GradientStop { position: 0; color: "#496070" }
-    GradientStop { position: 1; color: "#E7BDA7" }
-  }
   Rectangle {
-    anchors.fill: parent; radius: width / 2
-    color: Qt.rgba(1, 1, 1, 0.1)
-    opacity: 1 - root.emphasis
+    id: disc
+    x: 16; y: 0
+    width: 88; height: 88; radius: 44
+    color: root.selected ? Shell.Theme.accentSubtle
+        : root.hovered ? Shell.Theme.hover : Shell.Theme.control
+    border.width: root.selected ? 2 : 1
+    border.color: root.selected ? Shell.Theme.accentRing : Shell.Theme.border
+    Behavior on color { ColorAnimation { duration: Shell.Theme.hoverDuration; easing.type: Easing.OutCubic } }
+
+    Rectangle {
+      objectName: "themeSymbol"
+      x: 24; y: 24
+      width: 40; height: 40; radius: 20
+      color: root.theme.accent
+    }
+
+    Rectangle {
+      visible: root.selected
+      x: 60; y: 60
+      width: 24; height: 24; radius: 12
+      color: Shell.Theme.accent
+      Image {
+        anchors.centerIn: parent
+        width: 16; height: 16
+        source: Qt.resolvedUrl("../../icons/check.svg")
+        sourceSize: Qt.size(32, 32)
+        layer.enabled: true
+        layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.textOnAccent }
+      }
+    }
   }
-  Rectangle {
-    anchors.fill: parent; radius: width / 2
-    color: root.theme.hoverFill
-    gradient: root.fill
-    opacity: root.emphasis * (1 - root.selection) * (root.fill ? 0.5 : 1)
+
+  Text {
+    y: 100
+    width: parent.width
+    horizontalAlignment: Text.AlignHCenter
+    text: root.theme.label
+    font.family: Shell.Theme.fontFamily
+    font.weight: Font.Medium
+    font.pixelSize: 13
+    color: root.selected || root.hovered ? Shell.Theme.text : Shell.Theme.muted
   }
-  Rectangle {
-    anchors.fill: parent; radius: width / 2
-    color: root.theme.activeFill
-    gradient: root.fill
-    opacity: root.selection
-  }
-  // Only the symbol moves; the background disc stays fixed.
-  Image {
-    objectName: "themeSymbol"
-    anchors.centerIn: parent
-    width: 52; height: 52
-    source: Qt.resolvedUrl("../../assets/appearance/" + root.theme.key + "-symbol.svg")
-    sourceSize: Qt.size(104, 104)
-    rotation: root.theme.turn * (1 - root.emphasis)
-    scale: (40 + 12 * root.emphasis) / 52
-    opacity: 0.6 + 0.4 * root.emphasis
-    layer.enabled: true
-    layer.effect: MultiEffect { colorization: 1; colorizationColor: root.glyph }
-  }
+
   MouseArea {
     id: pointer; anchors.fill: parent; hoverEnabled: true
     cursorShape: Qt.PointingHandCursor

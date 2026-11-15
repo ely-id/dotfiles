@@ -101,9 +101,9 @@ def step_brightness(output, delta):
 
 
 def theme(name):
-    if name not in ("daylight", "unthemed", "hazel", "wisteria", "north"):
+    if name not in ("chiba", "freeside", "sprawl"):
         raise ValueError("Unknown theme")
-    atomic_write(CONFIG / "pond-interface/theme.json", json.dumps({"theme": name}) + "\n")
+    atomic_write(CONFIG / "wintermute-shell/theme.json", json.dumps({"theme": name}) + "\n")
     return {"theme": name}
 
 

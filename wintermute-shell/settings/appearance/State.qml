@@ -122,9 +122,10 @@ Singleton {
       const result = JSON.parse(text);
       if (result.error) error = result.error;
       if (result.theme) {
-        const themed = ["hazel", "wisteria", "north"].includes(result.theme);
+        const themed = ["chiba", "freeside", "sprawl"].includes(result.theme);
         launcherTheme.command = ["vicinae", "theme", "set", themed ? "pond-" + result.theme : "default"];
         launcherTheme.running = true;
+        Shell.Theme.setName(result.theme);
         Shell.Theme.reload();
       }
       if (result.mode) wallpaperFile.reload();
@@ -157,6 +158,7 @@ Singleton {
   function applyWallpaper(args) { apply(args, "wallpaper/control.py"); }
   function selectTheme(theme) {
     if (busy) return;
+    Shell.Theme.setName(theme);
     apply(["theme", theme]);
   }
   function selectDynamic() { applyWallpaper(["set", "dynamic"]); }

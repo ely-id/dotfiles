@@ -9,19 +9,20 @@ Motion das notificações: 180 ms.
 
 ## Central — 280 de largura, raio 16 (prévia 316 de altura com 3 itens)
 
-- Cabeçalho altura 60: “N notificações” Geist Serif 20 em (16,16); “Limpar tudo” `muted` à direita.
-- Divisor y 60, largura total 280.
-- Item: padding 16; ícone 16; título e hora 11 `muted`; corpo 13 Medium, line-height 16, largura 248, y 40.
-- Altura do item = 40 + linhas×16 + 16.
-- Hover do item: fundo `hover` raio 10 (inset 4) e botão fechar 24×24 raio 6 (`pressed`) no canto. A hora encolhe para dar lugar ao X.
+- Cabeçalho altura 60: “N notificações” Geist Serif 20 em (16,16); “Limpar tudo” 13 Medium `muted` à direita (`text` no hover).
+- Divisor y 60, largura total 280. Os divisores entre itens têm 16 de margem (x 16, 248 de largura) e ocupam 1 px a mais na altura do item.
+- Item: padding 16; ícone 16 em (16,16); **nome do app 13 `muted` em x 40 e hora 11 `muted` à direita** (a ficha dizia 11 para os dois, mas no print o nome do app tem a altura de 13 e a hora de 11); corpo 13 Medium, line-height 16, largura 248, y 40. O nome do app vem de `appName`, e o corpo junta resumo e texto (`Elo: o mercado chega às 18h…`).
+- Altura do item = 40 + linhas×16 + 16 (mais 1 px de divisor, menos no último). Até 3 linhas.
+- Respiro de 22 px embaixo da lista, medido no print (60 + 73 + 89 + 72 + 22 = 316 com 3 itens).
+- Hover do item: fundo `hover` raio 10 (inset 4) e botão fechar 24×24 raio 6 (`pressed`) em (largura − 40, 13). A hora recua 32 para dar lugar ao X.
 
 ## Toast (barra recolhida) — 288×88, raio 16
 
-- Mesma anatomia de um item (ícone, app `muted`, hora, corpo), sem lista. Aparece quando a barra está recolhida.
+- Mesma anatomia de um item (ícone, app `muted`, hora, corpo), sem lista, com 288 de largura (o corpo fica com 256). Aparece quando a barra está recolhida.
 
 ## Chegando no cartão da barra — 156×156
 
-- O cartão de notificações cresce de 48 para 156 em **300 ms** e mostra uma prévia 140×104 raio 12, fundo `control` + `border`, a partir de (8,44).
+- O cartão de notificações cresce de 48 para 156 em **300 ms** e mostra uma prévia 140×104 raio 12, fundo `control` + `border`, a partir de (8,44). Na prévia: sem ícone de app, padding 12, nome do app e hora 11 `muted` em y 12, corpo 13 Medium em y 36, altura 36 + linhas×16 + 20 (3 linhas = 104).
 
 ## OSDs
 

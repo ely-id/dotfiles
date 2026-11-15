@@ -15,7 +15,7 @@
 - Três botões 76×40 raio 8 em x 20 / 102 / 184, y 156: ícone 16 centrado. Selecionado: `accentSubtle` + `accentRing`. Repouso: `control` + `border`.
 - Rótulos 11 centrados em y 200, largura 76: Economia, Equilibrado, Desempenho. O selecionado usa `text`; os outros `muted`.
 
-Ícones nas prévias do pop-up: `leaf`, `gauge`, `rocket`.
+Ícones nas prévias do pop-up: `leaf`, `gauge`, `rocket`. **Vale `zap` no terceiro botão**, igual à tela inicial dos Ajustes (P-07, 2026-11-15).
 
 ## Alerta de bateria baixa
 
@@ -23,4 +23,4 @@
 
 ## A CONFIRMAR
 
-- Na tela inicial dos Ajustes (ficha 13) o terceiro perfil foi desenhado com ícone `zap`, não `rocket`. Qual dos dois fica? Não misture; pergunte se for implementar os dois lugares antes da resposta.
+- ~~Na tela inicial dos Ajustes (ficha 13) o terceiro perfil foi desenhado com ícone `zap`, não `rocket`. Qual dos dois fica?~~ Definido em 2026-11-15 (P-07): `zap` nos dois lugares, no pop-up da bateria e nos Ajustes.

@@ -40,7 +40,12 @@
 ## Status — 112
 
 - “Conectando…” com 3 pontos `accent` (opacidade 1 / 0,6 / 0,3), ou “Conectado” `successText` + check, ou “Senha incorreta” `dangerText` + alerta. Título Serif 20 centrado.
-- Fecha sozinho 1,5 s depois de conectar (comportamento da Pond — herdar o tempo do código; se não existir, **A CONFIRMAR**, não inventar outro).
+- Fecha sozinho 1,5 s (`1500 ms`) depois de conectar. É o tempo que a Pond já define em `wifi/Panel.qml:46` (`420 ms` nas outras ações). Confirmado em 2026-11-15 (P-09).
+
+## Rede cabeada
+
+- Quando há cabo conectado, o botão da barra e a linha da lista de redes usam o ícone Lucide `cable`, no lugar de `ethernet.svg` e `ethernet-no-internet.svg` da origem. Definido em 2026-11-15 (P-39).
+- O SVG `cable` entra em `wintermute-shell/icons/` na `F3-T02`. Como o estado "cabo sem internet" se diferencia (a origem trocava de arquivo) é visto nessa tarefa, sem inventar valor.
 
 ## Dados
 

@@ -12,7 +12,7 @@
 - Quatro cartões: Aparência, Bluetooth, Sistema, Informações. (Wi-Fi e Som continuam pelos controles da barra; Bluetooth também tem cartão aqui.)
 - Botão de sessão **128×128** raio 12, passo **136** (Pond 127). Círculo 80×80 raio 40 em (24,24), ícone 20 no centro. Hover de Desligar: o botão inteiro vira `danger` e o nome aparece à direita em Serif 32 `dangerText`, **60 ms depois**. Bloquear / Suspender / Reiniciar: o mesmo padrão com a cor de acento (não com perigo). Ponto `dangerText` 8×8 no Desligar em repouso.
 - Bandeja no topo (ícones 16 em botões 36×36 raio 6, faixa 204×44 raio 8).
-- Perfil de energia na borda direita: coluna 48×136 com três botões ícone 40 (Economia, Equilibrado selecionado, Desempenho). Ver *A CONFIRMAR* do ícone `zap` vs `rocket` na ficha 08.
+- Perfil de energia na borda direita: coluna 48×136 com três botões ícone 40 (Economia, Equilibrado selecionado, Desempenho). O ícone do Desempenho é `zap`, o mesmo do pop-up da bateria (P-07, 2026-11-15).
 - Selo de atualização embaixo: pílula `accentSubtle`, ícone + “N atualizações disponíveis” `accentText`. A contagem vem do estado do Cachy Update (decidido em 2026-11-14, P-32).
 - Entrada: cada cartão 0,86→1 em ordem aleatória, **28 ms** entre eles, cada um em 32 ms (`settings/Window.qml:369-421`). Fechar 180 ms.
 
@@ -76,5 +76,5 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado, Fus
 
 ## A CONFIRMAR
 
-- Ícone do perfil Desempenho na home: `zap` aqui vs `rocket` no pop-up da bateria (ficha 08).
+- ~~Ícone do perfil Desempenho na home: `zap` aqui vs `rocket` no pop-up da bateria (ficha 08).~~ Definido em 2026-11-15 (P-07): `zap` nos dois lugares.
 - O tutorial do Manual da Pond era um SVG de 2,9 MB não baixado. Seguir o layout do Figma (440×240).

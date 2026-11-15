@@ -257,7 +257,7 @@ Shell.Card {
                   readonly property bool addSlot: index === expandedWorkspace.windowItems.length
                   readonly property bool plusRevealed: addSlot && root.collapseProgress === 0
                       && expandedWorkspace.matchesOutput && !dragSession.active && (rowHover.hovered
-                          || (!expandedWorkspace.model.outputHasWindows && expandedWorkspace.model.isCreationRow))
+                          || Boolean(expandedWorkspace.model && !expandedWorkspace.model.outputHasWindows && expandedWorkspace.model.isCreationRow))
                   readonly property var windowData: hasWindow
                       ? expandedWorkspace.windowItems[index] : ({})
                   readonly property bool emptyWorkspaceActive: index === 0

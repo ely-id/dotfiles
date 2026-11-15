@@ -135,6 +135,7 @@ Item {
 
           IconImage {
             anchors.centerIn: parent
+            implicitSize: width
             width: 16
             height: 16
             source: button.modelData.icon

@@ -73,6 +73,7 @@ Rectangle {
     x: 16
     anchors.verticalCenter: parent.verticalCenter
     width: parent.width - x - root.rightPadding
+    enabled: root.visualState === ""
     color: Theme.text
     selectionColor: Theme.accentSubtle
     selectedTextColor: Theme.text

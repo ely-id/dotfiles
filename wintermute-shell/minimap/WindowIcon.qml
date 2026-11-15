@@ -58,6 +58,7 @@ Item {
   IconImage {
     anchors.centerIn: parent
     visible: (root.windowData.iconSource || "") !== ""
+    implicitSize: width
     width: Shell.Theme.workspaceIconSize * (root.lifted ? Shell.Theme.workspaceDragGlyphScale : 1)
     height: width
     source: root.windowData.iconSource || ""

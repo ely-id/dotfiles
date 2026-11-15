@@ -93,6 +93,7 @@ Item {
             required property var modelData
             required property int index
 
+            implicitSize: width
             width: Notifications.Style.summaryIconSize
             height: Notifications.Style.summaryIconSize
             source: modelData.iconSource || ""

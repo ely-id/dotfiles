@@ -62,6 +62,7 @@ Item {
     visible: !root.inlinePreview
     x: root.padding
     y: 16
+    implicitSize: width
     width: root.iconSize
     height: width
     source: Notifications.State.iconSource(root.notification || ({}))

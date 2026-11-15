@@ -9,10 +9,10 @@ Item {
   id: root
 
   property string text: ""
-  property color textColor: Shell.Theme.sidebarForeground
+  property color textColor: Shell.Theme.text
   property string fontFamily: Shell.Theme.fontFamily
   property int fontWeight: Font.Normal
-  property real fontPixelSize: 13
+  property real fontPixelSize: Shell.Theme.fontBody
   property bool playing: false
   property int startDelay: 900
   property int pixelsPerSecond: 22
@@ -71,6 +71,7 @@ Item {
     font.family: root.fontFamily
     font.weight: root.fontWeight
     font.pixelSize: root.fontPixelSize
+    font.letterSpacing: 0
     verticalAlignment: Text.AlignVCenter
     wrapMode: Text.NoWrap
   }
@@ -85,6 +86,7 @@ Item {
     font.family: root.fontFamily
     font.weight: root.fontWeight
     font.pixelSize: root.fontPixelSize
+    font.letterSpacing: 0
     verticalAlignment: Text.AlignVCenter
     wrapMode: Text.NoWrap
   }
@@ -98,8 +100,8 @@ Item {
     gradient: Gradient {
       orientation: Gradient.Horizontal
       GradientStop { position: 0; color: Qt.rgba(1, 1, 1, 1 - root.leftFadeAmount) }
-      GradientStop { position: root.leftFadeWidth / Math.max(1, root.width); color: Shell.Theme.colors.text }
-      GradientStop { position: 1 - Math.min(14 / Math.max(1, root.width), 1 / 3); color: Shell.Theme.colors.text }
+      GradientStop { position: root.leftFadeWidth / Math.max(1, root.width); color: Shell.Theme.text }
+      GradientStop { position: 1 - Math.min(14 / Math.max(1, root.width), 1 / 3); color: Shell.Theme.text }
       GradientStop { position: 1; color: "transparent" }
     }
   }

@@ -3,19 +3,39 @@ import Quickshell
 import ".." as Shell
 import "../battery" as Battery
 
+// Cartão de relógio + bateria da barra lateral (ficha 04):
+// Aberto: 156×76 (116 com aviso de bateria baixa, 56 sem bateria), raio 16.
+//   Hora Geist Serif 36 em (12,8) 88×40 sem AM/PM; chip da data 40×40 r8 em (104,8)
+//   borderStrong; trilho da bateria 132×4 r2 em (12,60) track + carga text 80%.
+// Recolhido: 48×156 (112 sem bateria), raio 16.
+//   Hora em duas linhas Geist Mono Regular 13 (y 8 / 28), divisor em y 56,
+//   dia abreviado 2 letras muted (y 64) + dia (y 84), divisor em y 112,
+//   bateria 16 numa caixa 32×32 r8 em (8,116).
 Shell.Card {
   id: root
 
   property real collapseProgress: 0
   property date previewTime: systemClock.date
+  // Permite fixar hover na hora ou simular bateria para demonstração visual
+  property bool forceTimeHovered: false
+  property bool previewBattery: false
+  property real previewBatteryPercentage: 76
   signal clicked
   signal batteryClicked
-  readonly property bool battery: Battery.State.present
-  readonly property bool low: Battery.State.low
-  readonly property color batteryColor: Battery.State.charging ? "#CBE25B"
-      : low ? Battery.State.lowColor : Shell.Theme.sidebarForeground
+
+  readonly property bool battery: previewBattery || Battery.State.present
+  readonly property bool low: !previewBattery && Battery.State.low
+  readonly property real effectiveBatteryPercentage: previewBattery
+      ? previewBatteryPercentage : Battery.State.percentage
+  readonly property color batteryFillColor: (!previewBattery && Battery.State.charging) ? Shell.Theme.success
+      : low ? Shell.Theme.danger : Shell.Theme.text
+  readonly property color batteryIconColor: (!previewBattery && Battery.State.charging) ? Shell.Theme.successText
+      : low ? Shell.Theme.dangerText : Shell.Theme.text
+  readonly property var weekdaysShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"]
+  readonly property var weekdaysCompact: ["DM", "SG", "TR", "QA", "QI", "SX", "SB"]
+
   Accessible.role: Accessible.Button
-  Accessible.name: "Open calendar"
+  Accessible.name: "Abrir calendário"
   Accessible.onPressAction: clicked()
 
   MouseArea {
@@ -26,17 +46,14 @@ Shell.Card {
 
   implicitWidth: Shell.Theme.lerp(Shell.Theme.sidebarCardExpandedWidth,
       Shell.Theme.sidebarCardCollapsedWidth, Shell.Theme.collapseWidth(collapseProgress))
-  implicitHeight: Shell.Theme.lerp(battery ? (low ? 115 : 75) : Shell.Theme.sidebarTimeExpandedHeight,
-      battery ? 155 : 113, Shell.Theme.collapseHeight(collapseProgress))
-  radius: Shell.Theme.lerp(12, Shell.Theme.sidebarCardRadius, Shell.Theme.collapseWidth(collapseProgress))
-  color: Shell.Theme.translucent
-      ? (cardHovered && !battery ? Shell.Theme.sidebarCardHoverFill : Shell.Theme.sidebarCardFill)
-      : classicColor
+  implicitHeight: Shell.Theme.lerp(
+      battery ? (low ? 116 : Shell.Theme.clockExpandedHeight) : 56,
+      battery ? Shell.Theme.clockCollapsedHeight : 112,
+      Shell.Theme.collapseHeight(collapseProgress))
+  radius: Shell.Theme.sidebarCardRadius
 
-  readonly property real expandedOpacity:
-      collapseProgress < 0.56 ? 1 : 0
-  readonly property real collapsedProgress:
-      collapseProgress >= 0.56 ? 1 : 0
+  readonly property real expandedOpacity: collapseProgress < 0.56 ? 1 : 0
+  readonly property real collapsedProgress: collapseProgress >= 0.56 ? 1 : 0
 
   SystemClock {
     id: systemClock
@@ -55,85 +72,69 @@ Shell.Card {
       y: 4
       width: 148
       height: 50
-      topLeftRadius: 8
-      topRightRadius: 8
-      bottomLeftRadius: 2
-      bottomRightRadius: 2
-      color: Qt.rgba(1, 1, 1, 0.08)
-      visible: root.battery
-      opacity: timeHover.hovered ? 1 : 0
+      radius: 8
+      color: Shell.Theme.hover
+      opacity: (timeHover.hovered || root.forceTimeHovered) ? 1 : 0
+      Behavior on opacity { Shell.HoverAnimation {} }
       HoverHandler { id: timeHover }
     }
 
     Text {
       id: timeText
-
       x: 12
       y: 8
-      height: 42
-      // An unpadded hour leaves room for AM/PM beside every possible time.
-      text: Qt.formatTime(root.previewTime, "h:mm AP").split(" ")[0]
-      color: Shell.Theme.sidebarForeground
+      width: 88
+      height: 40
+      text: Qt.formatTime(root.previewTime, "h:mm")
+      color: Shell.Theme.text
       font.family: Shell.Theme.titleFontFamily
       font.weight: Font.Normal
-      font.pixelSize: 39
+      font.pixelSize: Shell.Theme.clockTimeSize
+      font.letterSpacing: 0
       verticalAlignment: Text.AlignVCenter
-    }
-
-    FontMetrics { id: periodMetrics; font: periodText.font }
-
-    Text {
-      id: periodText
-
-      x: timeText.x + Math.ceil(timeText.implicitWidth - timeText.font.letterSpacing) + 4
-      y: 35 + periodMetrics.capitalHeight - baselineOffset
-      text: Qt.formatTime(root.previewTime, "AP")
-      color: Shell.Theme.sidebarForeground
-      opacity: 0.7
-      font.family: Shell.Theme.fontFamily
-      font.weight: Font.Medium
-      font.pixelSize: 11
+      horizontalAlignment: Text.AlignLeft
     }
 
     Rectangle {
       id: dateBox
-
       x: 104
-      y: 9
-      width: 40
-      height: 40
-      radius: 6
+      y: 8
+      width: Shell.Theme.dateChipSize
+      height: Shell.Theme.dateChipSize
+      radius: Shell.Theme.dateChipRadius
       color: "transparent"
       border.width: 1
-      border.color: Shell.Theme.colors.clockChipBorder
+      border.color: Shell.Theme.borderStrong
       antialiasing: true
 
-      FontMetrics { id: dateMetrics; font: weekdayText.font }
-
       Text {
-        id: weekdayText
-
-        x: 1
-        y: 9 + dateMetrics.capitalHeight - baselineOffset
-        width: parent.width - 2
-        text: Qt.formatDateTime(root.previewTime, "ddd")
-        color: Shell.Theme.sidebarForeground
+        x: 0
+        y: 4
+        width: parent.width
+        height: 16
+        text: root.weekdaysShort[root.previewTime.getDay()] || "sex"
+        color: Shell.Theme.muted
         font.family: Shell.Theme.fontFamily
-        font.weight: Font.Normal
-        font.pixelSize: 13
+        font.weight: Font.Medium
+        font.pixelSize: Shell.Theme.fontCaption
+        font.letterSpacing: 0
         horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
       }
 
       Text {
-        x: 1
-        y: 22 + dateMetrics.capitalHeight - baselineOffset
-        width: parent.width - 2
+        x: 0
+        y: 20
+        width: parent.width
+        height: 16
         text: String(root.previewTime.getDate())
-        color: Shell.Theme.sidebarForeground
+        color: Shell.Theme.text
         font.family: Shell.Theme.fontFamily
-        font.weight: Font.Normal
-        font.pixelSize: 13
+        font.weight: Font.Medium
+        font.pixelSize: Shell.Theme.fontBody
+        font.letterSpacing: 0
         horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
       }
     }
 
@@ -142,80 +143,73 @@ Shell.Card {
       y: 54
       width: 148
       height: batteryArea.height
-      topLeftRadius: 2
-      topRightRadius: 2
-      bottomLeftRadius: 8
-      bottomRightRadius: 8
-      color: root.low ? Qt.alpha(Battery.State.lowColor, 0.08) : Qt.rgba(1, 1, 1, 0.08)
+      radius: 8
+      color: root.low ? Qt.alpha(Shell.Theme.danger, 0.12) : Shell.Theme.hover
       visible: batteryArea.containsMouse
     }
 
     Rectangle {
       x: 12
-      y: 61
-      width: 132
-      height: 2
-      radius: 1
+      y: 60
+      width: Shell.Theme.batteryTrackWidth
+      height: Shell.Theme.batteryTrackHeight
+      radius: 2
       visible: root.battery
-      color: root.low ? Battery.State.lowColor : Shell.Theme.sidebarForeground
-      opacity: 0.2
+      color: Shell.Theme.track
+      antialiasing: true
     }
 
     Rectangle {
       id: batteryFill
       x: 12
-      y: 61
-      width: 132 * Battery.State.percentage / 100
-      height: 2
-      radius: 1
-      visible: root.battery
-      color: root.batteryColor
-      opacity: root.low || Battery.State.charging || batteryArea.containsMouse ? 1 : 0.7
+      y: 60
+      width: Math.round(Shell.Theme.batteryTrackWidth * root.effectiveBatteryPercentage / 100)
+      height: Shell.Theme.batteryTrackHeight
+      radius: 2
+      visible: root.battery && width > 0
+      color: root.batteryFillColor
+      opacity: root.low || (!root.previewBattery && Battery.State.charging) || batteryArea.containsMouse ? 1.0 : 0.8
+      antialiasing: true
     }
 
     Rectangle {
       x: Math.max(12, Math.min(144 - width, batteryFill.x + batteryFill.width - width))
-      y: 56
-      width: badgeText.implicitWidth + 8
-      height: 13
-      radius: height / 2
-      color: root.batteryColor
+      y: 54
+      width: Math.ceil(badgeText.implicitWidth) + 8
+      height: 16
+      radius: 8
+      color: root.batteryFillColor
       visible: batteryArea.containsMouse
-
-      FontMetrics { id: badgeMetrics; font: badgeText.font }
 
       Text {
         id: badgeText
-        x: 4
-        y: (parent.height - badgeMetrics.capitalHeight) / 2 + badgeMetrics.capitalHeight - baselineOffset
-        text: Battery.State.level + "%"
-        color: "#1D1D1D"
-        font.family: Shell.Theme.fontFamily
-        font.styleName: "Bold"
-        font.pixelSize: 11
+        anchors.centerIn: parent
+        text: Math.round(root.effectiveBatteryPercentage) + "%"
+        color: Shell.Theme.textOnAccent
+        font.family: Shell.Theme.monoFontFamily
+        font.weight: Font.Medium
+        font.pixelSize: Shell.Theme.fontMonoCaption
+        font.letterSpacing: 0
       }
     }
 
     Rectangle {
       x: 12
-      y: 71
+      y: 72
       width: 132
       height: 32
-      radius: 4
+      radius: 8
       visible: root.low
-      color: Qt.alpha(Battery.State.lowColor, 0.1)
-
-      FontMetrics { id: bannerMetrics; font: bannerText.font }
+      color: Qt.alpha(Shell.Theme.danger, 0.12)
 
       Text {
-        id: bannerText
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: (parent.height - bannerMetrics.capitalHeight) / 2 + bannerMetrics.capitalHeight - baselineOffset
-        text: "Battery at " + Battery.State.level + "%"
-        color: Battery.State.lowColor
+        anchors.centerIn: parent
+        text: "Bateria em " + Battery.State.level + "%"
+        color: Shell.Theme.dangerText
         font.family: Shell.Theme.fontFamily
         font.weight: Font.Medium
-        font.pixelSize: 13
+        font.pixelSize: Shell.Theme.fontBody
+        font.letterSpacing: 0
       }
     }
 
@@ -224,13 +218,13 @@ Shell.Card {
       x: 4
       y: 54
       width: 148
-      height: root.low ? 57 : 17
+      height: root.low ? 58 : 18
       visible: root.battery
       hoverEnabled: true
       cursorShape: Qt.PointingHandCursor
       onClicked: root.batteryClicked()
       Accessible.role: Accessible.Button
-      Accessible.name: "Open battery"
+      Accessible.name: "Abrir bateria"
       Accessible.description: Battery.State.description
       Accessible.onPressAction: root.batteryClicked()
     }
@@ -242,115 +236,103 @@ Shell.Card {
     height: parent.height
     visible: root.collapsedProgress > 0.001
 
-    readonly property real topPadding: 16
-    readonly property real lineStep: 13
-    readonly property real dateTop: 75
-    readonly property color dividerColor: Shell.Theme.sidebarDivider
-    FontMetrics {
-      id: compactMetrics
-      font.family: Shell.Theme.plexFontFamily
-      font.pixelSize: 13
-    }
-
     Text {
       x: 0
-      y: collapsedContent.topPadding + compactMetrics.capitalHeight - baselineOffset
-      width: parent.width
-      text: Qt.formatTime(root.previewTime, "hh AP").split(" ")[0]
-      color: Shell.Theme.sidebarForeground
+      y: 8
+      width: 48
+      height: 20
+      text: Qt.formatTime(root.previewTime, "hh")
+      color: Shell.Theme.text
       opacity: Shell.Theme.ramp(root.collapsedProgress, 0.00, 0.32)
-      font.family: Shell.Theme.plexFontFamily
+      font.family: Shell.Theme.monoFontFamily
       font.weight: Font.Normal
-      font.pixelSize: 13
+      font.pixelSize: Shell.Theme.fontMonoNumber
+      font.letterSpacing: 0
       horizontalAlignment: Text.AlignHCenter
+      verticalAlignment: Text.AlignVCenter
     }
 
     Text {
       x: 0
-      y: collapsedContent.topPadding + collapsedContent.lineStep + compactMetrics.capitalHeight - baselineOffset
-      width: parent.width
+      y: 28
+      width: 48
+      height: 20
       text: Qt.formatTime(root.previewTime, "mm")
-      color: Shell.Theme.sidebarForeground
+      color: Shell.Theme.text
       opacity: Shell.Theme.ramp(root.collapsedProgress, 0.12, 0.44)
-      font.family: Shell.Theme.plexFontFamily
+      font.family: Shell.Theme.monoFontFamily
       font.weight: Font.Normal
-      font.pixelSize: 13
+      font.pixelSize: Shell.Theme.fontMonoNumber
+      font.letterSpacing: 0
       horizontalAlignment: Text.AlignHCenter
-    }
-
-    Text {
-      x: 0
-      y: collapsedContent.topPadding + 2 * collapsedContent.lineStep + compactMetrics.capitalHeight - baselineOffset
-      width: parent.width
-      text: Qt.formatTime(root.previewTime, "AP")
-      color: Shell.Theme.sidebarForeground
-      opacity: 0.3 * Shell.Theme.ramp(root.collapsedProgress, 0.24, 0.56)
-      font.family: Shell.Theme.plexFontFamily
-      font.weight: Font.Normal
-      font.pixelSize: 13
-      horizontalAlignment: Text.AlignHCenter
+      verticalAlignment: Text.AlignVCenter
     }
 
     Rectangle {
-      id: compactDivider
-      anchors.horizontalCenter: parent.horizontalCenter
-      y: 63 - height / 2
+      x: 16
+      y: 56
       width: 16
       height: 1
-      color: collapsedContent.dividerColor
+      color: Shell.Theme.border
       opacity: Shell.Theme.ramp(root.collapsedProgress, 0.36, 0.68)
     }
 
     Text {
       x: 0
-      y: collapsedContent.dateTop + compactMetrics.capitalHeight - baselineOffset
-      width: parent.width
-      text: Qt.formatDateTime(root.previewTime, "ddd").slice(0, 2).toUpperCase()
-      color: Shell.Theme.sidebarForeground
-      opacity: 0.5 * Shell.Theme.ramp(root.collapsedProgress, 0.48, 0.80)
-      font.family: Shell.Theme.plexFontFamily
+      y: 64
+      width: 48
+      height: 20
+      text: root.weekdaysCompact[root.previewTime.getDay()] || "SX"
+      color: Shell.Theme.muted
+      opacity: Shell.Theme.ramp(root.collapsedProgress, 0.48, 0.80)
+      font.family: Shell.Theme.monoFontFamily
       font.weight: Font.Normal
-      font.pixelSize: 13
+      font.pixelSize: Shell.Theme.fontMonoNumber
+      font.letterSpacing: 0
       horizontalAlignment: Text.AlignHCenter
+      verticalAlignment: Text.AlignVCenter
     }
 
     Text {
       x: 0
-      y: collapsedContent.dateTop + collapsedContent.lineStep + compactMetrics.capitalHeight - baselineOffset
-      width: parent.width
+      y: 84
+      width: 48
+      height: 20
       text: Qt.formatDate(root.previewTime, "dd")
-      color: Shell.Theme.sidebarForeground
+      color: Shell.Theme.text
       opacity: Shell.Theme.ramp(root.collapsedProgress, 0.60, 0.92)
-      font.family: Shell.Theme.plexFontFamily
+      font.family: Shell.Theme.monoFontFamily
       font.weight: Font.Normal
-      font.pixelSize: 13
+      font.pixelSize: Shell.Theme.fontMonoNumber
+      font.letterSpacing: 0
       horizontalAlignment: Text.AlignHCenter
+      verticalAlignment: Text.AlignVCenter
     }
 
     Rectangle {
-      anchors.horizontalCenter: parent.horizontalCenter
-      y: 110 - height / 2
+      x: 16
+      y: 112
       width: 16
       height: 1
       visible: root.battery
-      color: collapsedContent.dividerColor
+      color: Shell.Theme.border
     }
 
     Rectangle {
       x: 8
-      y: 115
+      y: 116
       width: 32
       height: 32
       radius: 8
       visible: root.battery
-      color: root.low ? Qt.alpha(Battery.State.lowColor, 0.1) : "transparent"
+      color: root.low ? Qt.alpha(Shell.Theme.danger, 0.12) : "transparent"
 
       Battery.Indicator {
         x: 8
         y: 8
-        percentage: Battery.State.percentage
-        charging: Battery.State.charging
-        color: root.low || Battery.State.charging ? root.batteryColor : Shell.Theme.colors.text
+        percentage: root.effectiveBatteryPercentage
+        charging: !root.previewBattery && Battery.State.charging
+        color: root.batteryIconColor
       }
 
       MouseArea {
@@ -358,7 +340,7 @@ Shell.Card {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.batteryClicked()
         Accessible.role: Accessible.Button
-        Accessible.name: "Open battery"
+        Accessible.name: "Abrir bateria"
         Accessible.description: Battery.State.description
         Accessible.onPressAction: root.batteryClicked()
       }

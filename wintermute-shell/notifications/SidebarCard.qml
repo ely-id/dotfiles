@@ -3,103 +3,153 @@ import Quickshell.Widgets
 import "." as Notifications
 import ".." as Shell
 
+// Cartão de notificações da barra lateral (ficha 04):
+// Aberto (156×48, r16):
+//   Vazio: ícone bell 16 em (16,16) + texto "Notificações" em (40,0) 104×48.
+//   Com itens: bell 16 em (16,16) + contagem em (40,0) + divisor 1×16 em (60,16)
+//     + até 3 ícones de app 16×16 em (72,16), (96,16), (120,16) (2º e 3º a 40%).
+// Recolhido (48×48, r16):
+//   bell 16 no centro (16,16) + ponto não lido 6×6 accent em (28,14) quando não vazio.
+// Chegando (ficha 10): cresce de 48 para 156 em 300 ms e mostra prévia 140×104 r12.
 Item {
   id: root
   property real collapseProgress: 0
+  // Propriedades opcionais para amostra visual no painel de demonstração
+  property int previewCount: -1
+  property var previewIcons: []
+
   readonly property alias blurRegion: background.blurRegion
   onYChanged: blurRegion.changed()
-  readonly property bool empty: Notifications.State.notificationCount === 0
+  readonly property int effectiveCount: previewCount >= 0
+      ? previewCount : Notifications.State.notificationCount
+  readonly property bool empty: effectiveCount === 0
+  readonly property real widthProgress: Shell.Theme.collapseWidth(collapseProgress)
+  readonly property real heightProgress: Shell.Theme.collapseHeight(collapseProgress)
   signal panelRequested
-  property real transientProgress: Notifications.State.transientVisible ? 1 : 0
-  readonly property real inlineAmount: transientProgress * (1 - Shell.Theme.collapseHeight(collapseProgress))
+
+  property real transientProgress: (previewCount < 0 && Notifications.State.transientVisible) ? 1 : 0
+  readonly property real inlineAmount: transientProgress * (1 - heightProgress)
   readonly property real previewOpacity: inlineAmount >= 0.54 ? 1 : 0
   readonly property var notification: Notifications.State.currentTransient
+
+  implicitWidth: Shell.Theme.lerp(Shell.Theme.sidebarCardExpandedWidth,
+      Shell.Theme.sidebarCardCollapsedWidth, widthProgress)
   implicitHeight: 48 + (47 + preview.height - 48) * inlineAmount
   Behavior on transientProgress { Shell.Motion {} }
 
   Shell.Card {
     id: background
     anchors.fill: parent
-    radius: root.empty ? 12 : Shell.Theme.sidebarCardRadius
+    radius: Shell.Theme.sidebarCardRadius
+
     Item {
       id: summary
       width: parent.width
       height: 48
-
       implicitHeight: Shell.Theme.sidebarSimpleRowHeight
 
-      Item {
-        id: primary
-        width: Notifications.Style.summaryIconSize + (root.empty ? 0 : 2 + caption.width)
-        opacity: root.previewOpacity && Notifications.State.notificationCount === 1 ? 0.5 : 1
-        x: Math.round(Shell.Theme.lerp(
-            Shell.Theme.sidebarRowHorizontalPadding,
-            (summary.width - width) / 2,
-            Shell.Theme.collapseWidth(root.collapseProgress)))
-        y: Math.round((Shell.Theme.sidebarSimpleRowHeight - height) / 2)
-        height: Notifications.Style.summaryIconSize
+      Image {
+        id: bellIcon
+        x: 16
+        y: 16
+        width: 16
+        height: 16
+        source: Qt.resolvedUrl("../icons/bell.svg")
+        sourceSize: Qt.size(32, 32)
+        fillMode: Image.PreserveAspectFit
+        smooth: true
+        antialiasing: true
+      }
 
-        Image {
-          width: Notifications.Style.summaryIconSize
-          height: Notifications.Style.summaryIconSize
-          source: Qt.resolvedUrl("../icons/bell.svg")
-          opacity: root.empty && !Shell.Theme.translucent ? 0.88 : 1
-          sourceSize: Qt.size(Notifications.Style.summaryIconSize * 2,
-                              Notifications.Style.summaryIconSize * 2)
-          fillMode: Image.PreserveAspectFit
-          smooth: true
-          antialiasing: true
-        }
+      // Ponto não lido 6×6 accent em (28,14) quando recolhido e com notificações
+      Rectangle {
+        x: 28
+        y: 14
+        width: 6
+        height: 6
+        radius: 3
+        color: Shell.Theme.accent
+        opacity: !root.empty ? Shell.Theme.ramp(root.widthProgress, 0.5, 1.0) : 0
+        visible: opacity > 0.001
+        antialiasing: true
+      }
+
+      // Conteúdo expandido (x >= 40)
+      Item {
+        x: 40
+        y: 0
+        width: Math.max(0, summary.width - 40)
+        height: 48
+        opacity: 1 - Shell.Theme.ramp(root.collapseProgress, 0, 0.31)
+        visible: opacity > 0.001
 
         Text {
           id: caption
-          x: Notifications.Style.summaryIconSize + (root.empty ? 8 : 2)
-          y: 3 + metrics.capitalHeight - baselineOffset
-          width: root.empty ? implicitWidth : Math.max(14, implicitWidth)
-          height: Notifications.Style.summaryIconSize
-          text: root.empty ? "Notifications" : String(Notifications.State.notificationCount)
-          visible: !root.empty || root.collapseProgress < 0.31
-          opacity: root.empty && !Shell.Theme.translucent ? 0.6 : 1
-          color: root.empty ? Notifications.Style.foreground : "#B7B7B7"
+          x: 0
+          y: 0
+          width: root.empty ? 104 : Math.max(16, Math.ceil(implicitWidth))
+          height: 48
+          text: root.empty ? "Notificações" : String(root.effectiveCount)
+          color: Shell.Theme.text
           font.family: Shell.Theme.fontFamily
           font.weight: Font.Medium
-          font.pixelSize: 13
+          font.pixelSize: Shell.Theme.fontBody
+          font.letterSpacing: 0
           verticalAlignment: Text.AlignVCenter
-          horizontalAlignment: root.empty ? Text.AlignLeft : Text.AlignHCenter
-          FontMetrics { id: metrics; font: caption.font }
-        }
-      }
-
-      Row {
-        id: applications
-        x: primary.x + primary.width + 8
-        y: primary.y
-        width: Math.max(0, summary.width - x)
-        height: Notifications.Style.summaryIconSize
-        spacing: 8
-        opacity: root.collapseProgress < 0.31 ? 1 : 0
-        visible: !root.empty && opacity > 0.001
-
-        Rectangle {
-          width: 1
-          height: Notifications.Style.summaryIconSize
-          color: Notifications.Style.divider
+          horizontalAlignment: Text.AlignLeft
         }
 
-        Repeater {
-          model: Notifications.State.recentApps
+        Row {
+          id: applications
+          x: caption.width + 4
+          y: 16
+          height: 16
+          spacing: 8
+          visible: !root.empty
 
-          delegate: IconImage {
-            required property var modelData
-            required property int index
+          Rectangle {
+            width: 1
+            height: 16
+            color: Shell.Theme.border
+          }
 
-            implicitSize: width
-            width: Notifications.Style.summaryIconSize
-            height: Notifications.Style.summaryIconSize
-            source: modelData.iconSource || ""
-            asynchronous: true
-            smooth: true
-            opacity: index === 0 ? 1 : Notifications.Style.secondaryIconOpacity
+          Row {
+            spacing: 8
+            visible: root.previewIcons.length > 0
+            Repeater {
+              model: Math.min(3, root.previewIcons.length)
+              delegate: Image {
+                required property int index
+                width: 16
+                height: 16
+                source: Qt.resolvedUrl("../icons/" + root.previewIcons[index] + ".svg")
+                sourceSize: Qt.size(32, 32)
+                fillMode: Image.PreserveAspectFit
+                smooth: true
+                antialiasing: true
+                opacity: index === 0 ? 1.0 : 0.4
+              }
+            }
+          }
+
+          Row {
+            spacing: 8
+            visible: root.previewIcons.length === 0
+            Repeater {
+              model: Notifications.State.recentApps
+              delegate: IconImage {
+                required property var modelData
+                required property int index
+                visible: index < 3
+                implicitSize: width
+                width: 16
+                height: 16
+                source: modelData.iconSource || ""
+                asynchronous: true
+                smooth: true
+                opacity: index === 0 ? 1.0 : 0.4
+              }
+            }
           }
         }
       }
@@ -122,9 +172,9 @@ Item {
   MouseArea {
     width: parent.width
     height: 48
-    enabled: !root.empty
+    enabled: !root.empty && root.previewCount < 0
     hoverEnabled: true
-    cursorShape: Qt.PointingHandCursor
+    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
     onClicked: root.panelRequested()
   }
 

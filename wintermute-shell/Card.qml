@@ -8,8 +8,9 @@ Rectangle {
   property color classicColor: Theme.background
   property bool animateClassicColor: false
   property bool hoverEnabled: true
+  property bool forceHovered: false
   property bool showGlow: true
-  readonly property bool cardHovered: cardHover.hovered
+  readonly property bool cardHovered: cardHover.hovered || forceHovered
   readonly property Region blurRegion: Region {
     item: root
     radius: root.radius

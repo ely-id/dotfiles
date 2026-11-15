@@ -15,6 +15,7 @@ import "screenshot" as Screenshot
 PanelWindow {
   id: root
   required property bool expanded
+  property bool demoCards: false
   property string popup: ""
   property real collapseProgress: expanded ? 0 : 1
   signal toggleRequested
@@ -95,7 +96,7 @@ PanelWindow {
   }
 
   color: "transparent"
-  BackgroundEffect.blurRegion: Theme.translucent ? cardBlur : null
+  BackgroundEffect.blurRegion: cardBlur
   onHeightChanged: cardBlur.changed()
   Region {
     id: cardBlur
@@ -130,7 +131,7 @@ PanelWindow {
   }
   anchors { left: true; top: true; bottom: true }
   WlrLayershell.layer: WlrLayer.Top
-  WlrLayershell.namespace: "pond-sidebar"
+  WlrLayershell.namespace: "wintermute-sidebar"
   WlrLayershell.keyboardFocus: workspacesCard.dragSession.active
       ? WlrKeyboardFocus.Exclusive : panelOpen ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
   WlrLayershell.exclusionMode: ExclusionMode.Normal
@@ -148,6 +149,7 @@ PanelWindow {
       id: timeCard
       width: root.cardWidth
       collapseProgress: root.collapseProgress
+      previewBattery: root.demoCards
       onClicked: root.togglePopup("calendar")
       onBatteryClicked: root.togglePopup("battery")
     }
@@ -169,12 +171,15 @@ PanelWindow {
     Media.Player {
       id: mediaCard
       collapseProgress: root.collapseProgress
+      previewActive: root.demoCards
     }
 
     Notifications.SidebarCard {
       id: notificationCard
       width: root.cardWidth
       collapseProgress: root.collapseProgress
+      previewCount: root.demoCards ? 3 : -1
+      previewIcons: root.demoCards ? ["message-square", "mail", "terminal"] : []
       onPanelRequested: { root.dismissPanels(); Notifications.State.togglePanel(root.screen.name); }
     }
 
@@ -182,6 +187,10 @@ PanelWindow {
       id: installsCard
       width: root.cardWidth
       collapseProgress: root.collapseProgress
+      customModel: root.demoCards ? [
+        { jobId: "demo-1", name: "Firefox", status: "installing", progress: 0.65, icon: "globe" },
+        { jobId: "demo-2", name: "Blender", status: "installed", progress: 1.0, icon: "box" }
+      ] : null
     }
     KeyboardFeedback {
       id: keyboardFeedback

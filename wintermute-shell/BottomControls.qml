@@ -1,19 +1,36 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import "audio" as Audio
 import "wifi" as Wifi
 
+// Controles de baixo da barra lateral (ficha 03, boards 13:12277 e 13:14610):
+// Aberto (156×48, r16): 4 botões em y 4 (36 no hover de 80 px), altura 40, ícone 16 no centro:
+//   Wi-Fi (x 4, w 38, cantos 12,4,4,12), Som (x 42, w 36, cantos 4),
+//   Ajustes (x 78, w 36, cantos 4), Recolher (x 114, w 38, cantos 4,12,12,4).
+// Recolhido (48×168, r16): 4 botões 40×40 em x 4, y 4/44/84/124, ícone 16 em (12,12).
+// Hover que cresce para 80 (aberto):
+//   Wi-Fi: download (12,10) + texto 11 muted (32,8) + divisor (80,10) + upload (88,10) + texto 11 muted (108,8).
+//   Som: slider compacto 132×8 r4 em (12,14), preenchimento accent, alça 16 knob em y 10.
 Card {
   id: root
   property real collapseProgress: 0
+  // Propriedades opcionais para amostra estática no painel de demonstração
+  property string previewReveal: "" // "" | "wifi" | "sound"
+  property int previewSelectedSlot: -1
+  property int previewHoverSlot: -1
+  property string previewDownloadRate: "12 MB/s"
+  property string previewUploadRate: "1,2 MB/s"
+  property real previewVolume: 0.61
+
   signal collapseClicked
   readonly property real widthProgress: Theme.collapseWidth(collapseProgress)
   readonly property real heightProgress: Theme.collapseHeight(collapseProgress)
-  width: Theme.lerp(156, 48, widthProgress)
+  width: Theme.lerp(Theme.sidebarCardExpandedWidth, Theme.sidebarCardCollapsedWidth, widthProgress)
   height: Theme.lerp(openExpandedHeight, 168, heightProgress)
   contentClipped: false
-  radius: Theme.translucent ? Theme.lerp(12, 16, heightProgress) : Theme.sidebarCardRadius
+  radius: Theme.sidebarCardRadius
 
   property bool wifiOpen: false
   property bool soundOpen: false
@@ -25,15 +42,17 @@ Card {
       && QsWindow.window !== null && activeToplevel.screens.some(s => s.name === QsWindow.window.screen.name)
   readonly property bool collapsed: collapseProgress >= 0.56
   readonly property bool besideSidebar: collapsed && !fullscreenCovered
-  readonly property bool collapsedVolumeVisible: (collapsed || fullscreenCovered) && keyboardVolumeVisible && !soundOpen
-  // Wi-Fi metrics and the compact sound control share the same staged exit:
-  // fade the content, hold the shell, then collapse its height.
+  readonly property bool collapsedVolumeVisible: previewReveal === ""
+      && (collapsed || fullscreenCovered) && keyboardVolumeVisible && !soundOpen
+
   property bool hoverHeightRetained: false
   property string displayedReveal: ""
-  readonly property bool wifiContentVisible: displayedReveal === "wifi"
-  readonly property bool soundSliderContentVisible: displayedReveal === "sound"
+  readonly property string effectiveReveal: previewReveal !== "" ? previewReveal : displayedReveal
+  readonly property bool wifiContentVisible: effectiveReveal === "wifi"
+  readonly property bool soundSliderContentVisible: effectiveReveal === "sound"
   readonly property string requestedReveal: wifiPresentationRequested ? "wifi"
       : soundSliderRequested ? "sound" : ""
+
   signal wifiClicked
   signal settingsClicked
   signal soundClicked
@@ -42,15 +61,13 @@ Card {
   property bool soundButtonHovered: false
   readonly property bool wifiHovered: wifiButtonHovered
       || (wifiHoverRetained && panelHover.hovered)
-  readonly property bool noInternet: Wifi.State.internetUnavailable
+  readonly property bool noInternet: previewReveal === ""
+      && Wifi.State.internetUnavailable
       && (Wifi.State.wifiConnected || Wifi.State.wiredConnected)
-  // The compact slider belongs only to the sound control. Keep it open while
-  // the pointer moves onto the revealed slider, but not merely because the
-  // pointer remains somewhere else inside the settings card.
   readonly property bool soundHovered: soundButtonHovered
       || compactSoundSlider.hovered
   readonly property bool wifiPresentationRequested: wifiHovered || wifiOpen
-  readonly property bool wifiMetricsVisible: wifiMetrics.visible
+  readonly property bool wifiMetricsVisible: previewReveal === "" && wifiMetrics.visible
   onWifiMetricsVisibleChanged: Wifi.State.setRateConsumer(root, wifiMetricsVisible)
   Component.onCompleted: Wifi.State.setRateConsumer(root, wifiMetricsVisible)
   Component.onDestruction: Wifi.State.setRateConsumer(root, false)
@@ -58,18 +75,16 @@ Card {
       && collapseProgress <= 0.001
       && (soundHovered || keyboardVolumeVisible)
   readonly property int openExpandedHeight:
-      hoverHeightRetained ? 80 : 48
+      (previewReveal !== "" || hoverHeightRetained) ? 80 : 48
 
   onWifiButtonHoveredChanged: {
-    if (wifiButtonHovered) {
+    if (wifiButtonHovered)
       wifiHoverRetained = true;
-    }
   }
 
   onSoundButtonHoveredChanged: {
-    if (soundButtonHovered) {
+    if (soundButtonHovered)
       wifiHoverRetained = false;
-    }
   }
 
   onSoundOpenChanged: {
@@ -79,7 +94,6 @@ Card {
     }
   }
 
-  // Moving controls can transfer hover twice in one event; use the final target.
   onRequestedRevealChanged: Qt.callLater(syncReveal)
   function syncReveal() {
     if (requestedReveal === "") {
@@ -100,22 +114,23 @@ Card {
     }
   }
 
+  // Slider compacto no hover do Som: trilho 132×8 r4 em (12,14), alça 16×16 em y 10
   Slider {
     id: compactSoundSlider
     z: 2
     x: 12
-    y: 4
+    y: 0
     width: 132
-    height: 32
-    externalValue: Audio.State.outputVolume
-    muted: Audio.State.outputMuted
-    trackColor: Theme.colors.sidebarSliderTrack
-    interactive: root.soundSliderRequested
+    height: 36
+    compact: true
+    externalValue: root.previewReveal === "sound" ? root.previewVolume : Audio.State.outputVolume
+    muted: root.previewReveal === "sound" ? false : Audio.State.outputMuted
+    trackColor: Theme.track
+    interactive: root.previewReveal === "sound" || root.soundSliderRequested
     hoverEnabled: root.soundSliderContentVisible
     visible: opacity > 0.001
-    opacity: root.soundSliderContentVisible ? 1 : 0
-    onMoved: Audio.State.setOutputVolume(compactSoundSlider.value)
-
+    opacity: root.soundSliderContentVisible && root.collapseProgress <= 0.001 ? 1 : 0
+    onMoved: if (root.previewReveal === "") Audio.State.setOutputVolume(compactSoundSlider.value)
   }
 
   LazyLoader {
@@ -128,7 +143,7 @@ Card {
       readonly property real cardBottom: root.besideSidebar ? Math.round(Theme.sidebarOuterMargin + root.height - 46 - 36) : 40
       screen: root.QsWindow.window ? root.QsWindow.window.screen : null
       color: "transparent"
-      BackgroundEffect.blurRegion: Theme.translucent ? volumeCard.blurRegion : null
+      BackgroundEffect.blurRegion: volumeCard.blurRegion
       implicitWidth: cardX + Theme.sidebarCardExpandedWidth + 67
       implicitHeight: cardBottom + 36 + 67
       anchors { left: true; bottom: true }
@@ -144,22 +159,23 @@ Card {
         height: 36
         Shadow {
           anchors.fill: parent
-          cornerRadius: PanelStyle.radius
-          shadows: PanelStyle.controlShadows
+          cornerRadius: Theme.sidebarCardRadius
+          shadows: Theme.glassShadows
         }
         Card {
           id: volumeCard
           anchors.fill: parent
-          radius: PanelStyle.radius
-          classicColor: PanelStyle.surface
+          radius: Theme.sidebarCardRadius
         }
         Slider {
           x: 12
+          y: 0
           width: 132
-          height: 32
+          height: 36
+          compact: true
           externalValue: Audio.State.outputVolume
           muted: Audio.State.outputMuted
-          trackColor: Theme.colors.sidebarSliderTrack
+          trackColor: Theme.track
           interactive: false
           hoverEnabled: false
         }
@@ -168,13 +184,9 @@ Card {
   }
 
   Behavior on height {
-    // Hover expansion needs its short local animation, but the sidebar
-    // collapse is already animated by collapseProgress. Letting both animate
-    // the same height makes the card shell trail behind the four moving
-    // controls during the horizontal-to-vertical transition.
-    enabled: root.collapseProgress <= 0.001
+    enabled: root.collapseProgress <= 0.001 && root.previewReveal === ""
     NumberAnimation {
-      duration: PanelStyle.controlDuration
+      duration: Theme.controlDuration
       easing.type: Easing.OutCubic
     }
   }
@@ -182,88 +194,104 @@ Card {
   Text {
     id: noInternetLabel
     anchors.horizontalCenter: parent.horizontalCenter
-    y: 14.5 + noInternetMetrics.capitalHeight - baselineOffset
-    text: "No internet"
-    color: Theme.colors.text
+    y: 8
+    height: 20
+    text: "Sem internet"
+    color: Theme.muted
     font.family: Theme.fontFamily
     font.weight: Font.Medium
-    font.pixelSize: 13
+    font.pixelSize: Theme.fontCaption
+    font.letterSpacing: 0
+    verticalAlignment: Text.AlignVCenter
     opacity: root.noInternet && root.wifiContentVisible
-        && root.collapseProgress <= 0.001 ? 0.6 : 0
+        && root.collapseProgress <= 0.001 ? 1 : 0
     visible: opacity > 0
-    FontMetrics { id: noInternetMetrics; font: noInternetLabel.font }
   }
 
-  Row {
+  // Hover no Wi-Fi (ficha 03 / board 13:14610):
+  // download 16 em (12,10) + texto 11 muted em (32,8) 44×20 + divisor 1×16 em (80,10)
+  // + upload 16 em (88,10) + texto 11 muted em (108,8) 40×20.
+  Item {
     id: wifiMetrics
-    anchors.horizontalCenter: parent.horizontalCenter
-    y: 12
-    height: 19
-    spacing: 8
+    x: 0
+    y: 0
+    width: Theme.sidebarCardExpandedWidth
+    height: 36
     opacity: root.wifiContentVisible && !root.noInternet
         && root.collapseProgress <= 0.001 ? 1 : 0
     visible: opacity > 0
 
+    Image {
+      x: 12
+      y: 10
+      width: 16
+      height: 16
+      source: Qt.resolvedUrl("icons/download.svg")
+      sourceSize: Qt.size(32, 32)
+      smooth: true
+      antialiasing: true
+    }
 
-    Row {
-      height: 19
-      spacing: 4
-      opacity: 0.6
-      Image {
-        width: 14
-        height: 14
-        anchors.verticalCenter: parent.verticalCenter
-        source: Qt.resolvedUrl("icons/upload.svg")
-      }
-      Text {
-        height: 19
-        text: Wifi.State.uploadRate
-        color: Theme.colors.text
-        font.family: Theme.fontFamily
-        font.weight: Font.Medium
-        font.pixelSize: 13
-        verticalAlignment: Text.AlignVCenter
-      }
+    Text {
+      x: 32
+      y: 8
+      width: 44
+      height: 20
+      text: root.previewReveal === "wifi" ? root.previewDownloadRate : Wifi.State.downloadRate
+      color: Theme.muted
+      font.family: Theme.fontFamily
+      font.weight: Font.Medium
+      font.pixelSize: Theme.fontCaption
+      font.letterSpacing: 0
+      verticalAlignment: Text.AlignVCenter
+      elide: Text.ElideRight
     }
 
     Rectangle {
+      x: 80
+      y: 10
       width: 1
-      height: 14
-      anchors.verticalCenter: parent.verticalCenter
-      color: Theme.sidebarForeground
-      opacity: 0.24
+      height: 16
+      color: Theme.border
     }
 
-    Row {
-      height: 19
-      spacing: 4
-      opacity: 0.6
-      Image {
-        width: 14
-        height: 14
-        anchors.verticalCenter: parent.verticalCenter
-        source: Qt.resolvedUrl("icons/download.svg")
-      }
-      Text {
-        height: 19
-        text: Wifi.State.downloadRate
-        color: Theme.colors.text
-        font.family: Theme.fontFamily
-        font.weight: Font.Medium
-        font.pixelSize: 13
-        verticalAlignment: Text.AlignVCenter
-      }
+    Image {
+      x: 88
+      y: 10
+      width: 16
+      height: 16
+      source: Qt.resolvedUrl("icons/upload.svg")
+      sourceSize: Qt.size(32, 32)
+      smooth: true
+      antialiasing: true
+    }
+
+    Text {
+      x: 108
+      y: 8
+      width: 44
+      height: 20
+      text: root.previewReveal === "wifi" ? root.previewUploadRate : Wifi.State.uploadRate
+      color: Theme.muted
+      font.family: Theme.fontFamily
+      font.weight: Font.Medium
+      font.pixelSize: Theme.fontCaption
+      font.letterSpacing: 0
+      verticalAlignment: Text.AlignVCenter
+      elide: Text.ElideRight
     }
   }
 
   readonly property var icons: [
-      { icon: Wifi.State.statusIcon,
-        width: 14,
-        height: 14 },
-      { icon: "volume-2.svg", width: 14, height: 14 },
-      { icon: "settings.svg", width: 14, height: 14 },
-      { icon: "", width: 14, height: 14 }
+    { icon: previewReveal !== "" || previewSelectedSlot >= 0 || previewHoverSlot >= 0
+          ? "wifi.svg" : Wifi.State.statusIcon,
+      width: 16,
+      height: 16 },
+    { icon: "volume-2.svg", width: 16, height: 16 },
+    { icon: "settings.svg", width: 16, height: 16 },
+    { icon: "", width: 16, height: 16 }
   ]
+
   Repeater {
     model: 7
     IconButton {
@@ -286,9 +314,12 @@ Card {
         if (slot === 0) root.wifiButtonHovered = hovered;
         else if (slot === 1) root.soundButtonHovered = hovered;
       }
-      readonly property bool selected: slot === 0 ? root.wifiOpen : slot === 1 ? root.soundOpen : slot === 2 && root.settingsOpen
-      restingOpacity: selected || (slot === 1 && root.keyboardVolumeVisible)
-          || (Theme.translucent && !root.soundSliderContentVisible) ? 1 : 0.6
+      readonly property bool selected: root.previewSelectedSlot >= 0
+          ? slot === root.previewSelectedSlot
+          : (slot === 0 ? root.wifiOpen : slot === 1 ? root.soundOpen : slot === 2 && root.settingsOpen)
+      readonly property bool effectiveHovered: action.hovered || slot === root.previewHoverSlot
+      checked: selected
+      restingOpacity: 1.0
       iconSource: modelData.icon ? Qt.resolvedUrl("icons/" + modelData.icon) : ""
       iconWidth: modelData.width
       iconHeight: modelData.height
@@ -299,8 +330,8 @@ Card {
         else root.collapseClicked();
       }
       Accessible.role: Accessible.Button
-      Accessible.name: slot === 0 ? "Wi-Fi" : slot === 1 ? "Sound"
-          : slot === 2 ? "Settings" : root.collapseProgress < 0.5 ? "Collapse sidebar" : "Expand sidebar"
+      Accessible.name: slot === 0 ? "Wi-Fi" : slot === 1 ? "Som"
+          : slot === 2 ? "Ajustes" : root.collapseProgress < 0.5 ? "Recolher barra" : "Expandir barra"
       Accessible.onPressAction: action.clicked()
 
       Rectangle {
@@ -312,20 +343,22 @@ Card {
         bottomLeftRadius: action.slot === 0 ? Theme.lerp(12, 4, root.collapseProgress)
             : action.slot === 3 ? Theme.lerp(4, 12, root.collapseProgress) : 4
         bottomRightRadius: action.slot === 3 ? 12 : 4
-        color: action.selected ? Theme.colors.sidebarButtonSelected
-            : action.hovered ? Theme.colors.sidebarButtonHover : Theme.colors.sidebarButtonRest
-        Behavior on color { ColorAnimation { duration: 120; easing.type: Easing.OutCubic } }
+        color: action.selected ? Theme.accent
+            : action.pressed ? Theme.pressed
+            : action.effectiveHovered ? Theme.hover : "transparent"
+        Behavior on color { ColorAnimation { duration: Theme.hoverDuration; easing.type: Easing.OutCubic } }
       }
 
       Repeater {
         model: action.slot === 3 ? 2 : 0
         Image {
           required property int index
-          anchors.centerIn: parent
-          width: 14
-          height: 14
+          x: Math.round((parent.width - width) / 2)
+          y: Math.round((parent.height - height) / 2)
+          width: 16
+          height: 16
           source: Qt.resolvedUrl(index === 0 ? "icons/panel-left-close.svg" : "icons/panel-left-open.svg")
-          sourceSize: Qt.size(Math.ceil(width * 2), Math.ceil(height * 2))
+          sourceSize: Qt.size(32, 32)
           fillMode: Image.PreserveAspectFit
           readonly property real flipProgress: root.collapseProgress >= 0.5 ? 1 : 0
           opacity: action.glyphOpacity * (index === 0 ? 1 - flipProgress : flipProgress)
@@ -335,15 +368,16 @@ Card {
       }
     }
   }
+
   Timer {
     id: revealExit
-    interval: PanelStyle.hoverCollapseDelay
+    interval: Theme.hoverCollapseDelay
     onTriggered: if (root.requestedReveal === "") root.hoverHeightRetained = false
   }
 
   Timer {
     id: keyboardVolumeTimer
-    interval: 1200
+    interval: Theme.osdHoldDuration
     onTriggered: root.keyboardVolumeVisible = false
   }
 

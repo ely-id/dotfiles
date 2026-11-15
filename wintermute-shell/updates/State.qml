@@ -1,23 +1,64 @@
 pragma Singleton
 import QtQuick
+import QtCore
 import Quickshell
 import Quickshell.Io
 import "../installs" as Installs
 import "../settings" as Settings
 
+// Integração de atualizações do sistema com o Cachy Update / arch-update (P-32).
+// Lê os arquivos de estado que o cachy-update grava em ~/.local/state/arch-update/:
+//   - last_updates_check: pacotes disponíveis para atualização (1 por linha)
+//   - tray_icon: "cachy-update_updates-available-..." quando há atualizações
+//   - last_update_run: data da última execução concluída
 Singleton {
   id: root
   property string status: ""
   property string pending: ""
+  property int availableCount: 0
+
+  readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME")
+      || (StandardPaths.writableLocation(StandardPaths.GenericStateLocation)
+          || Quickshell.env("HOME") + "/.local/state")) + "/arch-update"
+  readonly property string runtimeStatusPath: (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp")
+      + "/wintermute-cachy-update"
+
+  function _recomputeFromFiles() {
+    const lines = updatesCheckFile.loadedText.split("\n")
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+    availableCount = lines.length;
+    const trayHasUpdates = trayIconFile.loadedText.indexOf("updates-available") !== -1;
+    if (root.status === "updating")
+      return;
+    if (availableCount > 0 || trayHasUpdates) {
+      root.status = "available";
+    } else if (root.status === "available") {
+      root.status = "";
+    }
+  }
 
   function start() {
-    if (status !== "available") return;
+    if (status !== "available")
+      return;
     pending = "";
     Settings.State.close();
-    Quickshell.execDetached(["sh", "-c", 'rm -f "$1.after"; echo updating > "$1"; '
-        + 'pm -u; case $? in 0) echo complete ;; 2) echo restart ;; *) echo failed ;; esac > "$1"; '
-        + 'action=$(cat "$1.after" 2>/dev/null) && [ -n "$action" ] && python3 "$2" "$action"',
-      "sh", statusFile.path, Quickshell.shellDir + "/settings/session.py"]);
+    root.status = "updating";
+    Installs.State.update("system-update", "Sistema", "installing", -1, "", "refresh-cw");
+    Quickshell.execDetached(["sh", "-c",
+      'rm -f "$1.after"; echo updating > "$1"; '
+      + 'ghostty --title="Cachy-Update" -e cachy-update; '
+      + 'if [ ! -f "/usr/lib/modules/$(uname -r)/vmlinuz" ]; then echo restart > "$1"; '
+      + 'elif [ -s "$2" ]; then echo available > "$1"; '
+      + 'else echo complete > "$1"; fi; '
+      + 'action=$(cat "$1.after" 2>/dev/null) && [ -n "$action" ] && python3 "$3" "$action"',
+      "sh", runtimeStatusPath, stateDir + "/last_updates_check",
+      Quickshell.shellDir + "/settings/session.py"]);
+  }
+
+  function checkNow() {
+    if (!checkProcess.running)
+      checkProcess.running = true;
   }
 
   function after(action) {
@@ -25,23 +66,22 @@ Singleton {
     afterFile.setText(pending);
   }
 
-  // A origem chamava o utilitário próprio "pm -a" para sondar atualizações.
-  // Desativo esta sondagem na F0 até ligar o estado ao Cachy Update (P-32).
+  // Sondagem periódica via cachy-update --check (o systemd user timer do
+  // arch-update também atualiza os mesmos arquivos em ~/.local/state/arch-update).
   Timer {
-    interval: 12 * 60 * 60 * 1000
-    running: false
+    interval: 6 * 60 * 60 * 1000
+    running: true
     repeat: true
     triggeredOnStart: false
-    onTriggered: check.running = true
+    onTriggered: root.checkNow()
   }
 
   Process {
-    id: check
-    command: ["pm", "-a"]
-    stdout: StdioCollector { id: output }
-    onExited: exitCode => {
-      if (exitCode === 0 && (root.status === "" || root.status === "available"))
-        root.status = output.text.trim() === "true" ? "available" : "";
+    id: checkProcess
+    command: ["cachy-update", "--check"]
+    onExited: {
+      updatesCheckFile.reload();
+      trayIconFile.reload();
     }
   }
 
@@ -52,8 +92,34 @@ Singleton {
   }
 
   FileView {
+    id: updatesCheckFile
+    property string loadedText: ""
+    path: root.stateDir + "/last_updates_check"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: {
+      loadedText = text();
+      root._recomputeFromFiles();
+    }
+  }
+
+  FileView {
+    id: trayIconFile
+    property string loadedText: ""
+    path: root.stateDir + "/tray_icon"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: {
+      loadedText = text().trim();
+      root._recomputeFromFiles();
+    }
+  }
+
+  FileView {
     id: statusFile
-    path: Quickshell.env("XDG_RUNTIME_DIR") + "/pond-update"
+    path: root.runtimeStatusPath
     watchChanges: true
     printErrors: false
     onFileChanged: reload()
@@ -62,16 +128,20 @@ Singleton {
       const wasUpdating = root.status === "updating";
       if (result === "updating") {
         root.status = "updating";
-        Installs.State.update("system-update", "Updating", "installing", -1, "");
+        Installs.State.update("system-update", "Sistema", "installing", -1, "", "refresh-cw");
       } else if (result === "restart") {
         root.status = "restart";
-        if (wasUpdating) Installs.State.update("system-update", "Update complete", "installed", -1, "");
+        if (wasUpdating)
+          Installs.State.update("system-update", "Sistema", "installed", 100, "", "refresh-cw");
       } else if (wasUpdating && result === "complete") {
         root.status = "complete";
-        Installs.State.update("system-update", "Update complete", "installed", -1, "");
+        Installs.State.update("system-update", "Sistema", "installed", 100, "", "refresh-cw");
+      } else if (wasUpdating && result === "available") {
+        root.status = "available";
+        Installs.State.dismiss("system-update");
       } else if (wasUpdating && result === "failed") {
         root.status = "available";
-        Installs.State.update("system-update", "Update failed", "failed", -1, "");
+        Installs.State.update("system-update", "Sistema", "failed", -1, "", "refresh-cw");
       }
     }
   }

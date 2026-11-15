@@ -11,7 +11,7 @@ QtObject {
   readonly property int desktopMargin: 10
   readonly property int radius: 16
   readonly property int contentPadding: 16
-  readonly property int summaryIconSize: 14
+  readonly property int summaryIconSize: 16
   readonly property int closeSize: 24
   readonly property int closeIconSize: 16
   readonly property color hover: Shell.Theme.colors.notificationHover

@@ -364,8 +364,5 @@ Singleton {
   }
   readonly property bool translucent: colors.translucent
 
-  readonly property color sidebarInnerOutline: colors.sidebarInnerOutline
   readonly property color sidebarDivider: colors.sidebarDivider
-  readonly property color sidebarForeground: colors.sidebarForeground
-  readonly property int sidebarHoverDuration: hoverDuration
 }

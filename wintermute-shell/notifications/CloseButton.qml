@@ -21,7 +21,7 @@ Rectangle {
   Behavior on color {
     enabled: !root.compact
     ColorAnimation {
-      duration: Shell.Theme.sidebarHoverDuration
+      duration: Shell.Theme.hoverDuration
       easing.type: Easing.OutCubic
     }
   }

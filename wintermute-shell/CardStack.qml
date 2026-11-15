@@ -32,8 +32,8 @@ Item {
   property real transitionProgress: 1
   property real transitionFromHeight: 0
   property real transitionToHeight: 0
-  property real transitionFromInset: 22
-  property real transitionToInset: 22
+  property real transitionFromInset: PanelStyle.frontInsetSingle
+  property real transitionToInset: PanelStyle.frontInsetSingle
 
   readonly property int collapseAllDuration: 200
   readonly property int depth: stackModel.count
@@ -53,7 +53,7 @@ Item {
       ? 0.92 + 0.08 * transitionProgress
       : transitionOperation === "pop" ? Math.max(0, 1 - 2 * transitionProgress) : 1
 
-  width: 336
+  width: PanelStyle.stackWidth
   height: transitionRunning
       ? Theme.lerp(transitionFromHeight, transitionToHeight,
                    transitionProgress)
@@ -86,7 +86,7 @@ Item {
   }
 
   function insetForDepth(cardDepth) {
-    return cardDepth > 1 ? 32 : 22;
+    return cardDepth > 1 ? PanelStyle.frontInsetStacked : PanelStyle.frontInsetSingle;
   }
 
   function open() {
@@ -199,10 +199,10 @@ Item {
   Item {
     id: backBounds
     readonly property var card: root.depth > 1 ? layerRepeater.itemAt(root.depth - 2) : null
-    readonly property real radius: 14.38
-    x: card ? card.x : 16
-    y: card ? card.y : 16
-    width: card ? card.width : 284
+    readonly property real radius: PanelStyle.radius
+    x: card ? card.x : PanelStyle.backOffsetX
+    y: card ? card.y : PanelStyle.backOffsetY
+    width: card ? card.width : PanelStyle.backWidth
     height: card ? card.height : 0
   }
 
@@ -231,21 +231,18 @@ Item {
       stackController: root
       interactive: !root.transitionRunning && relativeIndex === 0
 
-      x: 16 * backingAmount
+      x: PanelStyle.backOffsetX * backingAmount
       y: Theme.lerp(pushBack ? root.transitionFromInset
-          : popBack ? root.transitionToInset : root.frontInset, 16, backingAmount)
-      width: Theme.lerp(PanelStyle.width, 284, backingAmount)
-      // Keep the rear surface flush with the front card's bottom; clip its contents to fit.
+          : popBack ? root.transitionToInset : root.frontInset,
+          PanelStyle.backOffsetY, backingAmount)
+      width: Theme.lerp(PanelStyle.width, PanelStyle.backWidth, backingAmount)
+      // A carta de trás fica rente à base do cartão da frente (como na origem); o
+      // conteúdo que passa disso é cortado. No Figma ela mantém a altura natural e
+      // aparece abaixo da frente: pendência P-40.
       height: relativeIndex === 0 ? naturalHeight : root.height - y
       backingAmount: pushBack ? root.transitionProgress
           : popBack ? 1 - root.transitionProgress
           : relativeIndex === 0 ? 0 : 1
-      frontCardRect: relativeIndex === 1 ? Qt.rect(
-          PanelStyle.width * (1 - root.frontScale) / 2 - x,
-          root.frontInset + root.frontHeight * (1 - root.frontScale) - y,
-          PanelStyle.width * root.frontScale, root.frontHeight * root.frontScale)
-          : Qt.rect(0, 0, 0, 0)
-      frontCardRadius: PanelStyle.radius * root.frontScale
       opacity: pushFront ? root.transitionProgress
           : popFront ? 1
           : relativeIndex <= 1 ? 1 : 0
@@ -258,8 +255,8 @@ Item {
 
   PanelCloseButton {
     z: 100
-    x: 296
-    y: root.frontInset - 20
+    x: PanelStyle.closeButtonX
+    y: root.frontInset - PanelStyle.closeButtonOverhang
     enabled: !root.transitionRunning
     onClicked: root.pop()
   }

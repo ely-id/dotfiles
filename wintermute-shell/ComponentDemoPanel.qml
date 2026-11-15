@@ -11,14 +11,14 @@ import "notifications" as Notifications
 import "installs" as Installs
 import "settings/appearance" as Appearance
 
-// Painel de demonstração visual da F1 e da F2 (fichas 00 a 04, boards 13:11217, 13:11463, 13:12277 e 13:11395).
+// Painel de demonstração visual da F1, da F2 e da F3 (fichas 00 a 05, boards 13:11217, 13:11463, 13:12277, 13:11395 e 13:13604).
 // Abre com: qs -p ~/Projects/dotfiles/wintermute-shell ipc call demo toggle
 PanelWindow {
   id: root
   required property var panelScreen
   property bool opened: false
   property bool sidebarDemoCards: false
-  property int selectedPhaseTab: 0 // 0 = F2 (Barra e organizador), 1 = F1 (Componentes base)
+  property int selectedPhaseTab: 2 // 0 = F2 (Barra e organizador), 1 = F1 (Componentes base), 2 = F3 (Pop-ups e painéis)
   signal toggleSidebarDemoCards
   signal closeRequested
 
@@ -211,6 +211,131 @@ PanelWindow {
         colorization: 1
         colorizationColor: Theme.muted
       }
+    }
+  }
+
+  // Páginas fictícias da pilha de cartões (ficha 05). Usam só o que a ficha mede: título
+  // Serif 20 em (20,16), chave em (242,18), linhas 300×44 em x 8 a partir de y 64, e na página
+  // de senha o rótulo em (20,72), o campo em (20,100) e o botão em (20,160). O conteúdo real
+  // do Wi-Fi entra na F3-T02. Dados fictícios.
+  component StackDemoList: Item {
+    id: listPage
+    property var stackController: null
+    property bool interactive: false
+    property var selection: ({})
+    implicitWidth: PanelStyle.width
+    implicitHeight: 306
+
+    Text {
+      x: 20; y: 16; width: 200; height: 32
+      text: "Wi-Fi"
+      color: Theme.text
+      font.family: Theme.titleFontFamily
+      font.weight: Font.Normal
+      font.pixelSize: Theme.fontPanelTitle
+      font.letterSpacing: 0
+      verticalAlignment: Text.AlignVCenter
+    }
+    Toggle { x: 242; y: 18; checked: true }
+
+    Repeater {
+      model: [
+        { name: "Wintermute-5G", icon: "wifi", lock: false, current: true },
+        { name: "Casa_Lima", icon: "wifi", lock: true, current: false },
+        { name: "Biblioteca", icon: "wifi-low", lock: false, current: false },
+        { name: "Café Lume", icon: "wifi-low", lock: true, current: false }
+      ]
+      delegate: ListRow {
+        id: networkRow
+        required property int index
+        required property var modelData
+        x: 8
+        y: 64 + 44 * index
+        width: 300
+        title: modelData.name
+        iconName: modelData.icon
+        trailingIconName: modelData.lock ? "lock" : ""
+        selected: modelData.current
+        interactive: listPage.interactive
+        onClicked: {
+          if (modelData.lock)
+            listPage.stackController.push("join", modelData);
+        }
+      }
+    }
+    ListRow {
+      x: 8; y: 254; width: 300
+      title: "Adicionar rede"
+      iconName: "plus"
+      interactive: listPage.interactive
+    }
+  }
+
+  component StackDemoJoin: Item {
+    id: joinPage
+    property var stackController: null
+    property bool interactive: false
+    property var selection: ({})
+    implicitWidth: PanelStyle.width
+    implicitHeight: 228
+
+    Text {
+      x: 20; y: 16; width: 276; height: 32
+      text: "Entrar em “" + (joinPage.selection.name ?? "Casa_Lima") + "”"
+      color: Theme.text
+      font.family: Theme.titleFontFamily
+      font.weight: Font.Normal
+      font.pixelSize: Theme.fontPanelTitle
+      font.letterSpacing: 0
+      verticalAlignment: Text.AlignVCenter
+    }
+    Text {
+      x: 20; y: 72
+      text: "Senha"
+      color: Theme.text
+      font.family: Theme.fontFamily
+      font.weight: Font.Medium
+      font.pixelSize: Theme.fontLabel
+      font.letterSpacing: 0
+    }
+    Field { x: 20; y: 100; placeholderText: "Senha"; password: true }
+    ActionButton {
+      x: 20; y: 160
+      kind: "primary"
+      text: "Conectar"
+      interactive: joinPage.interactive
+      onClicked: joinPage.stackController.pop()
+    }
+  }
+
+  // A pilha de verdade (CardStack) com as páginas fictícias. Fechar pelo X deixa o palco vazio;
+  // o chip reabre.
+  component StackSpecimen: Item {
+    id: stackSpec
+    property bool startStacked: false
+    width: PanelStyle.stackWidth
+    height: PanelStyle.frontInsetSingle + 306
+
+    Component { id: listComponent; StackDemoList {} }
+    Component { id: joinComponent; StackDemoJoin {} }
+
+    CardStack {
+      id: demoStack
+      anchors.bottom: parent.bottom
+      pageComponents: ({ drawer: listComponent, join: joinComponent })
+      Component.onCompleted: {
+        open();
+        if (stackSpec.startStacked)
+          Qt.callLater(() => demoStack.push("join", { name: "Casa_Lima" }));
+      }
+    }
+
+    Chip {
+      anchors.centerIn: parent
+      visible: !demoStack.visible
+      text: "Abrir de novo"
+      iconName: "panel-left-open"
+      onClicked: demoStack.open()
     }
   }
 
@@ -634,7 +759,9 @@ PanelWindow {
           Text {
             x: 0
             anchors.verticalCenter: parent.verticalCenter
-            text: (root.selectedPhaseTab === 0
+            text: (root.selectedPhaseTab === 2
+                ? "3 · Pop-ups e painéis · "
+                : root.selectedPhaseTab === 0
                 ? "2 · Barra lateral e organizador · "
                 : "1 · Componentes base · ") + Theme.displayName
             color: Theme.text
@@ -649,6 +776,13 @@ PanelWindow {
             anchors.rightMargin: 24
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
+
+            Chip {
+              text: "F3 · Painéis"
+              iconName: "app-window"
+              selected: root.selectedPhaseTab === 2
+              onClicked: root.selectedPhaseTab = 2
+            }
 
             Chip {
               text: "F2 · Barra"
@@ -713,6 +847,31 @@ PanelWindow {
             id: contentColumn
             width: scrollArea.width
             spacing: 32
+
+            // =================================================================
+            // Aba F3 — Pop-ups e painéis (fichas 05 a 12)
+            // =================================================================
+            Column {
+              visible: root.selectedPhaseTab === 2
+              width: parent.width
+              spacing: 32
+
+              SectionBlock {
+                title: "Pilha de cartões (ficha 05, board 13:13604)"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Frente 316 · folga 22 · clique em Casa_Lima para empilhar"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: PanelStyle.frontInsetSingle + 306
+                  StackSpecimen {}
+                }
+                Specimen {
+                  caption: "Frente 316 sobre verso 284 em (16, 0) · folga 32 · o X volta"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: PanelStyle.frontInsetSingle + 306
+                  StackSpecimen { startStacked: true }
+                }
+              }
+            }
 
             // =================================================================
             // Aba F2 — Barra lateral e organizador (fichas 01 a 04)

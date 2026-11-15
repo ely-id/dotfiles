@@ -21,11 +21,12 @@
 - Divisor y 60, largura 276, x 20.
 - Linhas 300×44 raio 12 a partir de y 64, x 8 (passo 44).
 - Rede conectada: fundo `accentSubtle`, botão “Desconectar” 100×32 à direita.
-- Rodapé “Adicionar rede”: ícone `plus` 20 + texto 15 `muted`. Hover `hover`.
+- Rodapé “Adicionar rede”: ícone `plus` 20 + texto 15 `muted`. Hover `hover`. Divisor de 1 px em y 248 (x 20, 276 de largura) e linha 300×44 em y 254, medidos no print de referência (2026-11-15, S07).
+- “Desconectar” da rede conectada: botão pequeno 100×32 r8 em (192,6) da linha, `control` + `border`.
 
 ## Entrar (senha) — frente 228
 
-- Título “Entrar em «…»” (20,16). Rótulo “Senha” 15 em (20,72). Campo senha em (20,100). Primário “Conectar” em (20,160).
+- Título “Entrar em «…»” (20,16). Rótulo “Senha” 15 em (20,72). Campo senha em (20,100). Primário “Conectar” em (20,160). O botão fica sempre visível e **desativado** (opacidade 0,4) até haver senha; a origem escondia o botão e animava a altura de 167 para 226. Decisão minha na S07, para a altura ficar fixa em 228 como na ficha; não está no Figma.
 
 ## Adicionar rede — frente 436
 
@@ -35,18 +36,18 @@
 ## Detalhes — frente 424
 
 - Título = nome da rede; ícone wifi `accentText` à direita.
-- Linhas 48 (rótulo 15 à esquerda, valor `muted` à direita) com divisor: Velocidade, IPv4, Banda, Gateway, DNS, Interface.
-- Rodapé: “Esquecer” perigo 146×40 r10 em (8,368) e “Desconectar” secundário em (162,368).
+- Linhas de 48 com divisor de 1 px (passo 49), a primeira em y 64; rótulo 15 Medium à esquerda, valor 13 `muted` à direita, margem de 20 nos dois lados. Linhas: Velocidade, IPv4, Banda, Gateway, DNS, Interface.
+- Rodapé: “Esquecer” perigo 146×40 r10 em (8,368) e “Desconectar” secundário em (162,368), isto é, 56 acima da base (y = altura − 56). Ícone wifi 20×20 em (276,22).
 
 ## Status — 112
 
-- “Conectando…” com 3 pontos `accent` (opacidade 1 / 0,6 / 0,3), ou “Conectado” `successText` + check, ou “Senha incorreta” `dangerText` + alerta. Título Serif 20 centrado.
+- “Conectando…” com 3 pontos `accent` (opacidade 1 / 0,6 / 0,3), ou “Conectado” `successText` + check, ou “Senha incorreta” `dangerText` + alerta. Título Serif 20 centrado (caixa 276×32 em y 54). Os três pontos são 8×8 com espaço 4, e o ícone `circle-check` / `circle-alert` é 20×20, todos centrados em y 34 (medido no print).
 - Fecha sozinho 1,5 s (`1500 ms`) depois de conectar. É o tempo que a Pond já define em `wifi/Panel.qml:46` (`420 ms` nas outras ações). Confirmado em 2026-11-15 (P-09).
 
 ## Rede cabeada
 
 - Quando há cabo conectado, o botão da barra e a linha da lista de redes usam o ícone Lucide `cable`, no lugar de `ethernet.svg` e `ethernet-no-internet.svg` da origem. Definido em 2026-11-15 (P-39).
-- O SVG `cable` entra em `wintermute-shell/icons/` na `F3-T02`. Como o estado "cabo sem internet" se diferencia (a origem trocava de arquivo) é visto nessa tarefa, sem inventar valor.
+- O SVG `cable` ainda não está em `wintermute-shell/icons/`: ele é do Lucide e depende de eu autorizar o download (S07). Até lá a linha de rede cabeada usa o `ethernet.svg` da origem. Como o estado "cabo sem internet" se diferencia (a origem trocava de arquivo) fica em aberto, sem inventar valor.
 
 ## Dados
 

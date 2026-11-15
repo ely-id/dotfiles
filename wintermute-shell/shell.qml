@@ -14,6 +14,7 @@ import "wallpaper/desktop" as Wallpaper
 ShellRoot {
   id: root
   property bool expanded: true
+  property bool testPanelOpen: false
 
   Shortcuts {}
 
@@ -37,16 +38,21 @@ ShellRoot {
 
   IdleFade {}
 
+  // A abertura automática do Manual na primeira execução fica desligada até a
+  // F4 redesenhar settings/manual/Panel.qml (o SVG de 2,9 MB da origem não foi
+  // baixado). O caminho já aponta para wintermute-shell/manual-shown.
   FileView {
     path: Quickshell.screens.length
-        ? (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/pond-interface/manual-shown"
+        ? (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/wintermute-shell/manual-shown"
         : ""
     printErrors: false
-    onLoadFailed: error => {
-      if (error !== FileViewError.FileNotFound) return;
-      Settings.State.open("", "manual");
-      Qt.callLater(() => setText("shown\n"));
-    }
+  }
+
+  IpcHandler {
+    target: "test"
+    function toggle() { root.testPanelOpen = !root.testPanelOpen; }
+    function open() { root.testPanelOpen = true; }
+    function close() { root.testPanelOpen = false; }
   }
 
   IpcHandler {
@@ -92,6 +98,11 @@ ShellRoot {
       Battery.Notification { bar: sidebar; above: toast }
       PanelDismissWindow { bar: sidebar }
       Settings.Window { menuScreen: modelData }
+      FontTestPanel {
+        modelData: modelData
+        opened: root.testPanelOpen
+        onCloseRequested: root.testPanelOpen = false
+      }
     }
   }
 }

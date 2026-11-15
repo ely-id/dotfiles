@@ -19,6 +19,7 @@ Com a shell aberta, aciono ações pelo IPC do Quickshell (`qs -p ~/Projects/dot
 | Alvo e função | O que faz |
 |---|---|
 | `sidebar toggle` | Recolhe ou expande a barra lateral (156 px ↔ 48 px) |
+| `test toggle` / `open` / `close` | Abre ou fecha o painel de teste da F0 (Geist Serif, Geist, Geist Mono e troca rápida de variação) |
 | `settings toggle` | Abre ou fecha a tela inicial de Ajustes e sessão |
 | `settings open <página>` | Abre direto uma subpágina (`appearance`, `system`, `display`, `information`, `manual`, `wallpaper`) |
 | `settings close` | Fecha os Ajustes |

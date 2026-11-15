@@ -15,20 +15,20 @@ PanelWindow {
   color: "transparent"
 
   WlrLayershell.layer: WlrLayer.Overlay
-  WlrLayershell.namespace: "wintermute-font-test-" + (screen ? screen.name : "unknown")
+  WlrLayershell.namespace: "pond-settings-font-test-" + (screen ? screen.name : "unknown")
   WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
   WlrLayershell.exclusionMode: ExclusionMode.Ignore
+
+  BackgroundEffect.blurRegion: root.opened ? panel.blurRegion : null
 
   implicitWidth: 440
   implicitHeight: 316
 
-  Rectangle {
+  GlassSurface {
     id: panel
     anchors.fill: parent
-    radius: Theme.radiusPopup
-    color: Theme.secondary
-    border.width: 1
-    border.color: Theme.accentRing
+    surfaceType: "popup"
+    showShadow: false
     focus: root.opened
     Keys.onEscapePressed: root.closeRequested()
 

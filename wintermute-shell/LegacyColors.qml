@@ -23,14 +23,12 @@ QtObject {
   property color errorText: accent
 
   property color surface: "#1D1D1D"
-  property color backSurface: "#131313"
   property color border: "#3D3D3D"
   property color panelSurface: Qt.alpha("#202020", 0.8)
   property color panelBorder: Qt.alpha("#2F2F2F", 0.8)
   property Gradient panelGradient: null
   property Gradient calendarGradient: panelGradient
   property color hover: "#262626"
-  property color pressed: "#303030"
   property color outline: Qt.rgba(1, 1, 1, 0.10)
 
   property color controlFill: Qt.rgba(1, 1, 1, 0.05)
@@ -41,28 +39,16 @@ QtObject {
   property color monitorFill: controlFill
   property color weekFill: Qt.rgba(1, 1, 1, 0.06)
   property color sliderTrack: Qt.rgba(1, 1, 1, 0.07)
-  property color sliderFill: "#E7E7E7"
-  property color sliderBubble: "#D1D1D1"
   property color todayFill: accent
 
   property color drawerFill: Qt.rgba(1, 1, 1, 0.08)
-  property color drawerHover: Qt.rgba(1, 1, 1, 0.12)
   property color drawerRowHover: Qt.rgba(1, 1, 1, 0.10)
   property color drawerSliderTrack: Qt.alpha("#F9EFFF", 0.1)
   property real drawerToggleAlpha: 0.12
-  property color fieldFocus: drawerFill
   property color selectFill: Qt.rgba(1, 1, 1, 0.12)
-  property color checkFill: Qt.rgba(0, 0, 0, 0.2)
-  property color checkHover: Qt.rgba(0, 0, 0, 0.3)
-  property color checkMark: "#D9D9D9"
   property color menuSurface: "#191A1B"
   property color menuBorder: "#3A3A3A"
   property color menuRowHover: drawerFill
-  property color closeFill: "#323232"
-  property color closeHover: accent
-  property color closeBorder: Qt.alpha("#575757", 0.5)
-  property color closeHoverBorder: Qt.alpha("#684098", 0.5)
-  property color closeHoverGlyph: "#38224D"
 
   property real overlayOpacity: 0.8
   property color card: "#1D1D1D"
@@ -70,7 +56,6 @@ QtObject {
   property Gradient modalGradient: null
   property color modalBorder: panelBorder
   property color sessionControl: Qt.rgba(1, 1, 1, 0.15)
-  property color closeGlyph: "white"
   property color menuCard: Qt.alpha("#494949", 0.5)
   property color menuControl: Qt.alpha("#56575E", 0.5)
   property color menuCardHover: Qt.alpha("#707070", 0.5)
@@ -97,8 +82,6 @@ QtObject {
   property color sidebarBackground: "#1D1D1D"
   property color sidebarBorder: "#303030"
   property color sidebarDivider: sidebarCardOutline
-  property color sidebarWorkspaceActive: "#242424"
-  property color sidebarControl: "#303030"
   property color sidebarForeground: "#F8F9F9"
   property color sidebarInnerOutline: Qt.rgba(1, 1, 1, 0.20)
   property color sidebarSliderTrack: sidebarInnerOutline

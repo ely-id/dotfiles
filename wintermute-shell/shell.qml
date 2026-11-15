@@ -15,6 +15,7 @@ ShellRoot {
   id: root
   property bool expanded: true
   property bool testPanelOpen: false
+  property bool demoPanelOpen: false
 
   Shortcuts {}
 
@@ -53,6 +54,13 @@ ShellRoot {
     function toggle() { root.testPanelOpen = !root.testPanelOpen; }
     function open() { root.testPanelOpen = true; }
     function close() { root.testPanelOpen = false; }
+  }
+
+  IpcHandler {
+    target: "demo"
+    function toggle() { root.demoPanelOpen = !root.demoPanelOpen; }
+    function open() { root.demoPanelOpen = true; }
+    function close() { root.demoPanelOpen = false; }
   }
 
   IpcHandler {
@@ -102,6 +110,11 @@ ShellRoot {
         panelScreen: modelData
         opened: root.testPanelOpen
         onCloseRequested: root.testPanelOpen = false
+      }
+      ComponentDemoPanel {
+        panelScreen: modelData
+        opened: root.demoPanelOpen
+        onCloseRequested: root.demoPanelOpen = false
       }
     }
   }

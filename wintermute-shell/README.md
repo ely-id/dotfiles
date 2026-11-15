@@ -19,6 +19,7 @@ Com a shell aberta, aciono ações pelo IPC do Quickshell (`qs -p ~/Projects/dot
 | Alvo e função | O que faz |
 |---|---|
 | `sidebar toggle` | Recolhe ou expande a barra lateral (156 px ↔ 48 px) |
+| `demo toggle` / `open` / `close` | Abre ou fecha o painel de demonstração da F1 com toda a biblioteca de componentes base Armitage e os estados do board `13:11463` |
 | `test toggle` / `open` / `close` | Abre ou fecha o painel de teste da F0 (Geist Serif, Geist, Geist Mono e troca rápida de variação) |
 | `settings toggle` | Abre ou fecha a tela inicial de Ajustes e sessão |
 | `settings open <página>` | Abre direto uma subpágina (`appearance`, `system`, `display`, `information`, `manual`, `wallpaper`) |
@@ -45,7 +46,9 @@ Com a shell aberta, aciono ações pelo IPC do Quickshell (`qs -p ~/Projects/dot
 | `Sidebar.qml`, `BottomControls.qml` | Janela da barra lateral (`WlrLayershell`) e cartão inferior de controles (Wi-Fi, som, ajustes e recolher) |
 | `NiriMsg.qml` | Integração com o Niri (`niri msg event-stream` e soquete IPC): workspaces, janelas, foco e marcador do launcher (até a F5) |
 | `Shortcuts.qml` | Receptores IPC de volume, mídia e brilho |
-| `Card.qml`, `CardStack.qml`, `CardLayer.qml`, `DeviceList.qml`, `DeviceDetails.qml`, `Field.qml`, `Slider.qml`, `Toggle.qml`, `IconButton.qml`, `PanelCloseButton.qml` | Componentes base compartilhados entre cartões e painéis |
+| `GlassSurface.qml`, `GradientFill.qml`, `PanelBorder.qml`, `Shadow.qml`, `Card.qml`, `CardStack.qml`, `CardLayer.qml`, `PanelBackground.qml` | Superfície de vidro Armitage (degradê vertical com dithering, borda interna em degradê, brilho superior de 1 px, brilho de acento na base e sombra em duas camadas) e cartões empilhados |
+| `IconButton.qml`, `PanelCloseButton.qml`, `ActionButton.qml`, `Toggle.qml`, `Slider.qml`, `Field.qml`, `CheckBox.qml`, `RadioButton.qml`, `ListRow.qml`, `SettingsRow.qml`, `SegmentedSelector.qml`, `Chip.qml`, `Tag.qml`, `KeyCap.qml`, `AppTile.qml`, `DeviceList.qml`, `DeviceDetails.qml` | Biblioteca de componentes base Armitage (ficha `00-componentes-base.md`) |
+| `ComponentDemoPanel.qml`, `FontTestPanel.qml` | Painéis de inspeção e QA para as fases F1 (componentes base) e F0 (fontes e variações) |
 | `icons/` | Os 111 ícones Lucide do conjunto Armitage (`#F2F3F5`) e `LICENSE-lucide.txt` (ISC) |
 | `minimap/` | Organizador de workspaces na barra: linhas, círculos de janela, botão `+`, arraste e indicador de terminal com agente |
 | `calendar/` | Cartão do relógio + bateria na barra (`Clock.qml`) e pop-up de calendário mensal (`Card.qml`, `Window.qml`) |

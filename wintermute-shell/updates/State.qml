@@ -25,11 +25,13 @@ Singleton {
     afterFile.setText(pending);
   }
 
+  // A origem chamava o utilitário próprio "pm -a" para sondar atualizações.
+  // Desativo esta sondagem na F0 até ligar o estado ao Cachy Update (P-32).
   Timer {
     interval: 12 * 60 * 60 * 1000
-    running: true
+    running: false
     repeat: true
-    triggeredOnStart: true
+    triggeredOnStart: false
     onTriggered: check.running = true
   }
 

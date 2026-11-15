@@ -99,7 +99,7 @@ ShellRoot {
       PanelDismissWindow { bar: sidebar }
       Settings.Window { menuScreen: modelData }
       FontTestPanel {
-        modelData: modelData
+        panelScreen: modelData
         opened: root.testPanelOpen
         onCloseRequested: root.testPanelOpen = false
       }

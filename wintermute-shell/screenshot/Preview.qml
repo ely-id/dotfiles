@@ -122,7 +122,7 @@ Item {
       source: button.iconSource
       sourceSize: Qt.size(32, 32)
       layer.enabled: true
-      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.colors.panel }
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.textOnAccent }
     }
     MouseArea {
       id: pointer

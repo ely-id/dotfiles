@@ -63,7 +63,7 @@ Bluetooth.Row {
         source: Qt.resolvedUrl("../icons/check.svg")
         sourceSize: Qt.size(24, 24)
         layer.enabled: true
-        layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.colors.panel }
+        layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.textOnAccent }
       }
     }
     StatusAnimation {
@@ -78,7 +78,7 @@ Bluetooth.Row {
       source: Qt.resolvedUrl("../icons/circle-alert.svg")
       sourceSize: Qt.size(32, 32)
       layer.enabled: true
-      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.colors.dangerText }
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.dangerText }
     }
   } }
 }

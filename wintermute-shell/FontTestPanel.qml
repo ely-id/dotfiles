@@ -6,11 +6,11 @@ import "settings/appearance" as Appearance
 
 PanelWindow {
   id: root
-  required property var modelData
+  required property var panelScreen
   property bool opened: false
   signal closeRequested
 
-  screen: modelData
+  screen: panelScreen
   visible: opened
   color: "transparent"
 
@@ -25,8 +25,8 @@ PanelWindow {
   Rectangle {
     id: panel
     anchors.fill: parent
-    radius: Theme.radiusDialog
-    color: Theme.panel
+    radius: Theme.radiusPopup
+    color: Theme.secondary
     border.width: 1
     border.color: Theme.accentRing
     focus: root.opened
@@ -57,7 +57,7 @@ PanelWindow {
         Text {
           text: "GEIST SERIF · TÍTULO"
           color: Theme.muted
-          font.family: Theme.monoFamily
+          font.family: Theme.monoFontFamily
           font.pixelSize: Theme.fontCaption
           font.weight: Font.Medium
         }
@@ -66,8 +66,8 @@ PanelWindow {
           width: parent.width - 36
           text: "Wintermute Shell · " + Theme.displayName
           color: Theme.text
-          font.family: Theme.serifFamily
-          font.pixelSize: Theme.fontDisplayMd
+          font.family: Theme.titleFontFamily
+          font.pixelSize: Theme.fontPanelTitle
           font.weight: Font.Normal
           elide: Text.ElideRight
         }
@@ -76,7 +76,7 @@ PanelWindow {
       Rectangle {
         width: parent.width
         height: 1
-        color: Theme.divider
+        color: Theme.border
       }
 
       Column {
@@ -84,9 +84,9 @@ PanelWindow {
         spacing: 4
 
         Text {
-          text: "GEIST · CORPO (" + Theme.sansFamily + ")"
+          text: "GEIST · CORPO (" + Theme.fontFamily + ")"
           color: Theme.muted
-          font.family: Theme.monoFamily
+          font.family: Theme.monoFontFamily
           font.pixelSize: Theme.fontCaption
           font.weight: Font.Medium
         }
@@ -95,7 +95,7 @@ PanelWindow {
           width: parent.width
           text: "A shell abre sobre o Niri com superfície escura constante, tipografia Geist e ícones Lucide. Só o acento muda entre as três variações."
           color: Theme.text
-          font.family: Theme.sansFamily
+          font.family: Theme.fontFamily
           font.pixelSize: Theme.fontBody
           font.weight: Font.Normal
           wrapMode: Text.WordWrap
@@ -109,7 +109,7 @@ PanelWindow {
         Text {
           text: "GEIST MONO · NÚMEROS E CÓDIGOS"
           color: Theme.muted
-          font.family: Theme.monoFamily
+          font.family: Theme.monoFontFamily
           font.pixelSize: Theme.fontCaption
           font.weight: Font.Medium
         }
@@ -118,8 +118,8 @@ PanelWindow {
           width: parent.width
           text: "0123456789 · 14:32:08 · 192.168.0.42 · 98%"
           color: Theme.accentText
-          font.family: Theme.monoFamily
-          font.pixelSize: Theme.fontBodyLg
+          font.family: Theme.monoFontFamily
+          font.pixelSize: Theme.fontLabel
           font.weight: Font.Medium
         }
       }
@@ -127,7 +127,7 @@ PanelWindow {
       Rectangle {
         width: parent.width
         height: 1
-        color: Theme.divider
+        color: Theme.border
       }
 
       Row {
@@ -146,7 +146,7 @@ PanelWindow {
             readonly property bool active: Theme.name === modelData.key
             width: 124
             height: 36
-            radius: Theme.radiusButton
+            radius: Theme.radiusSecondaryButton
             color: active ? Theme.accentSubtle
                 : btnMouse.containsMouse ? Theme.hover : Theme.control
             border.width: 1
@@ -167,7 +167,7 @@ PanelWindow {
               Text {
                 text: schemeBtn.modelData.label
                 color: schemeBtn.active ? Theme.text : Theme.muted
-                font.family: Theme.sansFamily
+                font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontBody
                 font.weight: Font.Medium
               }

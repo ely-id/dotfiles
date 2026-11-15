@@ -88,7 +88,7 @@ Item {
         width: 16; height: 16; sourceSize: Qt.size(32, 32)
         source: Qt.resolvedUrl("../../icons/check.svg")
         layer.enabled: true
-        layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.colors.panel }
+        layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.textOnAccent }
       }
     }
   }

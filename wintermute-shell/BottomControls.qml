@@ -281,6 +281,7 @@ Card {
       width: vertical ? 40 : Theme.lerp(slot === 0 || slot === 3 ? 38 : 36, 40, root.widthProgress)
       height: 40
       enabled: opacity > 0.5
+      showBackground: false
       onHoveredChanged: {
         if (slot === 0) root.wifiButtonHovered = hovered;
         else if (slot === 1) root.soundButtonHovered = hovered;

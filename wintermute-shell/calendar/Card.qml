@@ -170,6 +170,7 @@ Shell.PanelBackground {
 
   component NavigationButton: Shell.IconButton {
     id: root
+    showBackground: false
     restingOpacity: 1
     iconWidth: 24
     iconHeight: 24

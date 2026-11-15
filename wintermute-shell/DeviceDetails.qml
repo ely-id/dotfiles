@@ -50,6 +50,7 @@ Item {
     }
     ActionButton {
       x: 7.5; y: parent.height - 48.5
+      kind: "danger"
       text: root.primaryText
       interactive: root.interactive && root.primaryEnabled
       onClicked: root.primaryClicked()

@@ -26,20 +26,9 @@ Item {
 
   Shadow {
     anchors.fill: parent
-    cornerRadius: Theme.lerp(PanelStyle.radius, 14.38,
+    cornerRadius: Theme.lerp(Theme.radiusPanel, 14.38,
                              root.backingAmount)
-    shadows: PanelStyle.frontShadows
-    visible: opacity > 0.001
-    opacity: 1 - root.backingAmount
-  }
-
-  Shadow {
-    anchors.fill: parent
-    cornerRadius: Theme.lerp(PanelStyle.radius, 14.38,
-                             root.backingAmount)
-    shadows: PanelStyle.backShadows
-    visible: opacity > 0.001
-    opacity: root.backingAmount
+    shadows: Theme.glassShadows
   }
 
   Item {
@@ -48,21 +37,13 @@ Item {
 
     Rectangle {
       anchors.fill: parent
-      radius: Theme.lerp(PanelStyle.radius, 14.38,
+      radius: Theme.lerp(Theme.radiusPanel, 14.38,
                          root.backingAmount)
-      color: PanelStyle.panelGradient ? "transparent" : Theme.translucent ? PanelStyle.panelSurface : Qt.rgba(
-          Theme.lerp(PanelStyle.surface.r, PanelStyle.backSurface.r,
-                     root.backingAmount),
-          Theme.lerp(PanelStyle.surface.g, PanelStyle.backSurface.g,
-                     root.backingAmount),
-          Theme.lerp(PanelStyle.surface.b, PanelStyle.backSurface.b,
-                     root.backingAmount),
-          1)
-      border.color: PanelStyle.panelBorder
-      border.width: Theme.translucent ? 0 : 1
+      color: "transparent"
+      border.width: 0
       antialiasing: true
-      GradientFill { fill: PanelStyle.panelGradient }
-      PanelBorder { radius: parent.radius }
+      GradientFill { radius: parent.radius }
+      PanelBorder { radius: parent.radius; z: 3 }
     }
 
     Item {
@@ -93,7 +74,7 @@ Item {
         height: 1
         z: 2
         visible: root.hasHeaderDivider
-        color: PanelStyle.outline
+        color: Theme.border
         antialiasing: false
       }
     }
@@ -133,7 +114,7 @@ Item {
           maskEnabled: true
           maskSource: coverage
           blurEnabled: true
-          blurMax: 48
+          blurMax: Theme.glassBlur
           blur: root.backingAmount
         }
       }

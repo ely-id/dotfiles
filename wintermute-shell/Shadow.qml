@@ -3,12 +3,13 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 
-// Draw only the shadow so translucent cards never reveal a solid backing rectangle.
+// Sombras de duas camadas do vidro Armitage (0,2 blur 6 α 0,30 + 0,12 blur 32 α 0,45).
 Item {
   id: root
 
-  property real cornerRadius: 0
-  property var shadows: []
+  property real cornerRadius: Theme.radiusCard
+  property var shadows: Theme.glassShadows
+  property real strength: 1.0
 
   Repeater {
     model: root.shadows
@@ -21,7 +22,7 @@ Item {
       radius: root.cornerRadius
       blur: modelData.blur
       spread: 0
-      color: Qt.rgba(0, 0, 0, modelData.alpha)
+      color: Qt.rgba(0, 0, 0, modelData.alpha * root.strength)
       antialiasing: true
       cached: false
     }

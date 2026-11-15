@@ -7,10 +7,10 @@
 
 ## Medidas — 264×296, raio 16
 
-- Título “Novembro de 2026” (mês corrente) em (16,16) caixa 160×24.
-- Três botões 24×24 raio 6 em y 16, x 176 / 204 / 232: voltar para hoje (`rotate-ccw`), mês anterior, mês seguinte.
+- Título “Novembro de 2026” (mês corrente) em (16,16) caixa 160×24, 13 Medium (medi no print: a altura das letras é de 13).
+- Três botões 24×24 raio 6 em y 16, x 176 / 204 / 232: voltar para hoje (`rotate-ccw`), mês anterior (`chevron-up`), mês seguinte (`chevron-down`), com ícone de 16. Os três ficam sempre visíveis, como na prévia; a origem escondia o de voltar para hoje no mês corrente. Hover `hover`.
 - Cabeçalho da semana: **segunda a domingo** (`S T Q Q S S D`), 11 `muted`, células 32 de largura a cada **36**, origem (8,48).
-- Células do dia: **32×32** raio 8, passo 36 (a Pond usava 33,14 — fora da grade; este é o refino). Origem da grade (8,72).
+- Células do dia: **32×32** raio 8, passo 36 (a Pond usava 33,14 — fora da grade; este é o refino). Origem da grade (8,72). Número 13 Medium. A grade tem sempre 6 linhas, então o painel fica com 296 de altura.
 - Hoje: fundo `accent`, número `onAccent`.
 - Hover: fundo `pressed`.
 - Dias de outro mês: `muted` a 50% de opacidade.

@@ -23,6 +23,7 @@ Item {
   property real labelGap: 8
   property int labelSize: Theme.fontBody
   property real contentOpacity: 1.0
+  property color titleColor: Theme.text
   property Component leading: null
   property Component trailing: null
   // Opcional para fixar o estado na demonstração: "" | "rest" | "hover" | "pressed" | "selected"
@@ -86,7 +87,7 @@ Item {
     width: Math.max(0, root.labelRight - x)
     elide: Text.ElideRight
     text: root.title
-    color: Theme.text
+    color: root.titleColor
     opacity: root.contentOpacity
     font.family: Theme.fontFamily
     font.weight: Font.Medium

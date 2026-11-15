@@ -1,7 +1,9 @@
 import QtQuick
 import Quickshell
 
-// Device drawer header, scrolling rows, empty state, and footer.
+// Cabeçalho, linhas rolantes, estado vazio e rodapé de uma lista de dispositivos (fichas 05 e 06).
+// Título Serif 20 em (20,16), caixa de 32 de altura; ícone opcional de 20 em (20,22) empurra o
+// título para x 48; controle (chave) em (242,18); linhas 300×44 em x 8 a partir de y 64.
 Item {
   id: root
   property var stackController
@@ -26,16 +28,27 @@ Item {
     anchors.fill: parent
     stacked: true
     Image {
-      x: 19.5; y: 23.5; width: 20; height: 20
-      visible: root.titleIcon.toString() !== ""; source: root.titleIcon
+      x: 20; y: 22; width: 20; height: 20
+      visible: root.titleIcon.toString() !== ""
+      source: root.titleIcon
+      sourceSize: Qt.size(40, 40)
+      fillMode: Image.PreserveAspectFit
     }
     Text {
-      x: root.titleIcon.toString() !== "" ? 43.5 : 19.5
-      y: 19.5
-      text: root.title; color: Theme.colors.text
-      font.family: Theme.titleFontFamily; font.weight: Font.Normal; font.pixelSize: 20
+      x: root.titleIcon.toString() !== "" ? 48 : 20
+      y: 16
+      width: 222 - x
+      height: 32
+      verticalAlignment: Text.AlignVCenter
+      elide: Text.ElideRight
+      text: root.title
+      color: Theme.text
+      font.family: Theme.titleFontFamily
+      font.weight: Font.Normal
+      font.pixelSize: Theme.fontPanelTitle
+      font.letterSpacing: 0
     }
-    Loader { x: 241.5; y: 19.5; width: 54; height: 28; sourceComponent: root.headerControl }
+    Loader { x: 242; y: 18; width: 54; height: 28; sourceComponent: root.headerControl }
     ListView {
       id: deviceList
       clip: true
@@ -49,16 +62,24 @@ Item {
       footerPositioning: ListView.InlineFooter
     }
     Text {
-      x: 20; y: root.listTop + (root.footer ? 52 : 16); width: 276
+      x: 20; y: root.listTop + (root.footer ? 52 : 32); width: 276
       text: root.emptyText; visible: deviceList.count === 0
-      wrapMode: Text.Wrap; color: Theme.colors.text; opacity: 0.5
-      font.family: Theme.fontFamily; font.pixelSize: 13
+      horizontalAlignment: Text.AlignHCenter
+      wrapMode: Text.Wrap
+      color: Theme.muted
+      font.family: Theme.fontFamily
+      font.weight: Font.Normal
+      font.pixelSize: Theme.fontBody
+      font.letterSpacing: 0
     }
     Text {
       x: 20; y: root.viewportHeight; width: 276; height: 38
       text: root.message; visible: root.message !== ""
-      wrapMode: Text.Wrap; color: Theme.colors.errorText
-      font.family: Theme.fontFamily; font.pixelSize: 12
+      wrapMode: Text.Wrap
+      color: Theme.dangerText
+      font.family: Theme.fontFamily
+      font.pixelSize: Theme.fontCaption
+      font.letterSpacing: 0
     }
     ScrollShade {
       view: deviceList

@@ -4,20 +4,22 @@ import QtQuick
 import QtQuick.Controls as Controls
 import ".."
 
+// Menu de opções (segurança, EAP) sobre um painel de vidro: linhas 40 raio 12, marcador
+// accentSubtle na opção atual e hover.
 Item {
   id: root
   property bool open: false
   property Item anchorItem
   property string currentMode: "wpa-psk"
   readonly property var securityOptions: [
-    { label: "Open (No password)", mode: "open" },
-    { label: "Enhanced Open (OWE)", mode: "owe" },
-    { label: "WPA Personal (Legacy)", mode: "wpa" },
-    { label: "WPA2 Personal", mode: "wpa2" },
-    { label: "WPA2/WPA3 Personal", mode: "wpa-psk" },
-    { label: "WPA3 Personal Only", mode: "sae" },
-    { label: "WPA2/3 Enterprise", mode: "wpa-eap" },
-    { label: "WEP Key (Legacy)", mode: "wep" }
+    { label: "Aberta (sem senha)", mode: "open" },
+    { label: "Aberta aprimorada (OWE)", mode: "owe" },
+    { label: "WPA Pessoal (legado)", mode: "wpa" },
+    { label: "WPA2 Pessoal", mode: "wpa2" },
+    { label: "WPA2/WPA3 Pessoal", mode: "wpa-psk" },
+    { label: "Somente WPA3 Pessoal", mode: "sae" },
+    { label: "WPA2/3 Empresarial", mode: "wpa-eap" },
+    { label: "Chave WEP (legado)", mode: "wep" }
   ]
   property var options: securityOptions
   signal selected(string label, string mode)
@@ -36,7 +38,7 @@ Item {
     });
   }
 
-  implicitWidth: 276
+  implicitWidth: PanelStyle.fieldWidth
   implicitHeight: Math.min(272, options.length * 40 + 16)
   visible: root.open || root.opacity > 0.001
   enabled: root.open
@@ -57,19 +59,10 @@ Item {
     }
   }
 
-  Shadow {
+  GlassSurface {
     anchors.fill: parent
-    cornerRadius: 16
-    shadows: PanelStyle.controlShadows
-  }
-
-  Rectangle {
-    anchors.fill: parent
-    radius: 16
-    color: PanelStyle.menuSurface
-    border.color: PanelStyle.menuBorder
-    border.width: 0.5
-    clip: true
+    surfaceType: "panel"
+    showGlow: false
 
     ListView {
       id: optionList
@@ -78,7 +71,7 @@ Item {
       ScrollWheel { view: optionList }
       x: 8
       y: 8
-      width: 259
+      width: root.width - 16
       height: root.implicitHeight - 16
       model: root.options
       keyNavigationEnabled: true
@@ -91,7 +84,7 @@ Item {
         width: 2
         padding: 0
         policy: size < 1 ? Controls.ScrollBar.AlwaysOn : Controls.ScrollBar.AlwaysOff
-        contentItem: Rectangle { radius: 2; color: Qt.rgba(1, 1, 1, 0.2) }
+        contentItem: Rectangle { radius: 2; color: Theme.dot }
         background: null
       }
       delegate: Rectangle {
@@ -100,19 +93,20 @@ Item {
         required property int index
         width: optionList.width
         height: 40
-        radius: 12
-        color: modelData.mode === root.currentMode || rowHover.hovered
-            || (optionList.activeFocus && index === optionList.currentIndex)
-            ? PanelStyle.menuRowHover : "transparent"
+        radius: Theme.radiusRow
+        color: modelData.mode === root.currentMode ? Theme.accentSubtle
+            : rowHover.hovered || (optionList.activeFocus && index === optionList.currentIndex)
+              ? Theme.hover : "transparent"
 
         Text {
           x: 12
           anchors.verticalCenter: parent.verticalCenter
           text: optionRow.modelData.label
-          color: Theme.colors.text
+          color: Theme.text
           font.family: Theme.fontFamily
           font.weight: Font.Medium
-          font.pixelSize: 13
+          font.pixelSize: Theme.fontBody
+          font.letterSpacing: 0
         }
         HoverHandler { id: rowHover; cursorShape: Qt.PointingHandCursor }
         TapHandler {

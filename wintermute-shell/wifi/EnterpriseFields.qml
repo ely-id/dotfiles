@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import ".."
 
+// Campos de rede empresarial (WPA2/3 Enterprise): rótulo 15 Medium, campo 28 abaixo, 12 entre linhas.
 Column {
   id: root
   property string eap: "peap"
@@ -29,7 +30,7 @@ Column {
   signal fieldFocused(var field)
 
   width: PanelStyle.fieldWidth
-  spacing: 20
+  spacing: 12
 
   function select(setting, mode) {
     if (setting === "eap") {
@@ -48,32 +49,33 @@ Column {
   component FormRow: Column {
     property string label
     width: PanelStyle.fieldWidth
-    spacing: 5
+    spacing: 8
     Text {
       text: parent.label
-      color: Theme.colors.text
+      color: Theme.text
       font.family: Theme.fontFamily
       font.weight: Font.Medium
-      font.pixelSize: 13
-      height: 16
+      font.pixelSize: Theme.fontLabel
+      font.letterSpacing: 0
+      height: 20
     }
   }
 
   FormRow {
-    label: "Username"
-    InputField { id: username; placeholderText: "Enter username" }
+    label: "Usuário"
+    InputField { id: username; placeholderText: "Usuário" }
   }
   FormRow {
-    label: "Password"
+    label: "Senha"
     InputField {
       id: password
       password: true
-      placeholderText: "Enter password"
+      placeholderText: "Senha"
       onAccepted: root.accepted()
     }
   }
   FormRow {
-    label: "Authentication"
+    label: "Autenticação"
     SelectField {
       text: root.eap.toUpperCase()
       onActiveFocusChanged: if (activeFocus) root.fieldFocused(this)
@@ -82,7 +84,7 @@ Column {
     }
   }
   FormRow {
-    label: "Inner authentication"
+    label: "Autenticação interna"
     visible: root.innerOptions.length > 1
     SelectField {
       text: root.innerOptions.find(option => option.mode === root.innerAuth)?.label || ""
@@ -92,22 +94,22 @@ Column {
     }
   }
   FormRow {
-    label: "Server domain"
+    label: "Domínio do servidor"
     InputField {
       id: domain
-      placeholderText: "e.g. wifi.example.edu"
+      placeholderText: "ex.: wifi.exemplo.edu.br"
       onAccepted: root.accepted()
     }
   }
   FormRow {
-    label: "Anonymous identity (optional)"
-    InputField { id: anonymous; placeholderText: "Enter anonymous identity" }
+    label: "Identidade anônima (opcional)"
+    InputField { id: anonymous; placeholderText: "Identidade anônima" }
   }
   FormRow {
-    label: "CA certificate (optional)"
+    label: "Certificado CA (opcional)"
     InputField {
       id: certificate
-      placeholderText: "/path/to/certificate.pem"
+      placeholderText: "/caminho/do/certificado.pem"
       onAccepted: root.accepted()
     }
   }

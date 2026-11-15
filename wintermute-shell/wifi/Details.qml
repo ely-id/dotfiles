@@ -2,29 +2,32 @@ import QtQuick
 import "." as Wifi
 import ".."
 
+// Detalhes da rede (ficha 05, 316×424 com 6 linhas).
 DeviceDetails {
   id: root
-  readonly property bool connected: selection.ssid === Wifi.State.connectedSsid
-  title: String(selection.ssid || Wifi.State.connectedSsid)
-  titleIcon: Component { SignalIcon { bars: Number(root.selection.bars || 3) } }
+  property var service: stackController ? stackController.service : Wifi.State
+  readonly property bool connected: selection.ssid === service.connectedSsid
+  title: String(selection.ssid || service.connectedSsid)
+  titleIcon: Component { SignalIcon { bars: Number(root.selection.bars || 3); tint: Theme.accentText } }
+  primaryText: "Esquecer"
   primaryEnabled: (selection.uuids || []).length > 0
-  secondaryText: connected ? "Disconnect" : "Connect"
+  secondaryText: connected ? "Desconectar" : "Conectar"
   detailRows: connected ? [
-    {label: "Link Speed", value: Wifi.State.linkSpeed},
-    {label: "IPv4 Address", value: Wifi.State.ipv4},
-    {label: "Band / Channel / Width", value: Wifi.State.band},
-    {label: "Default Gateway", value: Wifi.State.gateway},
-    {label: "DNS Server", value: Wifi.State.dns},
-    {label: "Network Interface", value: Wifi.State.device || "—"}
+    {label: "Velocidade", value: service.linkSpeed},
+    {label: "IPv4", value: service.ipv4},
+    {label: "Banda", value: service.band},
+    {label: "Gateway", value: service.gateway},
+    {label: "DNS", value: service.dns},
+    {label: "Interface", value: service.device || "—"}
   ] : []
-  Component.onCompleted: Wifi.State.refreshDetails()
+  Component.onCompleted: service.refreshDetails()
   onPrimaryClicked: {
-    Wifi.State.forget(selection);
+    service.forget(selection);
     stackController.showStatus();
   }
   onSecondaryClicked: {
     if (connected) {
-      Wifi.State.disconnect();
+      service.disconnect();
       stackController.showStatus();
     } else {
       stackController.connectNetwork(selection.ssid, "", false);

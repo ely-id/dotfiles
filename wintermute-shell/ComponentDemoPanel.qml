@@ -5,6 +5,7 @@ import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
 import "calendar" as Calendar
+import "demo" as Demo
 import "media" as Media
 import "minimap" as Minimap
 import "notifications" as Notifications
@@ -869,6 +870,62 @@ PanelWindow {
                   caption: "Frente 316 sobre verso 284 em (16, 0) · folga 32 · o X volta"
                   stageWidth: PanelStyle.stackWidth; stageHeight: PanelStyle.frontInsetSingle + 306
                   StackSpecimen { startStacked: true }
+                }
+              }
+
+              SectionBlock {
+                title: "Wi-Fi (ficha 05, board 13:13604) · pilha real com dados fictícios"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Lista 316×306 · rede conectada, cadeados e rodapé"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 328
+                  Demo.WifiSpecimen { page: "drawer"; height: 328 }
+                }
+                Specimen {
+                  caption: "Entrar 316×228 · “Conectar” desativado sem senha"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 260
+                  Demo.WifiSpecimen {
+                    page: "join"; height: 260
+                    selection: ({ ssid: "Casa_Lima", locked: true })
+                  }
+                }
+                Specimen {
+                  caption: "Adicionar rede 316×436 · SSID em foco"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 468
+                  Demo.WifiSpecimen { page: "add"; height: 468 }
+                }
+                Specimen {
+                  caption: "Detalhes 316×424 · 6 linhas de 48 com divisor"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 456
+                  Demo.WifiSpecimen {
+                    page: "details"; height: 456
+                    selection: ({ ssid: "Wintermute-5G", bars: 3, uuids: ["demo-1"] })
+                  }
+                }
+                Specimen {
+                  caption: "Status 316×112 · conectando"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 144
+                  Demo.WifiSpecimen {
+                    page: "status"; height: 144
+                    phase: "connecting"; statusText: "Conectando a Casa_Lima…"
+                  }
+                }
+                Specimen {
+                  caption: "Status · conectado (fecha sozinho em 1,5 s no painel real)"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 144
+                  Demo.WifiSpecimen {
+                    page: "status"; height: 144
+                    phase: "complete"; statusText: "Conectado"
+                  }
+                }
+                Specimen {
+                  caption: "Status · senha incorreta"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 144
+                  Demo.WifiSpecimen {
+                    page: "status"; height: 144
+                    phase: "failed"; statusText: "Senha incorreta"
+                  }
                 }
               }
             }

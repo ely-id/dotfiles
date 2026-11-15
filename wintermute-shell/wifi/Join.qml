@@ -1,10 +1,12 @@
 import QtQuick
 import ".."
 
+// Entrar na rede (ficha 05, 316×228): título (20,16), rótulo "Senha" 15 em (20,72), campo em
+// (20,100) e botão primário "Conectar" em (20,160), desativado até haver senha.
+// Redes empresariais usam o formulário rolável, a partir de y 72.
 Item {
   id: root
-  readonly property real headerDividerY: 63.5
-  readonly property bool headerDividerVisible: !optionsMenu.visible || optionsMenu.y > headerDividerY
+  readonly property bool headerDividerVisible: !optionsMenu.visible || optionsMenu.y > PanelStyle.headerDividerY
   property var stackController
   property var selection: ({})
   property bool interactive: true
@@ -14,22 +16,23 @@ Item {
   readonly property bool canConnect: isEnterprise ? enterprise.complete : password.text.length > 0
 
   implicitWidth: PanelStyle.width
-  implicitHeight: isEnterprise ? connectButton.y + (canConnect ? 63.5 : 0.5)
-                               : canConnect ? 226 : 167
+  implicitHeight: isEnterprise ? connectButton.y + connectButton.height + 20 : 228
 
   function focusEditor() {
     if (isEnterprise) enterprise.focusEditor();
     else password.focusEditor();
   }
+  function connect() {
+    if (!canConnect)
+      return;
+    root.stackController.connectNetwork(
+        String(root.selection.ssid || ""),
+        root.isEnterprise ? enterprise.secret : password.text, false,
+        root.isEnterprise ? "wpa-eap" : "auto",
+        root.isEnterprise ? enterprise.settings : undefined);
+  }
   Component.onCompleted: if (interactive) focusEditor()
   onInteractiveChanged: if (interactive) focusEditor()
-
-  Behavior on implicitHeight {
-    NumberAnimation {
-      duration: PanelStyle.openDuration
-      easing.type: Easing.OutCubic
-    }
-  }
 
   PanelBackground { anchors.fill: parent; stacked: true }
   Item {
@@ -41,83 +44,58 @@ Item {
     }
 
     Text {
-      x: 19.5
-      y: 19.5
-      width: 260
+      x: 20; y: 16
+      width: 276; height: 32
+      verticalAlignment: Text.AlignVCenter
       elide: Text.ElideRight
-      text: "Join “" + String(root.selection.ssid || "Wifi Network") + "”"
-      color: Theme.colors.text
+      text: "Entrar em “" + String(root.selection.ssid || "Rede Wi-Fi") + "”"
+      color: Theme.text
       font.family: Theme.titleFontFamily
       font.weight: Font.Normal
-      font.pixelSize: 20
+      font.pixelSize: Theme.fontPanelTitle
+      font.letterSpacing: 0
     }
     Text {
-      x: 19.5
-      y: 79.5
-      text: "Password"
+      x: 20; y: 72
+      text: "Senha"
       visible: !root.isEnterprise
-      color: Theme.colors.text
+      color: Theme.text
       font.family: Theme.fontFamily
       font.weight: Font.Medium
-      font.pixelSize: 15
+      font.pixelSize: Theme.fontLabel
+      font.letterSpacing: 0
     }
     Field {
       id: password
-      x: 19.5
-      y: 102.5
+      x: 20; y: 100
       visible: !root.isEnterprise
       password: true
-      placeholderText: "Enter password"
-      onAccepted: connectButton.trigger()
+      placeholderText: "Senha"
+      onAccepted: root.connect()
     }
     FormViewport {
       id: form
-      y: 79.5
+      y: 72
       width: parent.width
       height: 416
       contentHeight: enterprise.height
       visible: root.isEnterprise
       EnterpriseFields {
         id: enterprise
-        x: 19.5
+        x: 20
         onFieldFocused: field => form.reveal(field)
-        onAccepted: connectButton.trigger()
+        onAccepted: root.connect()
         onMenuRequested: menu => { root.menu = menu; root.dropdownOpen = true; }
       }
     }
-    Rectangle {
+    ActionButton {
       id: connectButton
-      x: 19.5
-      y: root.isEnterprise ? form.y + form.height + 16 : 162.5
-      width: 276
-      height: 48
-      radius: 100
-      visible: opacity > 0
-      opacity: root.canConnect ? 1 : 0
-      color: connectHover.hovered ? "#D8B8FA" : PanelStyle.accent
-
-      function trigger() {
-        if (root.canConnect)
-          root.stackController.connectNetwork(
-              String(root.selection.ssid || ""),
-              root.isEnterprise ? enterprise.secret : password.text, false,
-              root.isEnterprise ? "wpa-eap" : "auto",
-              root.isEnterprise ? enterprise.settings : undefined);
-      }
-
-      Behavior on opacity {
-        NumberAnimation { duration: PanelStyle.controlDuration }
-      }
-      Text {
-        anchors.centerIn: parent
-        text: "Connect"
-        color: PanelStyle.accentText
-        font.family: Theme.fontFamily
-        font.weight: Font.Medium
-        font.pixelSize: 15
-      }
-      HoverHandler { id: connectHover; cursorShape: Qt.PointingHandCursor }
-      TapHandler { onTapped: connectButton.trigger() }
+      x: 20
+      y: root.isEnterprise ? form.y + form.height + 16 : 160
+      kind: "primary"
+      text: "Conectar"
+      interactive: root.canConnect
+      onClicked: root.connect()
     }
   }
   Item {

@@ -1,15 +1,17 @@
 import QtQuick
 import ".."
 
+// Adicionar rede (ficha 05, 316×436): rótulos 15 em y 72 / 156 / 240 (campo 28 abaixo), caixa
+// "Rede oculta" em (20,328) com o rótulo em (48,328) e botão primário "Conectar" em (20,368),
+// desativado até dar para conectar. Redes empresariais usam o formulário rolável.
 Item {
   id: root
-  readonly property real headerDividerY: 63.5
-  readonly property bool headerDividerVisible: !securityMenu.visible || securityMenu.y > headerDividerY
+  readonly property bool headerDividerVisible: !securityMenu.visible || securityMenu.y > PanelStyle.headerDividerY
   property var stackController
   property bool interactive: true
   property var menu: ({})
   property bool dropdownOpen: false
-  property string securityValue: "WPA2/WPA3 Personal"
+  property string securityValue: "WPA2/WPA3 Pessoal"
   property string securityMode: "wpa-psk"
   property bool hiddenNetwork: false
   readonly property bool isEnterprise: securityMode === "wpa-eap"
@@ -19,14 +21,19 @@ Item {
       && (isEnterprise ? enterprise.complete : !needsPassword || password.text.length > 0)
 
   implicitWidth: PanelStyle.width
-  implicitHeight: connectButton.y + (canConnect ? 63.5 : isEnterprise ? 0.5 : -0.5)
+  implicitHeight: connectButton.y + connectButton.height + 20
   onSecurityModeChanged: form.contentY = 0
+  // A ficha mostra o campo do SSID já em foco.
+  Component.onCompleted: if (interactive) networkName.focusEditor()
+  onInteractiveChanged: if (interactive) networkName.focusEditor()
 
-  Behavior on implicitHeight {
-    NumberAnimation {
-      duration: PanelStyle.openDuration
-      easing.type: Easing.OutCubic
-    }
+  function connect() {
+    if (!canConnect)
+      return;
+    root.stackController.connectNetwork(
+        networkName.text, root.isEnterprise ? enterprise.secret : password.text,
+        root.hiddenNetwork, root.securityMode,
+        root.isEnterprise ? enterprise.settings : undefined);
   }
 
   PanelBackground { anchors.fill: parent; stacked: true }
@@ -41,49 +48,44 @@ Item {
     }
 
     Text {
-      x: 19.5
-      y: 19.5
-      text: "Add network"
-      color: Theme.colors.text
+      x: 20; y: 16
+      width: 276; height: 32
+      verticalAlignment: Text.AlignVCenter
+      text: "Adicionar rede"
+      color: Theme.text
       font.family: Theme.titleFontFamily
       font.weight: Font.Normal
-      font.pixelSize: 20
+      font.pixelSize: Theme.fontPanelTitle
+      font.letterSpacing: 0
     }
 
+    // O formulário começa em y 72; as posições abaixo são relativas a ele.
     FormViewport {
       id: form
-      y: 79.5
+      y: 72
       width: parent.width
-      height: root.isEnterprise ? 416 : 292
-      contentHeight: hidden.y + 44
+      height: root.isEnterprise ? 416 : 296
+      contentHeight: hidden.y + hidden.height + 8
 
-      Text {
-        x: 19.5
-        text: "Network name (SSID)"
-        color: Theme.colors.text
+      component FieldLabel: Text {
+        x: 20
+        color: Theme.text
         font.family: Theme.fontFamily
         font.weight: Font.Medium
-        font.pixelSize: 13
+        font.pixelSize: Theme.fontLabel
+        font.letterSpacing: 0
       }
+
+      FieldLabel { text: "Nome da rede (SSID)" }
       Field {
         id: networkName
-        x: 19.5
-        y: 21
-        placeholderText: "Enter network name"
+        x: 20; y: 28
+        placeholderText: "Nome da rede"
         onFocusedChanged: if (focused) form.reveal(this)
       }
-      Text {
-        x: 19.5
-        y: 85
-        text: "Security"
-        color: Theme.colors.text
-        font.family: Theme.fontFamily
-        font.weight: Font.Medium
-        font.pixelSize: 13
-      }
+      FieldLabel { y: 84; text: "Segurança" }
       SelectField {
-        x: 19.5
-        y: 106
+        x: 20; y: 112
         text: root.securityValue
         onActiveFocusChanged: if (activeFocus) form.reveal(this)
         onClicked: {
@@ -93,81 +95,51 @@ Item {
         }
       }
 
-      Text {
-        x: 19.5
-        y: 170
-        text: "Password"
-        visible: root.needsPassword
-        color: Theme.colors.text
-        font.family: Theme.fontFamily
-        font.weight: Font.Medium
-        font.pixelSize: 13
-      }
+      FieldLabel { y: 168; text: "Senha"; visible: root.needsPassword }
       Field {
         id: password
-        x: 19.5
-        y: 191
+        x: 20; y: 196
         password: true
-        placeholderText: "Enter password"
+        placeholderText: "Senha"
         visible: root.needsPassword
-        onAccepted: connectButton.trigger()
+        onAccepted: root.connect()
       }
       EnterpriseFields {
         id: enterprise
-        x: 19.5
-        y: 170
+        x: 20; y: 168
         visible: root.isEnterprise
         onFieldFocused: field => form.reveal(field)
-        onAccepted: connectButton.trigger()
+        onAccepted: root.connect()
         onMenuRequested: menu => { root.menu = menu; root.dropdownOpen = true; }
       }
 
       CheckBox {
         id: hidden
-        x: 19.5
-        y: root.isEnterprise ? enterprise.y + enterprise.height + 12 : 247
+        x: 20
+        y: root.isEnterprise ? enterprise.y + enterprise.height + 12 : 256
         checked: root.hiddenNetwork
         onToggled: checked => root.hiddenNetwork = checked
       }
       Text {
-        x: 51.5
+        x: 48
         anchors.verticalCenter: hidden.verticalCenter
-        text: "Hidden network"
-        color: Theme.colors.text
+        text: "Rede oculta"
+        color: Theme.text
         font.family: Theme.fontFamily
         font.weight: Font.Medium
-        font.pixelSize: 13
+        font.pixelSize: Theme.fontBody
+        font.letterSpacing: 0
       }
     }
 
-    Rectangle {
+    ActionButton {
       id: connectButton
-      x: 19.5
+      x: 20
       y: form.y + form.height + (root.isEnterprise ? 16 : 0)
-      width: 276
-      height: 48
-      radius: 100
-      visible: opacity > 0
-      opacity: root.canConnect ? 1 : 0
-      color: connectHover.hovered ? "#D8B8FA" : PanelStyle.accent
-
-      function trigger() {
-        if (root.canConnect)
-          root.stackController.connectNetwork(
-              networkName.text, root.isEnterprise ? enterprise.secret : password.text,
-              root.hiddenNetwork, root.securityMode,
-              root.isEnterprise ? enterprise.settings : undefined);
-      }
-      Text {
-        anchors.centerIn: parent
-        text: "Connect"
-        color: PanelStyle.accentText
-        font.family: Theme.fontFamily
-        font.weight: Font.Medium
-        font.pixelSize: 15
-      }
-      HoverHandler { id: connectHover; cursorShape: Qt.PointingHandCursor }
-      TapHandler { onTapped: connectButton.trigger() }
+      kind: "primary"
+      text: "Conectar"
+      interactive: root.canConnect
+      onClicked: root.connect()
     }
   }
 

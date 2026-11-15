@@ -3,28 +3,30 @@ import QtQuick
 import "." as Wifi
 import ".."
 
+// Lista de redes (ficha 05, 316×306): título Serif 20 em (20,16), chave em (242,18),
+// linhas 300×44 a partir de y 64 e rodapé "Adicionar rede" depois de um divisor.
 DeviceList {
   id: root
-  title: "Wifi"
+  property var service: stackController ? stackController.service : Wifi.State
+  title: "Wi-Fi"
   viewportHeight: 306
-  devices: Wifi.State.wiredNetworks.concat(Wifi.State.enabled ? Wifi.State.networks : [])
+  devices: service.wiredNetworks.concat(service.enabled ? service.networks : [])
   headerControl: Component { Toggle {
-    trackAlpha: PanelStyle.drawerToggleAlpha
-    checked: Wifi.State.enabled
+    checked: root.service.enabled
     enabled: root.interactive
-    onToggled: checked => Wifi.State.setWifiEnabled(checked)
+    onToggled: checked => root.service.setWifiEnabled(checked)
   } }
   deviceDelegate: Component { NetworkRow {
     required property var modelData
     width: PanelStyle.rowWidth
     network: modelData
     interactive: root.interactive && !modelData.wired
-    onDisconnectClicked: Wifi.State.disconnect()
+    onDisconnectClicked: root.service.disconnect()
     onDetailsRequested: {
       if (modelData.connected || modelData.known)
         root.stackController.push("details", modelData);
     }
-    onRowClicked: {
+    onClicked: {
       if (modelData.connected)
         root.stackController.push("details", modelData);
       else if (modelData.locked && !modelData.known)
@@ -34,46 +36,22 @@ DeviceList {
     }
   } }
   footer: Component { Item {
-    id: addNetworkRow
     width: PanelStyle.rowWidth
-    height: PanelStyle.rowHeight
+    height: 58
 
     Rectangle {
-      anchors.fill: parent
-      radius: PanelStyle.rowRadius
-      color: addNetworkPointer.containsMouse ? PanelStyle.drawerRowHover
-          : Qt.alpha(PanelStyle.drawerRowHover, 0)
-
-      Behavior on color {
-        ColorAnimation { duration: PanelStyle.controlDuration }
-      }
+      x: 12; y: 8
+      width: 276; height: 1
+      color: Theme.border
     }
-
-    Row {
-      x: 12
-      anchors.verticalCenter: parent.verticalCenter
-      spacing: 12
-      opacity: 0.5
-      Image {
-        width: 20
-        height: 20
-        source: Qt.resolvedUrl("../icons/plus.svg")
-      }
-      Text {
-        anchors.verticalCenter: parent.verticalCenter
-        text: "Add a network"
-        color: Theme.colors.text
-        font.family: Theme.fontFamily
-        font.weight: Font.Medium
-        font.pixelSize: 15
-      }
-    }
-    MouseArea {
-      id: addNetworkPointer
-      anchors.fill: parent
-      enabled: root.interactive
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
+    ListRow {
+      y: 14
+      width: PanelStyle.rowWidth
+      title: "Adicionar rede"
+      iconName: "plus"
+      labelSize: Theme.fontLabel
+      titleColor: Theme.muted
+      interactive: root.interactive
       onClicked: root.stackController.push("add", null)
     }
   } }

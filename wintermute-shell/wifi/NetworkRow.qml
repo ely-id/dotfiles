@@ -1,96 +1,49 @@
 import QtQuick
 import ".."
 
-Item {
+// Linha de rede (ficha 05): ListRow 300×44 r12 com o sinal em (12,12), cadeado em (272,14)
+// e, na rede conectada, fundo accentSubtle e botão "Desconectar" 100×32 em (192,6).
+ListRow {
   id: root
   property var network: ({})
-  property bool interactive: true
   readonly property bool canDisconnect: !!network.connected && !network.wired
-  signal rowClicked
   signal detailsRequested
   signal disconnectClicked
-  implicitWidth: PanelStyle.rowWidth
-  implicitHeight: PanelStyle.rowHeight
 
-  Rectangle {
-    anchors.fill: parent
-    radius: PanelStyle.rowRadius
-    color: hover.hovered ? PanelStyle.drawerRowHover : "transparent"
-  }
+  title: String(network.wired ? network.name : network.ssid || "")
+  selected: !!network.connected
+  trailingIconName: !!network.locked && !network.connected ? "lock" : ""
+  labelRight: canDisconnect ? 184 : (showTrailingIcon ? 264 : 288)
+  leading: Component { Item {
+    SignalIcon {
+      visible: !root.network.wired
+      anchors.fill: parent
+      bars: Number(root.network.bars || 1)
+    }
+    Image {
+      visible: !!root.network.wired
+      anchors.fill: parent
+      // O ícone Lucide `cable` (P-39) entra aqui quando o SVG estiver em icons/.
+      source: Qt.resolvedUrl("../assets/wifi/ethernet.svg")
+      sourceSize: Qt.size(40, 40)
+      fillMode: Image.PreserveAspectFit
+    }
+  } }
+
   MouseArea {
     anchors.fill: parent
     enabled: root.interactive
-    acceptedButtons: Qt.LeftButton | Qt.RightButton
-    cursorShape: Qt.PointingHandCursor
-    onClicked: mouse => {
-      if (mouse.button === Qt.RightButton)
-        root.detailsRequested();
-      else
-        root.rowClicked();
-    }
-  }
-  SignalIcon {
-    visible: !root.network.wired
-    x: 12; y: 12; width: 20; height: 20
-    bars: Number(root.network.bars || 1)
-  }
-  Image {
-    visible: !!root.network.wired
-    x: 12; y: 12; width: 20; height: 20
-    source: Qt.resolvedUrl("../assets/wifi/ethernet.svg")
-    sourceSize: Qt.size(40, 40)
-    fillMode: Image.PreserveAspectFit
-  }
-  Text {
-    x: 40
-    anchors.verticalCenter: parent.verticalCenter
-    width: (root.canDisconnect ? 202 : 264) - x
-    elide: Text.ElideRight
-    text: String(root.network.wired ? root.network.name : root.network.ssid || "")
-    color: Theme.colors.text
-    font.family: Theme.fontFamily
-    font.weight: Font.Medium
-    font.pixelSize: 13
-  }
-  Image {
-    visible: !!root.network.locked && !root.network.connected
-    x: 272
-    anchors.verticalCenter: parent.verticalCenter
-    width: 16
-    height: 16
-    source: Qt.resolvedUrl("../icons/lock.svg")
+    acceptedButtons: Qt.RightButton
+    onClicked: root.detailsRequested()
   }
 
-  Rectangle {
-    id: disconnect
+  ActionButton {
     visible: root.canDisconnect
-    x: 208
-    y: 2
-    width: 90
-    height: 40
-    radius: 10
-    color: disconnectHover.hovered ? PanelStyle.controlHover : "transparent"
-
-    Text {
-      anchors.centerIn: parent
-      text: "Disconnect"
-      color: Theme.colors.text
-      opacity: disconnectHover.hovered ? 1 : 0.8
-      font.family: Theme.fontFamily
-      font.weight: Font.Medium
-      font.pixelSize: 13
-    }
-    HoverHandler {
-      id: disconnectHover
-      enabled: root.interactive
-      cursorShape: Qt.PointingHandCursor
-    }
-    MouseArea {
-      anchors.fill: parent
-      enabled: root.interactive
-      cursorShape: Qt.PointingHandCursor
-      onClicked: root.disconnectClicked()
-    }
+    x: 192; y: 6
+    width: 100
+    small: true
+    text: "Desconectar"
+    interactive: root.interactive
+    onClicked: root.disconnectClicked()
   }
-  HoverHandler { id: hover; enabled: root.interactive; cursorShape: Qt.PointingHandCursor }
 }

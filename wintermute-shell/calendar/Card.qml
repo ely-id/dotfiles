@@ -4,9 +4,11 @@ import Quickshell
 import "Dates.js" as Dates
 import ".." as Shell
 
+// Calendário (ficha 09): 264×296, raio 16. Título 13 Medium em (16,16), três botões 24×24 r6 em
+// y 16 (x 176 / 204 / 232: voltar para hoje, mês anterior, mês seguinte), dias da semana 11 muted em
+// y 48 e células de dia 32×32 r8 a cada 36 a partir de (8,72). A semana começa na segunda.
 Shell.PanelBackground {
   id: root
-  fill: Shell.Theme.colors.calendarGradient
   property date today: clock.date
   property bool followToday: true
   property date browsedMonth: Dates.monthStart(today)
@@ -16,17 +18,16 @@ Shell.PanelBackground {
   readonly property var days: Dates.monthDays(displayedMonth)
   readonly property int weekRow: isCurrentMonth
       ? Dates.currentWeekRow(days, today) : -1
-  readonly property real cellWidth: (width - 20 - 12) / 7
-  readonly property color todayFill: Shell.Theme.colors.todayFill
-  readonly property real cellHeight: 36
-  readonly property real rowPitch: cellHeight + 2
-  readonly property string monthTitle: Qt.locale("en_US").standaloneMonthName(
-      displayedMonth.getMonth(), Locale.LongFormat) + ", " + displayedMonth.getFullYear()
+  readonly property var locale: Qt.locale("pt_BR")
+  readonly property string monthName: locale.standaloneMonthName(
+      displayedMonth.getMonth(), Locale.LongFormat)
+  readonly property string monthTitle: monthName.charAt(0).toUpperCase() + monthName.slice(1)
+      + " de " + displayedMonth.getFullYear()
 
   implicitWidth: 264
-  implicitHeight: 76 + days.length / 7 * rowPitch - 2 + 10
+  implicitHeight: 296
   Accessible.role: Accessible.Pane
-  Accessible.name: monthTitle + " calendar"
+  Accessible.name: "Calendário, " + monthTitle
 
   function showMonth(month) {
     browsedMonth = Dates.monthStart(month);
@@ -36,73 +37,73 @@ Shell.PanelBackground {
   function goToday() { followToday = true; }
 
   SystemClock { id: clock; precision: SystemClock.Minutes }
-  FontMetrics { id: metrics; font.family: Shell.Theme.fontFamily; font.pixelSize: 13 }
 
-  // Consume panel clicks so only clicks outside its bounds dismiss it.
+  // Consome os cliques no painel para que só cliques fora dele o dispensem.
   MouseArea {
     anchors.fill: parent
     acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
   }
 
   Text {
-    x: 18
-    y: 20 + metrics.capitalHeight - baselineOffset
+    x: 16; y: 16
+    width: 160; height: 24
+    verticalAlignment: Text.AlignVCenter
+    elide: Text.ElideRight
     text: root.monthTitle
-    color: Shell.Theme.colors.text
+    color: Shell.Theme.text
     font.family: Shell.Theme.fontFamily
-    font.pixelSize: 13
+    font.pixelSize: Shell.Theme.fontBody
     font.weight: Font.Medium
+    font.letterSpacing: 0
   }
 
   NavigationButton {
-    x: root.width - 84
-    y: 13
-    visible: !root.isCurrentMonth
-    iconSource: Qt.resolvedUrl("../icons/rotate-ccw.svg")
-    iconWidth: 14
-    iconHeight: 14
-    accessibleName: "Return to today"
+    x: 176; y: 16
+    iconName: "rotate-ccw"
+    accessibleName: "Voltar para hoje"
     onClicked: root.goToday()
   }
   NavigationButton {
-    x: root.width - 60
-    y: 13
-    iconSource: Qt.resolvedUrl("../icons/chevron-up.svg")
-    accessibleName: "Previous month"
+    x: 204; y: 16
+    iconName: "chevron-up"
+    accessibleName: "Mês anterior"
     onClicked: root.moveMonth(-1)
   }
   NavigationButton {
-    x: root.width - 36
-    y: 13
-    iconSource: Qt.resolvedUrl("../icons/chevron-down.svg")
-    accessibleName: "Next month"
+    x: 232; y: 16
+    iconName: "chevron-down"
+    accessibleName: "Próximo mês"
     onClicked: root.moveMonth(1)
   }
 
   Repeater {
-    model: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+    model: ["S", "T", "Q", "Q", "S", "S", "D"]
     delegate: Text {
       required property int index
       required property string modelData
-      x: 10 + index * (root.cellWidth + 2)
-      y: 55 + metrics.capitalHeight - baselineOffset
-      width: root.cellWidth
+      x: 8 + index * 36
+      y: 48
+      width: 32
+      height: 18
       text: modelData
       horizontalAlignment: Text.AlignHCenter
-      color: Shell.Theme.colors.text
-      opacity: 0.5
+      verticalAlignment: Text.AlignVCenter
+      color: Shell.Theme.muted
       font.family: Shell.Theme.fontFamily
-      font.pixelSize: 13
+      font.weight: Font.Medium
+      font.pixelSize: Shell.Theme.fontCaption
+      font.letterSpacing: 0
     }
   }
 
+  // Faixa da semana atual: 248×32 r8, atrás das células.
   Rectangle {
-    x: 10
-    y: 76 + root.weekRow * root.rowPitch
-    width: root.width - 20
-    height: root.cellHeight
+    x: 8
+    y: 72 + root.weekRow * 36
+    width: 248
+    height: 32
     radius: 8
-    color: Shell.Theme.colors.weekFill
+    color: Shell.Theme.hover
     visible: root.weekRow >= 0
   }
 
@@ -114,67 +115,48 @@ Shell.PanelBackground {
       required property date modelData
       readonly property bool isToday: Dates.sameDay(modelData, root.today)
       readonly property bool inMonth: Dates.sameMonth(modelData, root.displayedMonth)
-      x: 10 + index % 7 * (root.cellWidth + 2)
-      y: 76 + Math.floor(index / 7) * root.rowPitch
-      width: root.cellWidth
-      height: root.cellHeight
+      x: 8 + index % 7 * 36
+      y: 72 + Math.floor(index / 7) * 36
+      width: 32
+      height: 32
       radius: 8
-      color: isToday && root.isCurrentMonth ? root.todayFill : "transparent"
+      color: isToday && root.isCurrentMonth ? Shell.Theme.accent
+          : dayHover.hovered ? Shell.Theme.pressed : "transparent"
+      antialiasing: true
       Accessible.role: Accessible.StaticText
-      Accessible.name: Qt.formatDate(modelData, "dddd, MMMM d, yyyy")
-          + (isToday ? ", today" : "")
+      Accessible.name: root.locale.toString(modelData, "dddd, d 'de' MMMM 'de' yyyy")
+          + (isToday ? ", hoje" : "")
 
-      MouseArea {
-        id: dayHover
-        anchors.fill: parent
-        hoverEnabled: true
-        acceptedButtons: Qt.NoButton
-        onContainsMouseChanged: {
-          hoverExit.stop();
-          if (containsMouse)
-            hoverFill.opacity = 1;
-          else
-            hoverExit.restart();
-        }
+      Behavior on color {
+        ColorAnimation { duration: Shell.Theme.hoverDuration; easing.type: Easing.OutCubic }
       }
-      Rectangle {
-        id: hoverFill
 
-        anchors.fill: parent
-        radius: parent.radius
-        color: Qt.rgba(1, 1, 1, 0.15)
-        opacity: 0
-      }
-      // Animate only exits; pointer entry stops this and sets opacity directly.
-      NumberAnimation {
-        id: hoverExit
-        target: hoverFill
-        property: "opacity"
-        to: 0
-        duration: 150
-        easing.type: Easing.OutCubic
-      }
+      HoverHandler { id: dayHover }
 
       Text {
-        width: parent.width
-        y: (cell.height - 10) / 2 + metrics.capitalHeight - baselineOffset
+        anchors.fill: parent
         text: cell.modelData.getDate()
         horizontalAlignment: Text.AlignHCenter
-        color: cell.isToday && root.isCurrentMonth ? "#643957" : Shell.Theme.colors.text
-        opacity: cell.inMonth ? 1 : 0.3
+        verticalAlignment: Text.AlignVCenter
+        color: cell.isToday && root.isCurrentMonth ? Shell.Theme.textOnAccent : Shell.Theme.text
+        opacity: cell.inMonth ? 1 : 0.5
         font.family: Shell.Theme.fontFamily
-        font.pixelSize: 13
+        font.weight: Font.Medium
+        font.pixelSize: Shell.Theme.fontBody
+        font.letterSpacing: 0
       }
     }
   }
 
-  component NavigationButton: Shell.IconButton {
-    id: root
-    showBackground: false
-    restingOpacity: 1
-    iconWidth: 24
-    iconHeight: 24
-    activeFocusOnTab: visible
+  // Botão 24×24 r6 com ícone Lucide de 16, hover `hover`.
+  component NavigationButton: Item {
+    id: nav
+    property string iconName
+    property string accessibleName
+    signal clicked
+    width: 24
+    height: 24
+    activeFocusOnTab: true
     Accessible.role: Accessible.Button
     Accessible.name: accessibleName
     Accessible.onPressAction: clicked()
@@ -183,9 +165,19 @@ Shell.PanelBackground {
 
     Rectangle {
       anchors.fill: parent
-      z: -1
-      radius: 4
-      color: Qt.rgba(1, 1, 1, root.hovered || root.activeFocus ? 0.15 : 0)
+      radius: 6
+      color: navHover.hovered || nav.activeFocus ? Shell.Theme.hover : "transparent"
+      antialiasing: true
     }
+    Image {
+      anchors.centerIn: parent
+      width: 16
+      height: 16
+      source: Qt.resolvedUrl("../icons/" + nav.iconName + ".svg")
+      sourceSize: Qt.size(32, 32)
+      fillMode: Image.PreserveAspectFit
+    }
+    HoverHandler { id: navHover; cursorShape: Qt.PointingHandCursor }
+    TapHandler { onTapped: nav.clicked() }
   }
 }

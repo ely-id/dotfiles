@@ -996,6 +996,22 @@ PanelWindow {
                   Demo.BatterySpecimen { kind: "alert"; percentage: 9; charging: false }
                 }
               }
+
+              SectionBlock {
+                title: "Calendário (ficha 09, board 13:14610) · cartão real em 13 de novembro de 2026"
+                itemGap: 40
+
+                Specimen {
+                  caption: "264×296 · hoje em accent, semana atual em faixa, dias de outro mês a 50%"
+                  stageWidth: 264; stageHeight: 296
+                  Demo.CalendarSpecimen {}
+                }
+                Specimen {
+                  caption: "Mês seguinte (sem hoje nem faixa)"
+                  stageWidth: 264; stageHeight: 296
+                  Demo.CalendarSpecimen { browseMonths: 1 }
+                }
+              }
             }
 
             // =================================================================

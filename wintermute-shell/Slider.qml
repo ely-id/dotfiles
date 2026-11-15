@@ -121,7 +121,7 @@ T.Slider {
       visible: root.muted
       width: 16
       height: 16
-      source: Qt.resolvedUrl("assets/volume-mute.svg")
+      source: Qt.resolvedUrl("icons/volume-x.svg")
       sourceSize: Qt.size(width * 2, height * 2)
     }
   }

@@ -107,7 +107,7 @@ Settings.Modal {
           objectName: "rotateDisplay" + modelData
           width: 40; height: 40
           iconWidth: 16; iconHeight: 16
-          iconSource: Qt.resolvedUrl("../../assets/rotate.svg")
+          iconSource: Qt.resolvedUrl("../../icons/rotate-ccw.svg")
           mirrorIcon: modelData === "counterclockwise"
           animateGlyphOpacity: false
           glyphOpacity: highlighted ? 1 : 0.7

@@ -51,7 +51,7 @@ Rectangle {
   Image {
     anchors.right: parent.right; anchors.rightMargin: 20; anchors.verticalCenter: parent.verticalCenter
     width: 16; height: 16; visible: root.navigation
-    source: Qt.resolvedUrl("../assets/appearance/chevron.svg")
+    source: Qt.resolvedUrl("../icons/chevron-down.svg")
     rotation: -90
   }
   HoverHandler { id: hover; cursorShape: Qt.PointingHandCursor }

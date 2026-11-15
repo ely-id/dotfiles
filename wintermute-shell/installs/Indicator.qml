@@ -40,7 +40,7 @@ Item {
   Image {
     anchors.fill: parent
     visible: root.status === "installed"
-    source: Qt.resolvedUrl("../assets/installs/check.svg")
+    source: Qt.resolvedUrl("../icons/check.svg")
     sourceSize: Qt.size(32, 32)
   }
   Text {

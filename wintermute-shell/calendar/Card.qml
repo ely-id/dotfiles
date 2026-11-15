@@ -58,7 +58,7 @@ Shell.PanelBackground {
     x: root.width - 84
     y: 13
     visible: !root.isCurrentMonth
-    iconSource: Qt.resolvedUrl("../assets/navigation/return.svg")
+    iconSource: Qt.resolvedUrl("../icons/rotate-ccw.svg")
     iconWidth: 14
     iconHeight: 14
     accessibleName: "Return to today"
@@ -67,14 +67,14 @@ Shell.PanelBackground {
   NavigationButton {
     x: root.width - 60
     y: 13
-    iconSource: Qt.resolvedUrl("../assets/navigation/chevron-up.svg")
+    iconSource: Qt.resolvedUrl("../icons/chevron-up.svg")
     accessibleName: "Previous month"
     onClicked: root.moveMonth(-1)
   }
   NavigationButton {
     x: root.width - 36
     y: 13
-    iconSource: Qt.resolvedUrl("../assets/navigation/chevron-down.svg")
+    iconSource: Qt.resolvedUrl("../icons/chevron-down.svg")
     accessibleName: "Next month"
     onClicked: root.moveMonth(1)
   }

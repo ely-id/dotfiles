@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell.Widgets
 import "../../wallpaper/daylight" as Daylight
 import "../.." as Shell
@@ -43,7 +44,7 @@ Item {
     Image {
       visible: root.adding
       x: 16; y: 16; width: 32; height: 32
-      source: Qt.resolvedUrl("../../assets/appearance/add-wallpaper.svg")
+      source: Qt.resolvedUrl("../../icons/image-plus.svg")
     }
     Text {
       visible: root.adding
@@ -85,7 +86,9 @@ Item {
       Image {
         anchors.centerIn: parent
         width: 16; height: 16; sourceSize: Qt.size(32, 32)
-        source: Qt.resolvedUrl("../../assets/check.svg")
+        source: Qt.resolvedUrl("../../icons/check.svg")
+        layer.enabled: true
+        layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.colors.panel }
       }
     }
   }

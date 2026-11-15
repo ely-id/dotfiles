@@ -73,7 +73,7 @@ Settings.Modal {
         visible: row.chosen
         x: parent.width - (root.multiple ? 42 : 40); anchors.verticalCenter: parent.verticalCenter
         width: 20; height: 20; sourceSize: Qt.size(40, 40)
-        source: Qt.resolvedUrl("../../assets/installs/check.svg")
+        source: Qt.resolvedUrl("../../icons/check.svg")
       }
       HoverHandler { id: hover; cursorShape: Qt.PointingHandCursor }
       TapHandler { onTapped: root.choose(row.modelData.id) }
@@ -117,7 +117,7 @@ Settings.Modal {
         x: parent.width - 36; anchors.verticalCenter: parent.verticalCenter
         width: 20; height: 20; sourceSize: Qt.size(40, 40)
         visible: !search.text
-        source: Qt.resolvedUrl("../../assets/search.svg")
+        source: Qt.resolvedUrl("../../icons/search.svg")
       }
       Rectangle {
         objectName: "systemSearchClear"
@@ -131,7 +131,7 @@ Settings.Modal {
         Image {
           anchors.centerIn: parent
           width: 20; height: 20; sourceSize: Qt.size(40, 40)
-          source: Qt.resolvedUrl("../../assets/wifi/close.svg")
+          source: Qt.resolvedUrl("../../icons/x.svg")
         }
         HoverHandler { id: clearHover; cursorShape: Qt.PointingHandCursor }
         TapHandler { onTapped: { search.clear(); search.forceActiveFocus(); } }

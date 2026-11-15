@@ -41,7 +41,7 @@ Rectangle {
   }
   Image {
     x: parent.width - 36; y: 17; width: 16; height: 16
-    source: Qt.resolvedUrl("../../assets/appearance/chevron.svg")
+    source: Qt.resolvedUrl("../../icons/chevron-down.svg")
     objectName: "settingsRowChevron"
     visible: root.enabled
     rotation: root.navigation ? -90 : root.expanded ? 180 : 0

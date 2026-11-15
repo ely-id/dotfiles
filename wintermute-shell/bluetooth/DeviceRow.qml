@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Effects
 import "." as Bluetooth
 import ".." as Shell
 import "../battery" as Battery
@@ -14,7 +15,8 @@ Bluetooth.Row {
   label: String(device.name || device.address || "Bluetooth device")
   labelRight: showBattery ? (hovered ? 171 : 203) : hovered ? 232 : 264
   leading: Component { Image {
-    source: Qt.resolvedUrl("../assets/bluetooth/" + (root.device.icon || "bluetooth") + ".svg")
+    width: 20; height: 20
+    source: Qt.resolvedUrl("../icons/" + (root.device.icon || "bluetooth") + ".svg")
     sourceSize: Qt.size(40, 40)
   } }
   trailing: Component { Item {
@@ -45,7 +47,7 @@ Bluetooth.Row {
       Image {
         anchors.centerIn: parent; width: 16; height: 16
         opacity: infoPointer.containsMouse ? 1 : 0.6
-        source: Qt.resolvedUrl("../assets/bluetooth/info.svg")
+        source: Qt.resolvedUrl("../icons/info.svg")
         sourceSize: Qt.size(32, 32)
       }
     }
@@ -58,7 +60,10 @@ Bluetooth.Row {
       Image {
         anchors.centerIn: parent; width: 12; height: 12
         visible: !!root.device.connected
-        source: Qt.resolvedUrl("../assets/bluetooth/check.svg")
+        source: Qt.resolvedUrl("../icons/check.svg")
+        sourceSize: Qt.size(24, 24)
+        layer.enabled: true
+        layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.colors.panel }
       }
     }
     StatusAnimation {
@@ -70,7 +75,10 @@ Bluetooth.Row {
     Image {
       x: 272; y: 14; width: 16; height: 16
       visible: root.failed && !root.busy
-      source: Qt.resolvedUrl("../assets/bluetooth/failed.svg")
+      source: Qt.resolvedUrl("../icons/circle-alert.svg")
+      sourceSize: Qt.size(32, 32)
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.colors.dangerText }
     }
   } }
 }

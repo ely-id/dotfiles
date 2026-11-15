@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Effects
 import Quickshell.Services.UPower
 import "." as Battery
 import ".." as Shell
@@ -31,13 +32,15 @@ Shell.PanelBackground {
   Label { x: 20; capTop: 20; text: "Battery"; opacity: 0.7 }
 
   Image {
-    x: status.x - 13
+    x: status.x - 15
     y: 18
-    width: 6
+    width: 12
     height: 12
     visible: status.visible
-    source: Qt.resolvedUrl("../assets/battery/bolt.svg")
-    sourceSize: Qt.size(12, 24)
+    source: Qt.resolvedUrl("../icons/zap.svg")
+    sourceSize: Qt.size(24, 24)
+    layer.enabled: true
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: "#CBE25B" }
   }
   Label {
     id: status
@@ -67,8 +70,10 @@ Shell.PanelBackground {
       width: 9
       height: 9
       visible: root.charging && rate.visible
-      source: Qt.resolvedUrl("../assets/battery/plus.svg")
+      source: Qt.resolvedUrl("../icons/plus.svg")
       sourceSize: Qt.size(18, 18)
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: "#CBE25B" }
     }
     Label {
       id: rate
@@ -133,8 +138,10 @@ Shell.PanelBackground {
       y: 157
       width: 76
       height: 40
-      iconSource: Qt.resolvedUrl("../assets/battery/" + modelData.icon + (selected ? "-active" : "") + ".svg")
+      iconSource: Qt.resolvedUrl("../icons/" + modelData.icon + ".svg")
       glyphOpacity: !available ? 0.2 : selected || highlighted ? 1 : 0.6
+      layer.enabled: selected
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: button.modelData.accent }
 
       onHighlightedChanged: {
         if (highlighted) root.hoveredProfile = modelData.name;

@@ -41,7 +41,7 @@ Item {
       Image {
         width: 16
         height: 16
-        source: "assets/brightness.svg"
+        source: "icons/sun.svg"
         sourceSize: Qt.size(32, 32)
       }
       Row {

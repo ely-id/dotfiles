@@ -79,7 +79,7 @@ Rectangle {
     iconSourceSize: Qt.size(20, 20)
     restingOpacity: 0.7
     hoverEasing: Easing.Linear
-    iconSource: Qt.resolvedUrl(root.revealed ? "assets/eye-open.svg" : "assets/eye-closed.svg")
+    iconSource: Qt.resolvedUrl(root.revealed ? "icons/eye.svg" : "icons/eye-off.svg")
     onClicked: root.revealed = !root.revealed
 
     Rectangle {

@@ -213,7 +213,7 @@ Card {
         width: 14
         height: 14
         anchors.verticalCenter: parent.verticalCenter
-        source: Qt.resolvedUrl("assets/wifi/upload.svg")
+        source: Qt.resolvedUrl("icons/upload.svg")
       }
       Text {
         height: 19
@@ -242,7 +242,7 @@ Card {
         width: 14
         height: 14
         anchors.verticalCenter: parent.verticalCenter
-        source: Qt.resolvedUrl("assets/wifi/download.svg")
+        source: Qt.resolvedUrl("icons/download.svg")
       }
       Text {
         height: 19
@@ -258,11 +258,11 @@ Card {
 
   readonly property var icons: [
       { icon: Wifi.State.statusIcon,
-        width: Wifi.State.statusIcon === "wifi.svg" ? 13.9972 : 14,
-        height: Wifi.State.statusIcon === "wifi.svg" ? 10.2141 : 14 },
-      { icon: "sound.svg", width: 14, height: 14 },
-      { icon: "settings.svg", width: 13.6667, height: 11.9167 },
-      { icon: "", width: 10.1572, height: 12.3327 }
+        width: 14,
+        height: 14 },
+      { icon: "volume-2.svg", width: 14, height: 14 },
+      { icon: "settings.svg", width: 14, height: 14 },
+      { icon: "", width: 14, height: 14 }
   ]
   Repeater {
     model: 7
@@ -288,7 +288,7 @@ Card {
       readonly property bool selected: slot === 0 ? root.wifiOpen : slot === 1 ? root.soundOpen : slot === 2 && root.settingsOpen
       restingOpacity: selected || (slot === 1 && root.keyboardVolumeVisible)
           || (Theme.translucent && !root.soundSliderContentVisible) ? 1 : 0.6
-      iconSource: modelData.icon ? Qt.resolvedUrl("assets/" + modelData.icon) : ""
+      iconSource: modelData.icon ? Qt.resolvedUrl("icons/" + modelData.icon) : ""
       iconWidth: modelData.width
       iconHeight: modelData.height
       onClicked: {
@@ -321,13 +321,11 @@ Card {
         Image {
           required property int index
           anchors.centerIn: parent
-          anchors.horizontalCenterOffset: -0.1667
-          width: 10.1572
-          height: 12.3327
-          source: "assets/navigation/collapse.svg"
+          width: 14
+          height: 14
+          source: Qt.resolvedUrl(index === 0 ? "icons/panel-left-close.svg" : "icons/panel-left-open.svg")
           sourceSize: Qt.size(Math.ceil(width * 2), Math.ceil(height * 2))
           fillMode: Image.PreserveAspectFit
-          rotation: index === 0 ? 90 : -90
           readonly property real flipProgress: root.collapseProgress >= 0.5 ? 1 : 0
           opacity: action.glyphOpacity * (index === 0 ? 1 - flipProgress : flipProgress)
           smooth: true

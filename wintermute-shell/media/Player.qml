@@ -15,11 +15,11 @@ Shell.Card {
   property real collapsedTargetHeight: hasPlayer
       ? (pointer.pressed ? 126 : (revealed ? 116 : 48)) : 0
   readonly property url playPauseIconSource: Qt.resolvedUrl(
-      Media.State.isPlaying ? "../assets/media/pause.svg"
-                           : "../assets/media/play.svg")
+      Media.State.isPlaying ? "../icons/pause.svg"
+                           : "../icons/play.svg")
   readonly property url playPauseHoverIconSource: Qt.resolvedUrl(
-      Media.State.isPlaying ? "../assets/media/pause.svg"
-                           : "../assets/media/play-hover.svg")
+      Media.State.isPlaying ? "../icons/pause.svg"
+                           : "../icons/play.svg")
   readonly property real playPauseRestingOpacity: Media.State.isPlaying ? 0.5 : 1.0
   readonly property string displayTitle: Media.State.title !== ""
       ? Media.State.title : (Media.State.identity !== ""
@@ -118,9 +118,9 @@ Shell.Card {
     ControlButton {
       x: Shell.Theme.lerp(4, 0, controls.layoutProgress)
       y: Shell.Theme.lerp(4, 0, controls.verticalProgress)
-      iconSource: Qt.resolvedUrl("../assets/media/previous.svg")
+      iconSource: Qt.resolvedUrl("../icons/skip-back.svg")
       hoverIconSource: Qt.resolvedUrl(
-          "../assets/media/previous-hover.svg")
+          "../icons/skip-back.svg")
       available: Media.State.canPrevious
       onClicked: Media.State.previous()
     }
@@ -138,9 +138,9 @@ Shell.Card {
     ControlButton {
       x: Shell.Theme.lerp(52, 0, controls.layoutProgress)
       y: Shell.Theme.lerp(4, 40, controls.verticalProgress)
-      iconSource: Qt.resolvedUrl("../assets/media/next.svg")
+      iconSource: Qt.resolvedUrl("../icons/skip-forward.svg")
       hoverIconSource: Qt.resolvedUrl(
-          "../assets/media/next-hover.svg")
+          "../icons/skip-forward.svg")
       available: Media.State.canNext
       onClicked: Media.State.next()
     }

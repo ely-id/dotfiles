@@ -9,15 +9,15 @@ Item {
 
   Image {
     anchors.centerIn: parent
-    width: 17.5
-    height: 12.8
+    width: 20
+    height: 20
     source: root.bars >= 3
-        ? Qt.resolvedUrl("../assets/wifi/signal-3.svg")
+        ? Qt.resolvedUrl("../icons/wifi.svg")
         : root.bars === 2
-          ? Qt.resolvedUrl("../assets/wifi/signal-2.svg")
-          : Qt.resolvedUrl("../assets/wifi/signal-1.svg")
-    sourceSize: Qt.size(35, 26)
-    fillMode: Image.Stretch
+          ? Qt.resolvedUrl("../icons/wifi-high.svg")
+          : Qt.resolvedUrl("../icons/wifi-low.svg")
+    sourceSize: Qt.size(40, 40)
+    fillMode: Image.PreserveAspectFit
     smooth: true
     antialiasing: true
   }

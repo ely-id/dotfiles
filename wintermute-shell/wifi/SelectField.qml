@@ -33,6 +33,6 @@ Controls.Button {
     anchors.verticalCenter: parent.verticalCenter
     width: 16
     height: 16
-    source: Qt.resolvedUrl("../assets/wifi/chevron.svg")
+    source: Qt.resolvedUrl("../icons/chevron-down.svg")
   }
 }

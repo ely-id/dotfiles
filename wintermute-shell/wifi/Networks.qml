@@ -57,7 +57,7 @@ DeviceList {
       Image {
         width: 20
         height: 20
-        source: Qt.resolvedUrl("../assets/wifi/add.svg")
+        source: Qt.resolvedUrl("../icons/plus.svg")
       }
       Text {
         anchors.verticalCenter: parent.verticalCenter

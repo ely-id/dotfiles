@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "." as Audio
 import ".."
 
@@ -55,8 +56,10 @@ Item {
       width: 12
       height: 12
       visible: root.selected
-      source: Qt.resolvedUrl("../assets/check.svg")
+      source: Qt.resolvedUrl("../icons/check.svg")
       sourceSize: Qt.size(24, 24)
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.colors.panel }
     }
   }
 

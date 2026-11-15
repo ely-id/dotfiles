@@ -64,7 +64,7 @@ FocusScope {
           x: parent.width - 28; anchors.verticalCenter: parent.verticalCenter
           width: 16; height: 16; sourceSize: Qt.size(32, 32)
           rotation: option.modelData.submenu ? -90 : 0
-          source: Qt.resolvedUrl(option.modelData.submenu ? "../assets/appearance/chevron.svg" : "../assets/installs/check.svg")
+          source: Qt.resolvedUrl(option.modelData.submenu ? "../icons/chevron-down.svg" : "../icons/check.svg")
         }
         Rectangle {
           visible: !!option.modelData.separator

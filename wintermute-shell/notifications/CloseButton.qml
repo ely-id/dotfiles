@@ -29,7 +29,7 @@ Rectangle {
     anchors.centerIn: parent
     width: root.compact ? 12 : Notifications.Style.closeIconSize
     height: width
-    source: Qt.resolvedUrl("../assets/close.svg")
+    source: Qt.resolvedUrl("../icons/x.svg")
     layer.enabled: Shell.Theme.translucent && !root.compact
     layer.effect: MultiEffect {
       colorization: 1

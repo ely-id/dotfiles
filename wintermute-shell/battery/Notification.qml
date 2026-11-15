@@ -72,9 +72,9 @@ PanelWindow {
       id: dismiss
       x: 111
       y: 5
-      iconSource: Qt.resolvedUrl("../assets/battery/dismiss.svg")
-      iconWidth: 24
-      iconHeight: 24
+      iconSource: Qt.resolvedUrl("../icons/x.svg")
+      iconWidth: 16
+      iconHeight: 16
       restingOpacity: 0.3
       animateGlyphOpacity: false
       layer.enabled: true

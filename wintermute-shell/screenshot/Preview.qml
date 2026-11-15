@@ -121,6 +121,8 @@ Item {
       height: 14
       source: button.iconSource
       sourceSize: Qt.size(32, 32)
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.colors.panel }
     }
     MouseArea {
       id: pointer
@@ -135,7 +137,7 @@ Item {
     x: 8
     y: 8
     label: "Dismiss screenshot"
-    iconSource: Qt.resolvedUrl("assets/close.svg")
+    iconSource: Qt.resolvedUrl("../icons/x.svg")
     onActivated: Screenshot.State.dismiss()
   }
   ActionButton {
@@ -143,7 +145,7 @@ Item {
     x: parent.width - width - 8
     y: 8
     label: "Copy screenshot"
-    iconSource: Qt.resolvedUrl("assets/copy.svg")
+    iconSource: Qt.resolvedUrl("../icons/copy.svg")
     onActivated: Screenshot.State.copy()
   }
   Rectangle {

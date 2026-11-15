@@ -2,18 +2,20 @@
 
 function classifier(icon) {
   const value = String(icon || '').toLowerCase();
-  if (/headset|headphone/.test(value)) return 'headphone';
+  if (/headset|headphone/.test(value)) return 'headphones';
   if (/keyboard/.test(value)) return 'keyboard';
   if (/mouse|touchpad|tablet/.test(value)) return 'mouse';
   if (/speaker|audio-card|audio-output/.test(value)) return 'speaker';
-  if (/phone/.test(value)) return 'phone';
+  if (/phone/.test(value)) return 'smartphone';
+  if (/gamepad|joystick|gaming/.test(value)) return 'gamepad-2';
   return 'bluetooth';
 }
 
 function typeLabel(icon) {
   if (/touchpad/i.test(String(icon || ""))) return "Trackpad";
-  return ({headphone: 'Headphones', keyboard: 'Keyboard', mouse: 'Mouse',
-           speaker: 'Speaker', phone: 'Phone', bluetooth: 'Bluetooth device'})[classifier(icon)];
+  return ({headphones: 'Headphones', keyboard: 'Keyboard', mouse: 'Mouse',
+           speaker: 'Speaker', smartphone: 'Phone', 'gamepad-2': 'Controller',
+           bluetooth: 'Bluetooth device'})[classifier(icon)];
 }
 
 function powerDeviceFor(address, devices) {

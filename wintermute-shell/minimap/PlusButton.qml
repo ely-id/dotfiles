@@ -27,7 +27,7 @@ Item {
     anchors.centerIn: parent
     width: Shell.Theme.workspaceIconSize
     height: width
-    source: "../assets/navigation/plus.svg"
+    source: "../icons/plus.svg"
     sourceSize: Qt.size(width * 2, height * 2)
   }
   MouseArea {

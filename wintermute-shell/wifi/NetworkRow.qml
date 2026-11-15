@@ -58,7 +58,7 @@ Item {
     anchors.verticalCenter: parent.verticalCenter
     width: 16
     height: 16
-    source: Qt.resolvedUrl("../assets/wifi/lock.svg")
+    source: Qt.resolvedUrl("../icons/lock.svg")
   }
 
   Rectangle {

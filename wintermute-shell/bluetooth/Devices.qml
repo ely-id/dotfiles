@@ -6,7 +6,7 @@ Shell.DeviceList {
   id: root
   property var service: stackController ? stackController.service : Bluetooth.State
   title: "Bluetooth"
-  titleIcon: Qt.resolvedUrl("../assets/bluetooth/bluetooth.svg")
+  titleIcon: Qt.resolvedUrl("../icons/bluetooth.svg")
   listBottomPadding: 8
   viewportHeight: 292
   devices: service.enabled ? service.pairedDevices : []
@@ -34,7 +34,7 @@ Shell.DeviceList {
     label: "Search nearby devices"
     labelGap: 12; labelSize: 15; labelRight: 290; contentOpacity: 0.5
     interactive: root.interactive && root.service.enabled
-    leading: Component { Image { source: Qt.resolvedUrl("../assets/bluetooth/search.svg") } }
+    leading: Component { Image { width: 20; height: 20; source: Qt.resolvedUrl("../icons/search.svg"); sourceSize: Qt.size(40, 40) } }
     onClicked: root.stackController.openNearby()
   } }
 }

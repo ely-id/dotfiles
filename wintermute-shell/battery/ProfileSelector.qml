@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import "." as Battery
 import ".." as Shell
@@ -48,9 +49,10 @@ Item {
 
           width: 40
           height: 40
-          iconSource: Qt.resolvedUrl("../assets/battery/" + modelData.icon
-              + (selected || highlighted ? "-active" : "") + ".svg")
+          iconSource: Qt.resolvedUrl("../icons/" + modelData.icon + ".svg")
           glyphOpacity: !available ? 0.2 : selected || highlighted ? 1 : 0.5
+          layer.enabled: selected || highlighted
+          layer.effect: MultiEffect { colorization: 1; colorizationColor: button.accent }
 
           Rectangle {
             anchors.fill: parent

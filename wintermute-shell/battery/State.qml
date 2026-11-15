@@ -19,10 +19,13 @@ Singleton {
   readonly property int alertLevel: !low ? 0 : level <= 3 ? 3 : level <= 5 ? 5 : 10
   property int alert: 0
   property int alerted: 0
+  // No pop-up da bateria (ficha 08) o terceiro perfil usa rocket; na tela
+  // inicial de Ajustes (ficha 13) usa zap. Mantenho rocket nos dois lugares
+  // até a definição da P-07 na F3/F4.
   readonly property var profiles: [
-    { profile: PowerProfile.PowerSaver, name: "Eco", icon: "eco", accent: "#CBE25B" },
-    { profile: PowerProfile.Balanced, name: "Balanced", icon: "balanced", accent: "#E99FFF" },
-    { profile: PowerProfile.Performance, name: "Performance", icon: "performance", accent: "#FFE51D" }
+    { profile: PowerProfile.PowerSaver, name: "Eco", icon: "leaf", accent: "#CBE25B" },
+    { profile: PowerProfile.Balanced, name: "Balanced", icon: "gauge", accent: "#E99FFF" },
+    { profile: PowerProfile.Performance, name: "Performance", icon: "rocket", accent: "#FFE51D" }
   ]
 
   onChargingChanged: if (charging) { alerted = 0; alert = 0; }

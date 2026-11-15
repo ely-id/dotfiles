@@ -27,9 +27,9 @@ Singleton {
       || Networking.connectivity === NetworkConnectivity.Portal
       || Networking.connectivity === NetworkConnectivity.Limited
   readonly property string statusIcon: wiredConnected
-      ? (internetUnavailable ? "wifi/ethernet-no-internet.svg" : "wifi/ethernet.svg")
-      : !wifiConnected ? "wifi/disconnected.svg"
-      : internetUnavailable ? "wifi/no-internet.svg" : "wifi.svg"
+      ? (internetUnavailable ? "../assets/wifi/ethernet-no-internet.svg" : "../assets/wifi/ethernet.svg")
+      : !wifiConnected ? "wifi-off.svg"
+      : internetUnavailable ? "wifi-off.svg" : "wifi.svg"
   readonly property string device: adapter ? adapter.name : ""
   readonly property string rateDevice: wiredConnected ? connectedWiredAdapters[0].name : device
   readonly property string connectedSsid: networks.find(n => n.connected)?.ssid || ""

@@ -42,7 +42,7 @@ Item {
         Image {
           width: Notifications.Style.summaryIconSize
           height: Notifications.Style.summaryIconSize
-          source: Qt.resolvedUrl("../assets/bell.svg")
+          source: Qt.resolvedUrl("../icons/bell.svg")
           opacity: root.empty && !Shell.Theme.translucent ? 0.88 : 1
           sourceSize: Qt.size(Notifications.Style.summaryIconSize * 2,
                               Notifications.Style.summaryIconSize * 2)

@@ -104,7 +104,7 @@ Shell.Card {
         x: parent.width - width - root.contentPadding
         width: root.rowHeight
         height: parent.height
-        iconSource: Qt.resolvedUrl("../assets/installs/cross.svg")
+        iconSource: Qt.resolvedUrl("../icons/x.svg")
         iconWidth: 16
         iconHeight: 16
         onClicked: Installs.State.dismiss(row.jobId)

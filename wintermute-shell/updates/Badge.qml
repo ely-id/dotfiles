@@ -36,13 +36,19 @@ Rectangle {
 
     Image {
       anchors.verticalCenter: parent.verticalCenter
+      width: 16; height: 16
       visible: root.status === "complete"
-      source: Qt.resolvedUrl("../assets/updates/complete.svg")
+      source: Qt.resolvedUrl("../icons/circle-check.svg")
+      sourceSize: Qt.size(32, 32)
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: root.foreground }
     }
     Image {
       anchors.verticalCenter: parent.verticalCenter
+      width: 16; height: 16
       visible: root.status === "restart"
-      source: Qt.resolvedUrl("../assets/updates/restart.svg")
+      source: Qt.resolvedUrl("../icons/rotate-ccw.svg")
+      sourceSize: Qt.size(32, 32)
       layer.enabled: true
       layer.effect: MultiEffect { colorization: 1; colorizationColor: root.foreground }
     }
@@ -64,8 +70,12 @@ Rectangle {
     }
     Image {
       anchors.verticalCenter: parent.verticalCenter
+      width: 16; height: 16
       visible: root.status === "available"
-      source: Qt.resolvedUrl("../assets/updates/available.svg")
+      source: Qt.resolvedUrl("../icons/download.svg")
+      sourceSize: Qt.size(32, 32)
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: root.foreground }
     }
   }
 

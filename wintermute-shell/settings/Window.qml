@@ -32,22 +32,22 @@ PanelWindow {
   readonly property var primaryButtons: [
     {
       slot: 0, x: 0, y: 0, name: "Appearance", page: "appearance",
-      source: Qt.resolvedUrl("../assets/settings/appearance.svg"),
+      source: Qt.resolvedUrl("../icons/palette.svg"),
       boxWidth: 48, boxHeight: 48, iconWidth: 48, iconHeight: 48
     },
     {
       slot: 1, x: 274, y: 0, name: "Bluetooth", page: "",
-      source: Qt.resolvedUrl("../assets/settings/bluetooth.svg"),
+      source: Qt.resolvedUrl("../icons/bluetooth.svg"),
       boxWidth: 30, boxHeight: 48, iconWidth: 30, iconHeight: 48
     },
     {
       slot: 2, x: 0, y: 274, name: "System", page: "system",
-      source: Qt.resolvedUrl("../assets/settings/system.svg"),
+      source: Qt.resolvedUrl("../icons/settings.svg"),
       boxWidth: 48, boxHeight: 48, iconWidth: 42, iconHeight: 36
     },
     {
       slot: 3, x: 274, y: 274, name: "Information", page: "information",
-      source: Qt.resolvedUrl("../assets/settings/information.svg"),
+      source: Qt.resolvedUrl("../icons/info.svg"),
       boxWidth: 48, boxHeight: 48, iconWidth: 48, iconHeight: 48
     }
   ]
@@ -55,14 +55,14 @@ PanelWindow {
   readonly property var sessionButtons: [
     {
       slot: 4, y: 0, action: "lock", name: "Lock screen",
-      source: Qt.resolvedUrl("../assets/lock.svg"),
+      source: Qt.resolvedUrl("../icons/lock.svg"),
       iconWidth: 32, iconHeight: 32,
       hover: "#FFE51D", control: "#632B0F", labelWidth: 170,
       dot: false
     },
     {
       slot: 5, y: 137, action: "suspend", name: "Sleep",
-      source: Qt.resolvedUrl("../assets/settings/sleep.svg"),
+      source: Qt.resolvedUrl("../icons/moon.svg"),
       iconWidth: 32, iconHeight: 32,
       hover: "#E99FFF", control: "#681D4F", labelWidth: 74,
       dot: false
@@ -70,7 +70,7 @@ PanelWindow {
     {
       slot: 6, y: 274, action: "reboot", name: "Restart",
       updatingName: "Restart after update", pendingName: "Restarting after update",
-      source: Qt.resolvedUrl("../assets/settings/restart.svg"),
+      source: Qt.resolvedUrl("../icons/rotate-ccw.svg"),
       iconWidth: 32, iconHeight: 32,
       hover: "#CEF058", control: "#1B322D", labelWidth: 99,
       dot: false
@@ -78,7 +78,7 @@ PanelWindow {
     {
       slot: 7, y: 411, action: "shutdown", name: "Power off",
       updatingName: "Shutdown after update", pendingName: "Shutting down after update",
-      source: Qt.resolvedUrl("../assets/settings/power.svg"),
+      source: Qt.resolvedUrl("../icons/power.svg"),
       iconWidth: 32, iconHeight: 32,
       hover: "#FE6146", control: "#632B0F", labelWidth: 127,
       dot: true

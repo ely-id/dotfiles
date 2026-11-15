@@ -291,6 +291,8 @@ Singleton {
     } else if (ev.WindowClosed) {
       const wins = Object.assign({}, _windows);
       delete wins[ev.WindowClosed.id];
+      delete _unread[ev.WindowClosed.id];
+      delete _agentWindows[ev.WindowClosed.id];
       _windows = wins;
     } else if (ev.WindowFocusChanged) {
       const focused = ev.WindowFocusChanged.id;
@@ -327,18 +329,40 @@ Singleton {
   }
 
   property var _unread: ({})
+  property var _agentWindows: ({})
 
-  // Claude Code titles are "◐ "/"◑ " while working, "✳ " idle; Codex prefixes a
-  // braille spinner while working. Fish on Pond has " - ", bash/zsh has "@"
-  // & every other kitty title is considered idle Codex.
-  // This is obviously a dumb hack. Should fix & add support for more stuff.
+  function _isTerminalApp(appId) {
+    const id = String(appId || "").toLowerCase();
+    return id === "kitty" || id === "com.mitchellh.ghostty" || id === "ghostty";
+  }
+
+  // Claude Code usa "◐ "/"◑ " trabalhando e "✳ " parado; Codex usa spinner
+  // braille trabalhando e "[!]"/"[.]" aguardando entrada. Reconheço kitty e
+  // Ghostty (P-30) sem marcar prompts comuns do Ghostty (~, /, …/) como agente.
   function _isWorking(title) { return /^[\u2800-\u28ff\u25d0\u25d1] /.test(title); }
-  // Codex blinks between these markers while input or approval is pending.
   function _needsAttention(title) { return /^\[\s*[!.]\s*\](?:\s|$)/.test(title); }
+  function _isShellPromptTitle(title) {
+    return /^(~|\/|…\/|Ghostty$|zsh$|bash$|fish$)/.test(title) || / - \S+$|@/.test(title);
+  }
+  function _hasExplicitAgentTitle(title) {
+    return _needsAttention(title)
+        || /^[\u2800-\u28ff\u25d0\u25d1\u2733] /.test(title)
+        || /\b(claude|codex|opencode|aider)\b/i.test(title);
+  }
   function _isAgent(w) {
-    return w.appId === "kitty" && w.title !== ""
-        && (_needsAttention(w.title) || /^[\u2800-\u28ff\u25d0\u25d1\u2733] /.test(w.title)
-            || !/ - \S+$|@/.test(w.title));
+    if (!_isTerminalApp(w.appId) || w.title === "")
+      return false;
+    if (_hasExplicitAgentTitle(w.title)) {
+      _agentWindows[w.id] = true;
+      return true;
+    }
+    if (_isShellPromptTitle(w.title)) {
+      delete _agentWindows[w.id];
+      return false;
+    }
+    if (_agentWindows[w.id])
+      return true;
+    return w.appId === "kitty" && !/ - \S+$|@/.test(w.title);
   }
 
   function _appInfo(appId) {
@@ -487,6 +511,7 @@ Singleton {
         const agent = _isAgent(w);
         windowRecords.push({
           winId: w.id,
+          isFocused: Boolean(w.isFocused || (ws.isActive && w.id === ws.activeWindowId)),
           iconName: info.iconName,
           iconSource: agent ? "" : info.iconSource,
           dotState: !agent ? "" : _needsAttention(w.title) ? "attention"

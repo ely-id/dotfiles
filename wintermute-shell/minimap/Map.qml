@@ -1,11 +1,26 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Shapes
 import Quickshell
 import "." as Minimap
 import ".." as Shell
 
+// Organizador de workspaces da barra lateral (ficha 02, boards 13:12277 e 13:11395):
+// Aberto (cartão 156, r16):
+//   Padding 10; altura = 50 × max(linhas, 3) + 10 (mínimo 3 linhas = 160 px).
+//   Círculo 40, gap 8, passo H 48, passo V 50.
+//   Fundo da linha (146×50 r10 em x 5, y -5):
+//     Ativo: accentSubtle + borda accentRing 1 px.
+//     Hover: hover (6%).
+//     Alvo de arraste: accentSubtle.
+//     Linha levantada (reordenar): raised + borda borderStrong 1 px + sombra.
+//   Pílula 14×20 r7 na borda (x -7 do cartão): Repouso, Hover (puxador 3 pontos), Ativa, Arrastando.
+// Recolhido (cartão 48, r16):
+//   Número Geist Mono Regular 13 em (4, y+6) 40×20 (text no ativo/hover, muted nos inativos).
+//   Ativo (fundo pressed r12 em x 4, w 40): empilha janelas de 32 px em x 8, y+37, passo 40.
+//   Janela focada no recolhido (F2-T08): círculo de 32 px com anel accent 1,5 px no mesmo centro (x 8).
+//   Inativos: até 4 pontos 4×4 centrados em y+30; hover acende número e fundo hover (6%).
+//   Divisor 16×1 border em x 16 entre linhas.
 Shell.Card {
   id: root
 
@@ -19,10 +34,8 @@ Shell.Card {
   signal windowRequested(var windowId)
   signal addRequested(var workspaceId)
 
-  readonly property real expandedOpacity:
-      collapseProgress < 0.56 ? 1 : 0
-  readonly property real collapsedOpacity:
-      collapseProgress >= 0.56 ? 1 : 0
+  readonly property real expandedOpacity: collapseProgress < 0.56 ? 1 : 0
+  readonly property real collapsedOpacity: collapseProgress >= 0.56 ? 1 : 0
   readonly property int expandedVisibleRowCount: expandedColumn.height > 0
       ? Math.round((expandedColumn.height + Shell.Theme.workspaceRowGap)
                    / Shell.Theme.workspaceRowPitch)
@@ -41,8 +54,7 @@ Shell.Card {
       expandedNaturalHeight, collapsedNaturalHeight,
       Shell.Theme.collapseHeight(collapseProgress))
   readonly property bool workspaceNumbersRevealed: expandedLayer.enabled
-      && (expandedComponentHover.hovered
-          || (dragSession.active && (!dragSession.windowDrag || Shell.Theme.translucent)))
+      && (expandedComponentHover.hovered || root.forceHovered || dragSession.active)
 
   focus: dragSession.active
   Keys.onEscapePressed: dragSession.cancel()
@@ -83,19 +95,14 @@ Shell.Card {
     }
     return count;
   }
+
   width: Shell.Theme.lerp(Shell.Theme.sidebarCardExpandedWidth,
       Shell.Theme.sidebarCardCollapsedWidth, widthProgress)
   height: Math.min(maximumHeight, naturalHeight)
-  radius: Shell.Theme.translucent
-      ? Shell.Theme.lerp(12, Shell.Theme.sidebarCardRadius, widthProgress)
-      : Shell.Theme.sidebarCardRadius
-  color: Shell.Theme.translucent
-      ? (cardHovered || (dragSession.active && dragSession.windowDrag)
-          ? Shell.Theme.sidebarCardHoverFill : Shell.Theme.sidebarCardFill)
-      : classicColor
-  // The number hit target reaches ten pixels outside the expanded card. The
-  // panel gutter contains it; clipping returns once the compact layer takes
-  // over so its top and bottom rows retain the card radius.
+  radius: Shell.Theme.sidebarCardRadius
+  forceHovered: dragSession.active || expandedComponentHover.hovered
+  // A pílula se projeta 7 px para fora da borda esquerda no modo expandido;
+  // o recorte volta no modo recolhido.
   contentClipped: collapseProgress >= 0.56
 
   Item {
@@ -115,9 +122,6 @@ Shell.Card {
 
     Column {
       id: expandedColumn
-      // Own the complete screen-edge rail as part of every row. This keeps
-      // pointer delivery inside the delegate instead of depending on an
-      // out-of-bounds child to receive the grab.
       x: 0
       y: Shell.Theme.workspaceContentPadding
       width: expandedLayer.width
@@ -132,17 +136,19 @@ Shell.Card {
           required property int index
           required property var model
 
-          readonly property bool matchesOutput: expandedWorkspace.model.outputName === ""
-              || !root.screen
-              || expandedWorkspace.model.outputName === root.screen.name
+          readonly property bool matchesOutput: !expandedWorkspace.model
+              ? false
+              : (expandedWorkspace.model.outputName === ""
+                 || !root.screen
+                 || expandedWorkspace.model.outputName === root.screen.name)
           readonly property var windowItems: {
             try {
-              return JSON.parse(expandedWorkspace.model.windowsJson || "[]");
+              return JSON.parse(expandedWorkspace.model?.windowsJson || "[]");
             } catch (e) {
               return [];
             }
           }
-          readonly property var activeWindowId: model.activeWindowId
+          readonly property var activeWindowId: model ? model.activeWindowId : -1
           property int windowStart: 0
           property var firstWindowId: null
 
@@ -159,7 +165,6 @@ Shell.Card {
           function updateWindowStart() {
             if (dragSession.windowDrag) return;
             const columns = Shell.Theme.workspaceGridColumns;
-            // Preserve the first icon when windows before it close or move.
             const first = windowItems.findIndex(w => w.winId === firstWindowId);
             let start = first < 0 ? windowStart : first;
             const active = windowItems.findIndex(w => w.winId === activeWindowId);
@@ -172,34 +177,57 @@ Shell.Card {
           readonly property int carouselSlotCount: Math.max(
               Shell.Theme.workspaceGridColumns, windowItems.length + 1)
           readonly property int workspaceNumber:
-              Number(expandedWorkspace.model.sidebarWorkspaceNumber) || 0
+              Number(expandedWorkspace.model?.sidebarWorkspaceNumber) || 0
+          readonly property bool isRowActive: Boolean(expandedWorkspace.model?.isActive)
           readonly property bool dragTarget: dragSession.windowDrag
-              && dragSession.destination?.workspaceId === Number(model.workspaceId)
+              && dragSession.destination?.workspaceId === Number(model?.workspaceId)
+          readonly property bool isLiftedRow: dragSession.active && !dragSession.windowDrag
+              && dragSession.source?.workspaceId === Number(model?.workspaceId)
           readonly property int remainingWindows: windowItems.filter(w =>
               !dragSession.windowDrag || w.winId !== dragSession.source.windowData.winId).length
-          property real dragOffset: root.rowOffset(Number(model.workspaceId), workspaceNumber)
+          property real dragOffset: root.rowOffset(Number(model?.workspaceId), workspaceNumber)
+
           visible: matchesOutput
           width: expandedColumn.width
           height: matchesOutput ? Shell.Theme.workspaceControlSize : 0
-          z: dragSession.source?.kind === "workspace"
-              && dragSession.source.workspaceId === Number(model.workspaceId) ? 20 : 0
+          z: isLiftedRow ? 20 : 0
           transform: Translate { y: expandedWorkspace.dragOffset }
           Behavior on dragOffset {
             enabled: !dragSession.resetting && !dragSession.committing
                 && !(dragSession.held && expandedWorkspace.z === 20)
             Shell.HoverAnimation { duration: Shell.Theme.workspaceDragSnapDuration }
           }
+
+          // Sombra da linha levantada ao reordenar workspaces (estado 8)
+          Shell.Shadow {
+            x: Shell.Theme.workspaceActiveIndicatorInset - expandedLayer.x
+            y: -Shell.Theme.workspaceRowGap / 2
+            width: Shell.Theme.workspaceActiveIndicatorWidth
+            height: Shell.Theme.workspaceActiveIndicatorHeight
+            cornerRadius: Shell.Theme.workspaceActiveIndicatorRadius
+            visible: expandedWorkspace.isLiftedRow
+            shadows: Shell.Theme.glassShadows
+            strength: 0.7
+          }
+
+          // Indicador de fundo da linha: ativo, hover, alvo de arraste ou levantada (146×50 r10 em x 5, y -5)
           Rectangle {
             x: Shell.Theme.workspaceActiveIndicatorInset - expandedLayer.x
             y: -Shell.Theme.workspaceRowGap / 2
-            width: root.width - Shell.Theme.workspaceActiveIndicatorInset * 2
-            height: Shell.Theme.workspaceRowPitch
-            radius: 10
-            color: expandedWorkspace.model.isActive || expandedWorkspace.dragTarget
-                ? Shell.Theme.workspaceActiveIndicatorColor
-                : Qt.rgba(Shell.Theme.workspaceActiveIndicatorColor.r,
-                          Shell.Theme.workspaceActiveIndicatorColor.g,
-                          Shell.Theme.workspaceActiveIndicatorColor.b, 0)
+            width: Shell.Theme.workspaceActiveIndicatorWidth
+            height: Shell.Theme.workspaceActiveIndicatorHeight
+            radius: Shell.Theme.workspaceActiveIndicatorRadius
+            antialiasing: true
+            color: expandedWorkspace.isLiftedRow ? Shell.Theme.raised
+                : expandedWorkspace.dragTarget ? Shell.Theme.accentSubtle
+                : (expandedWorkspace.isRowActive && !dragSession.windowDrag) ? Shell.Theme.accentSubtle
+                : (rowHover.hovered && !dragSession.active) ? Shell.Theme.hover
+                : Qt.rgba(0, 0, 0, 0)
+            border.width: expandedWorkspace.isLiftedRow
+                || (expandedWorkspace.isRowActive && !dragSession.windowDrag && !expandedWorkspace.dragTarget)
+                ? 1 : 0
+            border.color: expandedWorkspace.isLiftedRow
+                ? Shell.Theme.borderStrong : Shell.Theme.accentRing
 
             Behavior on color {
               ColorAnimation {
@@ -216,7 +244,7 @@ Shell.Card {
             height: Shell.Theme.workspaceRowPitch
             acceptedButtons: Qt.LeftButton
             cursorShape: Qt.PointingHandCursor
-            onClicked: root.focusRequested(
+            onClicked: if (expandedWorkspace.model) root.focusRequested(
                 expandedWorkspace.model.workspaceIndex)
           }
 
@@ -241,10 +269,12 @@ Shell.Card {
                     * Shell.Theme.workspaceControlGap
               height: parent.height
 
-              Behavior on x { enabled: root.collapseProgress === 0; Shell.Motion { duration: 220 } }
+              Behavior on x {
+                enabled: root.collapseProgress === 0
+                Shell.Motion { duration: Shell.Theme.carouselDuration }
+              }
 
               Repeater {
-                // Keep every window instantiated as the displayed range slides.
                 model: expandedWorkspace.carouselSlotCount
 
                 delegate: Item {
@@ -255,18 +285,21 @@ Shell.Card {
                   readonly property bool hasWindow:
                       index < expandedWorkspace.windowItems.length
                   readonly property bool addSlot: index === expandedWorkspace.windowItems.length
+                  readonly property bool emptyWorkspaceActive: index === 0
+                      && expandedWorkspace.windowItems.length === 0
+                      && expandedWorkspace.isRowActive
+                  readonly property int visualIndex: root.windowIndex(
+                      Number(expandedWorkspace.model?.workspaceId),
+                      expandedWorkspace.windowItems, index)
+                  readonly property bool dropTargetSlot: expandedWorkspace.dragTarget
+                      && visualIndex === dragSession.destination?.slot
                   readonly property bool plusRevealed: addSlot && root.collapseProgress === 0
-                      && expandedWorkspace.matchesOutput && !dragSession.active && (rowHover.hovered
+                      && expandedWorkspace.matchesOutput && !dragSession.active && !dropTargetSlot
+                      && (emptyWorkspaceActive
+                          || rowHover.hovered
                           || Boolean(expandedWorkspace.model && !expandedWorkspace.model.outputHasWindows && expandedWorkspace.model.isCreationRow))
                   readonly property var windowData: hasWindow
                       ? expandedWorkspace.windowItems[index] : ({})
-                  readonly property bool emptyWorkspaceActive: index === 0
-                      && expandedWorkspace.windowItems.length === 0
-                      && expandedWorkspace.model.isActive
-                  readonly property int visualIndex: root.windowIndex(Number(expandedWorkspace.model.workspaceId),
-                      expandedWorkspace.windowItems, index)
-                  readonly property bool translucentDropTarget: Shell.Theme.translucent && expandedWorkspace.dragTarget
-                      && visualIndex === dragSession.destination?.slot
 
                   visible: root.collapseProgress === 0 || (index >= expandedWorkspace.windowStart
                       && index < expandedWorkspace.windowStart + Shell.Theme.workspaceGridColumns)
@@ -280,23 +313,13 @@ Shell.Card {
                   }
 
                   Rectangle {
-                    anchors.fill: parent
-                    visible: workspaceSlot.emptyWorkspaceActive && !workspaceSlot.translucentDropTarget
-                    radius: width / 2
-                    color: Shell.Theme.workspaceLauncherActive
-                    border.color: Shell.Theme.colors.workspaceActiveRing
-                    border.width: Shell.Theme.sidebarStrokeWidth
-                    antialiasing: true
-                  }
-
-                  Rectangle {
                     anchors.centerIn: parent
-                    visible: root.collapseProgress === 0 && !workspaceSlot.hasWindow && !workspaceSlot.emptyWorkspaceActive
-                        && (!dragSession.active || Shell.Theme.translucent) && !workspaceSlot.translucentDropTarget
+                    visible: root.collapseProgress === 0 && !workspaceSlot.hasWindow
+                        && !workspaceSlot.emptyWorkspaceActive && !workspaceSlot.dropTargetSlot
                     width: Shell.Theme.workspacePlaceholderDotSize
                     height: Shell.Theme.workspacePlaceholderDotSize
                     radius: width / 2
-                    color: Shell.Theme.workspacePlaceholderColor
+                    color: Shell.Theme.dot
                     opacity: workspaceSlot.plusRevealed ? 0 : 1
                     Behavior on opacity { Shell.HoverAnimation {} }
                   }
@@ -323,7 +346,7 @@ Shell.Card {
                         if (active) dragSession.begin({ kind: "window",
                             windowData: Object.assign({}, workspaceSlot.windowData),
                             slot: workspaceSlot.index,
-                            workspaceId: Number(expandedWorkspace.model.workspaceId) },
+                            workspaceId: Number(expandedWorkspace.model?.workspaceId) },
                             windowIcon, centroid.scenePressPosition, centroid.scenePosition);
                         else dragSession.release();
                       }
@@ -335,8 +358,9 @@ Shell.Card {
                   Minimap.PlusButton {
                     anchors.fill: parent
                     revealed: workspaceSlot.plusRevealed
+                    accentStyle: workspaceSlot.emptyWorkspaceActive
                     enabled: expandedLayer.enabled && !dragSession.active
-                    onActivated: root.addRequested(Number(expandedWorkspace.model.workspaceId))
+                    onActivated: root.addRequested(Number(expandedWorkspace.model?.workspaceId))
                   }
                 }
               }
@@ -344,7 +368,7 @@ Shell.Card {
               DropArea {
                 id: windowDrop
                 parent: expandedLayer
-                readonly property int workspaceId: Number(expandedWorkspace.model.workspaceId)
+                readonly property int workspaceId: Number(expandedWorkspace.model?.workspaceId)
                 property int slot: 0
                 readonly property int lastStart: Math.max(0,
                     expandedWorkspace.remainingWindows + 1 - Shell.Theme.workspaceGridColumns)
@@ -373,7 +397,6 @@ Shell.Card {
                       (slot - expandedWorkspace.windowStart) * Shell.Theme.workspaceControlPitch, 0);
                 }
 
-                // Scrolling moves the slots beneath a stationary drag pointer.
                 Connections {
                   target: windowCarousel
                   function onXChanged() { if (windowDrop.containsDrag) windowDrop.updateSlot(); }
@@ -390,69 +413,100 @@ Shell.Card {
                 }
               }
 
-              Shape {
+              // Alvo de soltar janela (estado 7): 40×40 r20, accentSubtle + accentRing 1 px
+              Rectangle {
                 visible: expandedWorkspace.dragTarget
                 x: (dragSession.destination?.slot ?? 0) * Shell.Theme.workspaceControlPitch
                 width: Shell.Theme.workspaceControlSize
                 height: width
+                radius: width / 2
+                color: Shell.Theme.accentSubtle
+                border.width: 1
+                border.color: Shell.Theme.accentRing
                 antialiasing: true
                 Behavior on x { Shell.HoverAnimation { duration: Shell.Theme.workspaceDragSnapDuration } }
-                ShapePath {
-                  strokeColor: Shell.Theme.colors.workspaceDropStroke
-                  strokeWidth: 1
-                  strokeStyle: Shell.Theme.translucent ? ShapePath.SolidLine : ShapePath.DashLine
-                  dashPattern: [3, 3]
-                  capStyle: ShapePath.RoundCap
-                  fillColor: Shell.Theme.workspaceDropFill
-                  PathRectangle { x: 0.5; y: 0.5; width: 39; height: 39; radius: 20 }
-                }
               }
             }
           }
 
+          // Pílula do workspace (14×20 r7 em x = -7 do cartão, ficha 02)
           Item {
             anchors.verticalCenter: parent.verticalCenter
             z: 30
             width: 20
             height: Shell.Theme.workspaceRowPitch
             visible: root.workspaceNumbersRevealed && expandedWorkspace.workspaceNumber > 0
+
+            readonly property bool isPillDragging: workspaceDrag.active || expandedWorkspace.isLiftedRow
+            readonly property bool isPillHovered: (numberPointer.containsMouse || numberPointer.pressed)
+                && !isPillDragging
+            readonly property bool isPillActive: expandedWorkspace.isRowActive && !isPillHovered && !isPillDragging
+
+            Shell.Shadow {
+              anchors.fill: pillRect
+              cornerRadius: pillRect.radius
+              visible: parent.isPillDragging
+              shadows: Shell.Theme.glassShadows
+              strength: 0.5
+            }
+
             Rectangle {
+              id: pillRect
               x: 3
               anchors.verticalCenter: parent.verticalCenter
-              width: 14
-              height: 20
-              radius: 10
-              color: numberPointer.containsMouse || numberPointer.pressed
-                  || (Shell.Theme.translucent && dragSession.active && dragSession.windowDrag)
-                  ? Shell.Theme.workspaceNumberDragBackground : Shell.Theme.workspaceNumberBackground
+              width: Shell.Theme.workspacePillWidth
+              height: Shell.Theme.workspacePillHeight
+              radius: 7
+              color: parent.isPillDragging ? Shell.Theme.accentHover
+                  : parent.isPillActive ? Shell.Theme.accent
+                  : Shell.Theme.raised
+              border.width: parent.isPillDragging || parent.isPillActive ? 0 : 1
+              border.color: Shell.Theme.borderStrong
               antialiasing: true
-              Behavior on color { ColorAnimation { duration: 120; easing.type: Easing.OutCubic } }
+
+              Behavior on color {
+                ColorAnimation { duration: Shell.Theme.hoverDuration; easing.type: Easing.OutCubic }
+              }
+
               Text {
                 anchors.fill: parent
-                visible: !numberPointer.containsMouse && !workspaceDrag.active
-                text: expandedWorkspace.workspaceNumber
-                color: Shell.Theme.colors.workspaceNumberText
-                font.family: Shell.Theme.plexFontFamily
+                visible: !parent.parent.isPillHovered && !parent.parent.isPillDragging
+                text: String(expandedWorkspace.workspaceNumber)
+                color: parent.parent.isPillActive ? Shell.Theme.textOnAccent : Shell.Theme.text
+                font.family: Shell.Theme.monoFontFamily
                 font.weight: Font.Medium
-                font.pixelSize: 11
+                font.pixelSize: Shell.Theme.fontMonoCaption
+                font.letterSpacing: 0
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
               }
-              Image {
+
+              // Puxador de 3 pontos (estados 4 e 8)
+              Column {
                 anchors.centerIn: parent
-                width: 2
-                height: 10
-                visible: numberPointer.containsMouse || workspaceDrag.active
-                source: "../assets/navigation/drag-handle.svg"
+                spacing: 2
+                visible: parent.parent.isPillHovered || parent.parent.isPillDragging
+                Repeater {
+                  model: 3
+                  delegate: Rectangle {
+                    width: 2
+                    height: 2
+                    radius: 1
+                    color: pillRect.parent.isPillDragging
+                        ? Shell.Theme.textOnAccent : Shell.Theme.text
+                  }
+                }
               }
             }
+
             MouseArea {
               id: numberPointer
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: workspaceDrag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-              onClicked: root.focusRequested(expandedWorkspace.model.workspaceIndex)
+              onClicked: if (expandedWorkspace.model) root.focusRequested(expandedWorkspace.model.workspaceIndex)
             }
+
             DragHandler {
               id: workspaceDrag
               target: null
@@ -462,7 +516,7 @@ Shell.Card {
               xAxis.enabled: false
               onActiveChanged: {
                 if (active) dragSession.begin({ kind: "workspace",
-                    workspaceId: Number(expandedWorkspace.model.workspaceId),
+                    workspaceId: Number(expandedWorkspace.model?.workspaceId),
                     number: expandedWorkspace.workspaceNumber,
                     count: root.numberedWorkspaceCount() }, expandedWorkspace,
                     centroid.scenePressPosition, centroid.scenePosition);
@@ -476,7 +530,7 @@ Shell.Card {
           DropArea {
             id: workspaceDrop
             parent: expandedLayer
-            readonly property int workspaceId: Number(expandedWorkspace.model.workspaceId)
+            readonly property int workspaceId: Number(expandedWorkspace.model?.workspaceId)
             readonly property int number: expandedWorkspace.workspaceNumber
             x: 0
             y: expandedColumn.y + expandedWorkspace.y - Shell.Theme.workspaceRowGap / 2
@@ -495,6 +549,7 @@ Shell.Card {
       }
     }
 
+    // Linhas de pontos para completar o mínimo de 3 linhas (estado 12)
     Column {
       visible: root.collapseProgress === 0
       x: Shell.Theme.workspaceContentPadding - expandedLayer.x
@@ -523,7 +578,7 @@ Shell.Card {
                 width: Shell.Theme.workspacePlaceholderDotSize
                 height: Shell.Theme.workspacePlaceholderDotSize
                 radius: width / 2
-                color: Shell.Theme.workspacePlaceholderColor
+                color: Shell.Theme.dot
               }
             }
           }
@@ -553,18 +608,20 @@ Shell.Card {
 
           required property var model
 
-          readonly property bool matchesOutput: collapsedWorkspace.model.outputName === ""
-              || !root.screen
-              || collapsedWorkspace.model.outputName === root.screen.name
-          readonly property bool active: !!collapsedWorkspace.model.isActive
+          readonly property bool matchesOutput: !collapsedWorkspace.model
+              ? false
+              : (collapsedWorkspace.model.outputName === ""
+                 || !root.screen
+                 || collapsedWorkspace.model.outputName === root.screen.name)
+          readonly property bool active: Boolean(collapsedWorkspace.model?.isActive)
           readonly property int workspaceNumber:
-              Number(collapsedWorkspace.model.sidebarWorkspaceNumber) || 0
+              Number(collapsedWorkspace.model?.sidebarWorkspaceNumber) || 0
           readonly property int displayNumber: workspaceNumber > 0
               ? workspaceNumber
-              : (Number(collapsedWorkspace.model.sidebarRowOrdinal) || 0) + 1
+              : (Number(collapsedWorkspace.model?.sidebarRowOrdinal) || 0) + 1
           readonly property var windowItems: {
             try {
-              return JSON.parse(collapsedWorkspace.model.windowsJson || "[]");
+              return JSON.parse(collapsedWorkspace.model?.windowsJson || "[]");
             } catch (e) {
               return [];
             }
@@ -590,12 +647,13 @@ Shell.Card {
             }
           }
 
+          // Fundo da linha no recolhido: pressed (10%) no ativo, hover (6%) no hover inativo (estados 9 e 10)
           Rectangle {
             x: 4
-            width: parent.width - 8
+            width: 40
             height: Math.max(0, parent.height - Shell.Theme.workspaceCollapsedControlGap)
             radius: 12
-            color: Shell.Theme.colors.workspaceCollapsedActive
+            color: collapsedWorkspace.active ? Shell.Theme.pressed : Shell.Theme.hover
             opacity: collapsedWorkspace.active || collapsedRowPointer.containsMouse ? 1 : 0
 
             Behavior on opacity {
@@ -608,62 +666,57 @@ Shell.Card {
 
           MouseArea {
             id: collapsedRowPointer
-            y: -4
+            y: 0
             width: parent.width
-            height: parent.height
+            height: Math.max(0, parent.height - Shell.Theme.workspaceCollapsedControlGap)
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: root.focusRequested(
+            onClicked: if (collapsedWorkspace.model) root.focusRequested(
                 collapsedWorkspace.model.workspaceIndex)
           }
 
-          FontMetrics {
-            id: collapsedNumberMetrics
-            font: collapsedNumber.font
-          }
-
+          // Número em Geist Mono Regular 13, caixa 40×20 em (4,6) (estados 9 e 10)
           Text {
             id: collapsedNumber
-            readonly property real contentHeight: collapsedNumberMetrics.capitalHeight
-                + (windowDots.visible ? 8 : 0)
-            x: 0
-            y: (41 - contentHeight) / 2
-                + collapsedNumberMetrics.capitalHeight - baselineOffset
-            width: parent.width
+            x: 4
+            y: 6
+            width: 40
+            height: 20
             text: collapsedWorkspace.displayNumber < 10
                 ? "0" + collapsedWorkspace.displayNumber
                 : String(collapsedWorkspace.displayNumber)
-            color: Shell.Theme.sidebarForeground
-            opacity: collapsedWorkspace.active
-                ? 1.0 : 0.5
-            font.family: Shell.Theme.plexFontFamily
+            color: collapsedWorkspace.active || collapsedRowPointer.containsMouse
+                ? Shell.Theme.text : Shell.Theme.muted
+            font.family: Shell.Theme.monoFontFamily
             font.weight: Font.Normal
-            font.pixelSize: 13
+            font.pixelSize: Shell.Theme.fontMonoNumber
+            font.letterSpacing: 0
             horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
 
-            Behavior on opacity {
-              NumberAnimation {
-                duration: Shell.Theme.sidebarWorkspaceSwitchDuration
+            Behavior on color {
+              ColorAnimation {
+                duration: Shell.Theme.hoverDuration
                 easing.type: Easing.OutCubic
               }
             }
           }
 
+          // Janelas de 32 px empilhadas em x = 8, y = 37, passo 40 (F2-T08: focada = 32 px + anel accent)
           Item {
             visible: collapsedWorkspace.active
-            anchors.horizontalCenter: parent.horizontalCenter
+            x: 8
             y: Shell.Theme.workspaceCollapsedHeaderHeight * root.heightProgress
             width: Shell.Theme.workspaceCollapsedControlSize
             height: Math.max(0, collapsedWorkspace.windowItems.length
                 * Shell.Theme.workspaceCollapsedControlPitch - Shell.Theme.workspaceCollapsedControlGap)
 
             Repeater {
-              // Keep delegates alive when focus, title or activity changes.
-              // An array model destroys them on every new JSON snapshot.
               model: collapsedWorkspace.windowItems.length
 
               delegate: Minimap.WindowIcon {
                 required property int index
+                x: 0
                 y: index * Shell.Theme.workspaceCollapsedControlPitch * root.heightProgress
                 controlSize: Shell.Theme.workspaceCollapsedControlSize
                 windowData: collapsedWorkspace.windowItems[index] || ({})
@@ -672,11 +725,12 @@ Shell.Card {
             }
           }
 
+          // Até 4 pontos 4×4 centrados em y = 30 nos workspaces inativos
           Row {
             id: windowDots
             visible: !collapsedWorkspace.active
                 && collapsedWorkspace.windowItems.length > 0
-            y: collapsedNumber.y + collapsedNumber.baselineOffset + 4
+            y: 30
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: 2
 
@@ -684,63 +738,27 @@ Shell.Card {
               model: Math.min(4, collapsedWorkspace.windowItems.length)
 
               delegate: Rectangle {
-                id: appDot
                 required property int index
-                readonly property string imageFile: Quickshell.env("XDG_RUNTIME_DIR")
-                    + "/pond-icon-" + Quickshell.processId + "-" + Qt.md5(String(appDot)) + ".png"
                 width: 4
                 height: 4
                 radius: 2
                 antialiasing: true
-                readonly property string dotState: collapsedWorkspace.windowItems[index].dotState || ""
-                color: dotState === "working" ? "#CBA6F7" : dotState === "unread" ? "#FF9F67"
-                    : dotState === "read" ? "#CBE25B" : iconColor.colors[0] ?? "white"
-
-                // ColorQuantizer needs a file; theme icons use an image-provider URL.
-                Image {
-                  id: colorSource
-                  width: 32
-                  height: 32
-                  visible: false
-                  asynchronous: true
-                  source: Quickshell.iconPath(collapsedWorkspace.windowItems[appDot.index].iconName,
-                      "application-x-executable")
-                  readonly property bool ready: status === Image.Ready && Boolean(Window.window?.visible)
-                  onReadyChanged: if (ready) Qt.callLater(capture)
-                  onSourceChanged: {
-                    iconColor.source = "";
-                    if (ready) Qt.callLater(capture);
-                  }
-                  function capture() {
-                    if (!ready)
-                      return;
-                    const requested = source.toString();
-                    grabToImage(result => {
-                      if (source.toString() === requested && result.saveToFile(appDot.imageFile))
-                        iconColor.source = "file://" + appDot.imageFile;
-                    });
-                  }
-                }
-
-                ColorQuantizer {
-                  id: iconColor
-                  depth: 0
-                  rescaleSize: 32
-                }
-                Component.onDestruction: {
-                  colorSource.source = "";
-                  Quickshell.execDetached(["rm", "-f", imageFile]);
-                }
+                readonly property string dotState: collapsedWorkspace.windowItems[index]?.dotState || ""
+                color: dotState === "working" ? Shell.Theme.accentText
+                    : dotState === "attention" ? Shell.Theme.attentionText
+                    : dotState === "unread" ? Shell.Theme.warning
+                    : dotState === "read" ? Shell.Theme.successText
+                    : Shell.Theme.muted
               }
             }
           }
 
           Rectangle {
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: parent.height - Shell.Theme.workspaceCollapsedControlGap / 2 - height / 2
+            x: 16
+            y: parent.height - Shell.Theme.workspaceCollapsedControlGap / 2
             width: 16
             height: 1
-            color: Shell.Theme.sidebarDivider
+            color: Shell.Theme.border
             visible: collapsedWorkspace.y + collapsedWorkspace.height < collapsedColumn.height - 0.5
           }
         }

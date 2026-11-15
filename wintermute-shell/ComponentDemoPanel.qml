@@ -10,6 +10,7 @@ import "media" as Media
 import "minimap" as Minimap
 import "notifications" as Notifications
 import "installs" as Installs
+import "settings" as Settings
 import "settings/appearance" as Appearance
 
 // Painel de demonstração visual da F1, da F2 e da F3 (fichas 00 a 05, boards 13:11217, 13:11463, 13:12277, 13:11395 e 13:13604).
@@ -211,6 +212,43 @@ PanelWindow {
       layer.effect: MultiEffect {
         colorization: 1
         colorizationColor: Theme.muted
+      }
+    }
+  }
+
+  // Quadro explicativo do IdleFade (ficha 12): um papel de parede fictício com o véu preto no mesmo
+  // percurso linear que o IdleFade.qml percorre em 5 s (a opacidade do véu = tempo / 5 s).
+  component IdleFadeFrame: Item {
+    id: frame
+    property real progress: 0
+    width: 216
+    height: 136
+    Rectangle {
+      anchors.fill: parent
+      radius: 12
+      gradient: Gradient {
+        GradientStop { position: 0.0; color: "#0b1226" }
+        GradientStop { position: 0.6; color: "#1d2347" }
+        GradientStop { position: 1.0; color: "#3a1f4a" }
+      }
+      Rectangle {
+        x: 12; y: 12; width: 36; height: 112; radius: 8
+        color: Theme.control
+        border.width: 1
+        border.color: Theme.border
+      }
+      Rectangle {
+        anchors.fill: parent
+        radius: parent.radius
+        color: "black"
+        opacity: frame.progress
+      }
+      Rectangle {
+        anchors.fill: parent
+        radius: parent.radius
+        color: "transparent"
+        border.width: 1
+        border.color: Theme.border
       }
     }
   }
@@ -1067,6 +1105,50 @@ PanelWindow {
                   caption: "Teclado 156×76 · layout atual com rádio marcado"
                   stageWidth: 156; stageHeight: 76
                   KeyboardLayoutCard { layouts: ["Português (BR)", "English (US)"]; activeIndex: 0 }
+                }
+              }
+
+              SectionBlock {
+                title: "Aparência (ficha 11, board 13:14610) · modal 580×456 com as três variações"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Escolher um disco troca o acento (e grava em theme.json, como no cabeçalho)"
+                  stageWidth: 600; stageHeight: 469
+                  Settings.Modal {
+                    x: 0; y: 13
+                    title: "Aparência"
+                    bodyTop: 0
+                    contentHeight: appearanceBody.contentHeight
+                    Appearance.Body {
+                      id: appearanceBody
+                      brightnessAvailable: true
+                      onThemeSelected: key => Appearance.State.selectTheme(key)
+                      onBrightnessToggled: brightnessExpanded = !brightnessExpanded
+                      onBrightnessMoved: value => brightness = Math.max(0, Math.min(1, value))
+                    }
+                  }
+                }
+              }
+
+              SectionBlock {
+                title: "IdleFade (ficha 12, board 13:14610) · véu linear em 5 s, depois desliga os monitores"
+                itemGap: 24
+
+                Specimen {
+                  caption: "0 s · tempo de tela esgotado"
+                  stageWidth: 216; stageHeight: 136
+                  IdleFadeFrame { progress: 0 }
+                }
+                Specimen {
+                  caption: "2,5 s · escurecendo (50%)"
+                  stageWidth: 216; stageHeight: 136
+                  IdleFadeFrame { progress: 0.5 }
+                }
+                Specimen {
+                  caption: "5 s · preto, desliga os monitores"
+                  stageWidth: 216; stageHeight: 136
+                  IdleFadeFrame { progress: 1 }
                 }
               }
             }

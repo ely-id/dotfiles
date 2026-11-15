@@ -4,21 +4,21 @@ import Quickshell
 import "." as Settings
 import ".." as Shell
 
-// Centered settings page with a fixed header and scrolling body.
+// Página de ajustes centralizada (ficha 11): vidro Armitage r32, título Serif 32 e corpo rolante.
 Rectangle {
   id: root
   default property alias content: body.contentItem.data
   property string title
   property real bodyTop: 82
   property real titleOpacity: 1
-  property string closeLabel: "Back to settings"
+  property string closeLabel: "Voltar para os ajustes"
   property alias overlay: overlays.data
   property alias scrollItem: body
   property real contentHeight: 0
   property real availableHeight: 900
   property bool roundedContent: false
   property bool showOutline: true
-  property Gradient fill: Shell.PanelStyle.modalGradient
+  property Gradient fill: null
   property real closeButtonY: -13
   signal backRequested
   implicitWidth: 580
@@ -26,7 +26,7 @@ Rectangle {
   // hit targets stay in step instead of starting another animation each frame.
   implicitHeight: Math.min(contentHeight + bodyTop, availableHeight)
   radius: 32
-  color: fill ? "transparent" : Shell.Theme.colors.modalSurface
+  color: "transparent"
   readonly property Region blurRegion: Region {
     item: root.enabled && root.parent?.opacity > Shell.PanelStyle.blurRevealOpacity
         && root.color.a < 1 ? root : null
@@ -37,13 +37,18 @@ Rectangle {
   Shell.GradientFill { fill: root.fill }
   // Stop dialog clicks from reaching the outside-dismiss area.
   MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }
+  // Título Serif 32 em (30,20), caixa 400×44 (ficha 11).
   Text {
-    x: 30; y: 20
+    x: 30; y: 20; width: 400; height: 44
+    verticalAlignment: Text.AlignVCenter
+    elide: Text.ElideRight
     text: root.title
     opacity: root.titleOpacity
-    color: Shell.Theme.colors.text
+    color: Shell.Theme.text
     font.family: Shell.Theme.titleFontFamily
-    font.pixelSize: 32
+    font.weight: Font.Normal
+    font.pixelSize: Shell.Theme.fontModalTitle
+    font.letterSpacing: 0
   }
   Flickable {
     id: body
@@ -67,7 +72,7 @@ Rectangle {
         sourceItem: Rectangle {
           width: body.width; height: body.height
           radius: root.radius
-          color: Shell.Theme.colors.text
+          color: Shell.Theme.text
           antialiasing: true
         }
       }
@@ -75,7 +80,6 @@ Rectangle {
   }
   Shell.PanelBorder {
     radius: root.radius
-    color: Shell.PanelStyle.modalBorder
     visible: Shell.Theme.translucent && root.showOutline
     z: 4
   }

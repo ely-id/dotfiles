@@ -16,6 +16,8 @@ Item {
   property Component deviceDelegate
   property Component footer
   property string emptyText: ""
+  // Legenda de seção 11 muted em (20,72), usada por "Procurando…" nos dispositivos próximos.
+  property string sectionLabel: ""
   property string message: ""
   property int viewportHeight: 306
   property real listTop: 64
@@ -49,6 +51,17 @@ Item {
       font.letterSpacing: 0
     }
     Loader { x: 242; y: 18; width: 54; height: 28; sourceComponent: root.headerControl }
+    Text {
+      x: 20; y: 72; width: 276; height: 20
+      visible: root.sectionLabel !== ""
+      verticalAlignment: Text.AlignVCenter
+      text: root.sectionLabel
+      color: Theme.muted
+      font.family: Theme.fontFamily
+      font.weight: Font.Medium
+      font.pixelSize: Theme.fontCaption
+      font.letterSpacing: 0
+    }
     ListView {
       id: deviceList
       clip: true

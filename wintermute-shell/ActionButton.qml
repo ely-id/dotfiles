@@ -24,9 +24,13 @@ Rectangle {
 
   signal clicked
 
-  implicitWidth: isPrimary && !small ? 276 : 146
-  implicitHeight: small ? 32 : (isPrimary ? 48 : 40)
-  radius: small ? 8 : (isPrimary ? Theme.radiusPrimaryButton : Theme.radiusSecondaryButton)
+  // Compacto: 146×40 r10 em qualquer tipo, para botões lado a lado num painel
+  // (por exemplo o "Parear" primário da ficha 06).
+  property bool compact: false
+  implicitWidth: compact ? 146 : (isPrimary && !small ? 276 : 146)
+  implicitHeight: compact ? 40 : (small ? 32 : (isPrimary ? 48 : 40))
+  radius: compact ? Theme.radiusSecondaryButton
+      : small ? 8 : (isPrimary ? Theme.radiusPrimaryButton : Theme.radiusSecondaryButton)
   color: isPrimary
       ? (isHovered ? Theme.accentHover : Theme.accent)
       : (isHovered ? Theme.pressed : Theme.control)
@@ -51,7 +55,7 @@ Rectangle {
     opacity: root.textOpacity
     font.family: Theme.fontFamily
     font.weight: Font.Medium
-    font.pixelSize: root.isPrimary && !root.small ? Theme.fontLabel : Theme.fontBody
+    font.pixelSize: root.isPrimary && !root.small && !root.compact ? Theme.fontLabel : Theme.fontBody
     font.letterSpacing: 0
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter

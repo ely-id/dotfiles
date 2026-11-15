@@ -928,6 +928,37 @@ PanelWindow {
                   }
                 }
               }
+
+              SectionBlock {
+                title: "Bluetooth (ficha 06, board 13:13604) · pilha real com dados fictícios"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Lista 316×306 · conectado, bateria, conectando e rodapé"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 328
+                  Demo.BluetoothSpecimen { page: "drawer"; height: 328 }
+                }
+                Specimen {
+                  caption: "Próximos 316×236 · procurando"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 268
+                  Demo.BluetoothSpecimen { page: "nearby"; searching: true; height: 268 }
+                }
+                Specimen {
+                  caption: "Pareamento 316×236 · código em Serif 32 accentText"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 268
+                  Demo.BluetoothSpecimen { page: "pair"; height: 268 }
+                }
+                Specimen {
+                  caption: "Desligado 316×156"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 178
+                  Demo.BluetoothSpecimen { page: "drawer"; bluetoothEnabled: false; height: 178 }
+                }
+                Specimen {
+                  caption: "Detalhes · mesmo layout do Wi-Fi"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 380
+                  Demo.BluetoothSpecimen { page: "details"; height: 380 }
+                }
+              }
             }
 
             // =================================================================

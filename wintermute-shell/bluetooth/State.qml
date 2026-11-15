@@ -56,7 +56,7 @@ Singleton {
   }
   function failed(path) { return failures[path] !== undefined; }
   function send(action, path, extra) {
-    if (!transportReady) { errorText = "Bluetooth service is starting. Try again."; return false; }
+    if (!transportReady) { errorText = "O serviço de Bluetooth está iniciando. Tente de novo."; return false; }
     const job = Object.assign({id: ++serial, action: action, path: path}, extra || {});
     const next = Object.assign({}, pending); next[job.id] = job; pending = next;
     const errors = Object.assign({}, failures); delete errors[path]; failures = errors;
@@ -66,7 +66,7 @@ Singleton {
   }
   function activate(device) {
     if (!device || !enabled || isBusy(device.path)) return;
-    if (device.blocked) { errorText = "This device is blocked in Bluetooth settings."; return; }
+    if (device.blocked) { errorText = "Este dispositivo está bloqueado nas configurações de Bluetooth."; return; }
     send(device.connected ? "disconnect" : device.paired || device.bonded ? "connect" : "pair", device.path);
   }
   function forget(device) {
@@ -118,14 +118,14 @@ Singleton {
       discoveryOwned = job.action === "scan-start" && message.success;
       if (!discoveryOwned) discoveryPath = "";
       if (!message.success && job.action === "scan-start")
-        errorText = "Couldn’t search for nearby devices. Close and reopen search to try again.";
+        errorText = "Não foi possível procurar dispositivos próximos. Feche e abra a busca para tentar de novo.";
       else Qt.callLater(syncDiscovery);
     } else if (!message.success) {
       const errors = Object.assign({}, failures); errors[job.path] = Date.now() + 3500; failures = errors;
-      errorText = job.action === "power" ? "Couldn’t change Bluetooth power. Check the adapter or airplane mode."
-          : job.action === "forget" ? "Couldn’t forget this device. Try again."
-          : job.action === "disconnect" ? "Couldn’t disconnect. Try again."
-          : "Couldn’t connect. Make sure the device is on and nearby, then try again.";
+      errorText = job.action === "power" ? "Não foi possível mudar o Bluetooth. Confira o adaptador ou o modo avião."
+          : job.action === "forget" ? "Não foi possível esquecer este dispositivo. Tente de novo."
+          : job.action === "disconnect" ? "Não foi possível desconectar. Tente de novo."
+          : "Não foi possível conectar. Confira se o dispositivo está ligado e por perto e tente de novo.";
     }
     actionFinished(job.path, job.action, message.success);
   }

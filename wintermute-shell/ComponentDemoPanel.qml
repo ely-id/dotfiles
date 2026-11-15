@@ -959,6 +959,22 @@ PanelWindow {
                   Demo.BluetoothSpecimen { page: "details"; height: 380 }
                 }
               }
+
+              SectionBlock {
+                title: "Som (ficha 07, board 13:14610) · pop-up real com dispositivos fictícios"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Saída 316×236 · slider com o valor na alça"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 258
+                  Demo.AudioSpecimen { tab: "output"; height: 258 }
+                }
+                Specimen {
+                  caption: "Entrada 316×236"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 258
+                  Demo.AudioSpecimen { tab: "input"; height: 258 }
+                }
+              }
             }
 
             // =================================================================

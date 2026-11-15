@@ -1,66 +1,61 @@
 import QtQuick
-import QtQuick.Effects
 import "." as Audio
 import ".."
 
+// Linha de dispositivo de som (ficha 07): 300×40 r12, ícone 16 em (12,12), nome 13 Medium em x 40
+// e rádio de seleção em (272,12). Hover `hover`.
 Item {
   id: root
 
   property var device
+  property var service: Audio.State
   property bool selected: false
   property bool interactive: true
   signal clicked
 
   implicitWidth: PanelStyle.rowWidth
-  implicitHeight: PanelStyle.audioRowHeight
+  implicitHeight: Theme.audioRowHeight
 
   Rectangle {
     anchors.fill: parent
-    radius: PanelStyle.rowRadius
-    color: pointer.containsMouse ? PanelStyle.drawerRowHover
-        : Qt.alpha(PanelStyle.drawerRowHover, 0)
+    radius: Theme.radiusRow
+    color: pointer.containsMouse ? Theme.hover : "transparent"
+    antialiasing: true
 
     Behavior on color {
       ColorAnimation {
-        duration: PanelStyle.controlDuration
+        duration: Theme.controlDuration
         easing.type: Easing.OutCubic
       }
     }
   }
 
+  Image {
+    x: 12; y: 12
+    width: 16; height: 16
+    source: Qt.resolvedUrl("../icons/" + root.service.deviceIcon(root.device) + ".svg")
+    sourceSize: Qt.size(32, 32)
+    fillMode: Image.PreserveAspectFit
+    smooth: true
+  }
+
   Text {
-    x: 12
-    width: 244
+    x: 40
+    width: 224
     anchors.verticalCenter: parent.verticalCenter
-    text: Audio.State.displayName(root.device)
-    color: Theme.colors.text
+    text: root.service.displayName(root.device)
+    color: Theme.text
     elide: Text.ElideRight
     font.family: Theme.fontFamily
     font.weight: Font.Medium
-    font.pixelSize: 13
+    font.pixelSize: Theme.fontBody
+    font.letterSpacing: 0
   }
 
-  Rectangle {
-    x: 272
-    y: 12
-    width: 16
-    height: 16
-    radius: 8
-    color: root.selected ? Theme.colors.text : "transparent"
-    border.width: root.selected ? 0 : 1
-    border.color: Theme.colors.text
-    opacity: root.selected ? 1 : 0.3
-
-    Image {
-      anchors.centerIn: parent
-      width: 12
-      height: 12
-      visible: root.selected
-      source: Qt.resolvedUrl("../icons/check.svg")
-      sourceSize: Qt.size(24, 24)
-      layer.enabled: true
-      layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.textOnAccent }
-    }
+  RadioButton {
+    x: 272; y: 12
+    checked: root.selected
+    interactive: false
   }
 
   MouseArea {

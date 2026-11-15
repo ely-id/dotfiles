@@ -3,10 +3,14 @@ import Quickshell
 import "." as Audio
 import ".."
 
+// Pop-up de som (ficha 07): um cartão de 316 com o botão de fechar pendurado em (296, 2) e folga
+// de 22 em cima, como a pilha sem verso. `service` é o estado de áudio; a vitrine troca por um fictício.
 Item {
   id: root
 
+  property var service: Audio.State
   property bool opened: false
+  property alias selectedTab: soundCard.selectedTab
   readonly property int closeAllDuration: 200
   readonly property Region blurRegion: Region {
     item: root.opened && root.opacity > PanelStyle.blurRevealOpacity ? soundCard : null
@@ -16,8 +20,8 @@ Item {
   onYChanged: blurRegion.changed()
   onScaleChanged: blurRegion.changed()
 
-  width: 336
-  height: soundCard.implicitHeight + 22
+  width: PanelStyle.stackWidth
+  height: soundCard.implicitHeight + PanelStyle.frontInsetSingle
   visible: opened || closeCleanup.running
   opacity: opened ? 1 : 0
   scale: opened ? 1 : 0.9
@@ -25,7 +29,7 @@ Item {
 
   Behavior on height {
     NumberAnimation {
-      duration: 350
+      duration: Theme.pageDuration
       easing.type: Easing.Bezier
       easing.bezierCurve: [0.19, 1, 0.22, 1, 1, 1]
     }
@@ -51,21 +55,22 @@ Item {
 
   Shadow {
     anchors.fill: soundCard
-    cornerRadius: PanelStyle.radius
-    shadows: PanelStyle.frontShadows
+    cornerRadius: Theme.radiusPanel
+    shadows: Theme.glassShadows
   }
 
   Devices {
     id: soundCard
-    y: 22
+    y: PanelStyle.frontInsetSingle
     width: PanelStyle.width
     height: root.height - y
+    service: root.service
     interactive: root.opened
   }
 
   PanelCloseButton {
-    x: 296
-    y: 2
+    x: PanelStyle.closeButtonX
+    y: PanelStyle.frontInsetSingle - PanelStyle.closeButtonOverhang
     enabled: root.opened
     onClicked: root.closeAll()
   }
@@ -78,7 +83,7 @@ Item {
   function open() {
     closeCleanup.stop();
     opened = true;
-    Audio.State.refreshPorts();
+    service.refreshPorts();
   }
 
   function closeAll() {

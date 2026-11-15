@@ -44,9 +44,25 @@ Singleton {
 
   function displayName(node) {
     if (!node)
-      return "Unknown device";
+      return "Dispositivo desconhecido";
     return String(node.description || node.nickname || node.name
-                  || "Unknown device");
+                  || "Dispositivo desconhecido");
+  }
+
+  // Ícone Lucide da linha (ficha 07): saída = alto-falante, fones ou monitor (HDMI e afins);
+  // entrada = microfone ou fones.
+  function deviceIcon(node) {
+    if (!node)
+      return "speaker";
+    const props = node.properties || ({});
+    const text = [props["device.form-factor"], props["device.icon-name"], displayName(node)]
+        .join(" ").toLowerCase();
+    const headphones = /head(set|phone)|fone|earbud|buds/.test(text);
+    if (!node.isSink)
+      return headphones ? "headphones" : "mic";
+    if (/hdmi|displayport|monitor|display|\btv\b/.test(text))
+      return "monitor";
+    return headphones ? "headphones" : "speaker";
   }
 
   function suppressExternalChanges(duration) {

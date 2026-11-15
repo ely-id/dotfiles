@@ -26,8 +26,10 @@ Singleton {
   readonly property bool internetUnavailable: Networking.connectivity === NetworkConnectivity.None
       || Networking.connectivity === NetworkConnectivity.Portal
       || Networking.connectivity === NetworkConnectivity.Limited
+  // Rede cabeada usa o Lucide `cable` (P-39), com ou sem internet: o Lucide não tem uma variante
+  // "sem internet", e a origem trocava de arquivo.
   readonly property string statusIcon: wiredConnected
-      ? (internetUnavailable ? "../assets/wifi/ethernet-no-internet.svg" : "../assets/wifi/ethernet.svg")
+      ? "cable.svg"
       : !wifiConnected ? "wifi-off.svg"
       : internetUnavailable ? "wifi-off.svg" : "wifi.svg"
   readonly property string device: adapter ? adapter.name : ""

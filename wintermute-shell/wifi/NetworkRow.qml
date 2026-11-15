@@ -23,8 +23,8 @@ ListRow {
     Image {
       visible: !!root.network.wired
       anchors.fill: parent
-      // O ícone Lucide `cable` (P-39) entra aqui quando o SVG estiver em icons/.
-      source: Qt.resolvedUrl("../assets/wifi/ethernet.svg")
+      // Rede cabeada: ícone Lucide `cable` (P-39).
+      source: Qt.resolvedUrl("../icons/cable.svg")
       sourceSize: Qt.size(40, 40)
       fillMode: Image.PreserveAspectFit
     }

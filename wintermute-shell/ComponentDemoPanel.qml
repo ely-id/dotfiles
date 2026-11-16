@@ -14,6 +14,7 @@ import "settings" as Settings
 import "settings/appearance" as Appearance
 import "settings/system" as System
 import "settings/display" as Display
+import "settings/information" as Information
 
 // Painel de demonstração visual da F1, da F2 e da F3 (fichas 00 a 05, boards 13:11217, 13:11463, 13:12277, 13:11395 e 13:13604).
 // Abre com: qs -p ~/Projects/dotfiles/wintermute-shell ipc call demo toggle
@@ -984,6 +985,24 @@ PanelWindow {
                   caption: "Arrange displays 580×500 · área 520×320, monitor arrastado com guia de encaixe em accentText"
                   stageWidth: 600; stageHeight: 513
                   Display.Arrange { y: 13; service: demoDisplayArrange; demoDragIndex: 0 }
+                }
+              }
+
+              Demo.InformationService { id: demoInformation }
+
+              SectionBlock {
+                title: "Informações (ficha 13, board 13:16083) · página real com dados fictícios"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Information 580×620 · 7 linhas a cada 48, botão Manual 520×64, rodapé com a grade de + (contatos: P-50)"
+                  stageWidth: 600; stageHeight: 633
+                  Information.Panel { y: 13; service: demoInformation }
+                }
+                Specimen {
+                  caption: "Hover no botão Manual · fundo pressed, como as linhas dos Ajustes"
+                  stageWidth: 600; stageHeight: 633
+                  Information.Panel { y: 13; service: demoInformation; manualHovered: true }
                 }
               }
             }

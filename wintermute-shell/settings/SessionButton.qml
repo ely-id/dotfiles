@@ -1,45 +1,54 @@
 import QtQuick
 import Quickshell
-import "." as Settings
 import ".." as Shell
 
-// Shared 127px session action. The label is intentionally delayed a beat
-// behind the immediate color response, after the immediate hover response.
+// Botão de sessão da tela inicial dos Ajustes (ficha 13; Figma 13:15832 e 13:15898).
+// Vidro de 128×128, raio 12, sem o brilho do acento. Círculo de 80 em `control` em
+// (24,24) com o ícone de 20. No hover o botão inteiro vira `danger` (Desligar) ou
+// `accent` (os outros três), o círculo escurece para o fundo a 55%, o rim some e o nome
+// aparece à direita em Geist Serif 32, em dangerText ou accentText, 60 ms depois.
+// O Desligar tem um ponto dangerText de 8 em (100,20), que some no hover.
 Item {
   id: root
 
-  property url iconSource
-  property real iconWidth: 32
-  property real iconHeight: 32
-  property bool showStatusDot: false
-  property color hoverColor: "white"
-  property color hoverControlColor: "#632B0F"
+  property string iconName: ""
   property string label: ""
-  property real labelWidth: 127
+  property bool danger: false
+  property bool showStatusDot: false
   property bool revealed: false
-  property string accessibleName: label
-  property bool labelShown: false
+  // Hover vindo de fora: o selo "Restart recommended" acende o Reiniciar.
   property bool highlighted: false
+  // Fixa o hover na vitrine.
+  property bool forceHovered: false
+  property bool labelShown: false
   signal clicked
 
-  readonly property bool hovered: pointer.containsMouse || highlighted
+  readonly property bool hovered: (pointer.containsMouse && pointer.enabled) || highlighted || forceHovered
+  readonly property color fillColor: danger ? Shell.Theme.danger : Shell.Theme.accent
+  readonly property color labelColor: danger ? Shell.Theme.dangerText : Shell.Theme.accentText
   readonly property Region blurRegion: Region {
-    item: root.revealed && root.opacity > Shell.PanelStyle.blurRevealOpacity ? root : null
-    radius: Settings.Style.radius
+    item: root.revealed && root.opacity > Shell.Theme.blurRevealOpacity ? root : null
+    radius: Shell.Theme.settingsSessionRadius
   }
 
-  implicitWidth: Settings.Style.sessionSize
-  implicitHeight: Settings.Style.sessionSize
+  implicitWidth: Shell.Theme.settingsSessionSize
+  implicitHeight: Shell.Theme.settingsSessionSize
   visible: opacity > 0.001
   opacity: revealed ? 1 : 0
   scale: revealed ? 1 : 0.86
   transformOrigin: Item.Center
   onScaleChanged: blurRegion.changed()
 
+  Accessible.role: Accessible.Button
+  Accessible.name: label
+  Accessible.onPressAction: clicked()
+
   onRevealedChanged: {
     if (!revealed) {
       labelDelay.stop();
       labelShown = false;
+    } else if (hovered) {
+      labelDelay.restart();
     }
   }
 
@@ -52,111 +61,113 @@ Item {
     }
   }
 
+  Component.onCompleted: if (hovered && revealed) labelDelay.restart()
+
   Behavior on opacity {
     NumberAnimation {
-      duration: root.revealed ? Settings.Style.revealDuration
-                              : Settings.Style.closeDuration
+      duration: root.revealed ? Shell.Theme.settingsCardAppear : Shell.Theme.settingsCloseDuration
       easing.type: Easing.OutCubic
     }
   }
 
   Behavior on scale {
     NumberAnimation {
-      duration: root.revealed ? Settings.Style.revealDuration
-                              : Settings.Style.closeDuration
+      duration: root.revealed ? Shell.Theme.settingsCardAppear : Shell.Theme.settingsCloseDuration
       easing.type: Easing.OutCubic
     }
   }
 
-  Rectangle {
-    id: card
+  Shell.Shadow {
     anchors.fill: parent
-    radius: Settings.Style.radius
-    color: root.hovered ? root.hoverColor : Settings.Style.menuCard
-    clip: true
+    cornerRadius: Shell.Theme.settingsSessionRadius
+    shadows: Shell.Theme.glassShadows
+  }
 
-    Behavior on color {
-      ColorAnimation {
-        duration: Settings.Style.hoverDuration
-        easing.type: Easing.InOutCubic
-      }
-    }
+  Shell.GradientFill {
+    radius: Shell.Theme.settingsSessionRadius
+    showGlow: false
+  }
 
-    Shell.PanelBorder {
-      color: Settings.Style.menuCardBorder
-      radius: parent.radius
-    }
+  Rectangle {
+    anchors.fill: parent
+    radius: Shell.Theme.settingsSessionRadius
+    color: root.fillColor
+    opacity: root.hovered ? 1 : 0
+    antialiasing: true
 
-    Rectangle {
-      width: 80
-      height: width
-      anchors.centerIn: parent
-      radius: width / 2
-      color: root.hovered ? root.hoverControlColor
-          : Shell.Theme.translucent ? Settings.Style.sessionControl
-          : Qt.tint(Settings.Style.card, Settings.Style.sessionControl)
-
-      Behavior on color {
-        ColorAnimation {
-          duration: Settings.Style.hoverDuration
-          easing.type: Easing.InOutCubic
-        }
-      }
-
-      Item {
-        width: 32
-        height: width
-        anchors.centerIn: parent
-
-        Image {
-          anchors.centerIn: parent
-          width: root.iconWidth
-          height: root.iconHeight
-          source: root.iconSource
-          sourceSize: Qt.size(Math.ceil(root.iconWidth * 2),
-                              Math.ceil(root.iconHeight * 2))
-          fillMode: Image.PreserveAspectFit
-          smooth: true
-          antialiasing: true
-        }
-      }
-    }
-
-    Image {
-      x: 110
-      y: 11
-      width: 6
-      height: 6
-      visible: root.showStatusDot
-      source: Qt.resolvedUrl("../assets/settings/power-dot.svg")
-      sourceSize: Qt.size(12, 12)
+    Behavior on opacity {
+      NumberAnimation { duration: Shell.Theme.settingsHoverDuration; easing.type: Easing.InOutCubic }
     }
   }
 
-  Text {
-    x: Settings.Style.sessionSize + 16
-    y: (Settings.Style.sessionSize - height) / 2
-    width: root.labelWidth
-    height: 36
-    text: root.label
-    color: root.hoverColor
-    opacity: root.labelShown && root.revealed ? 0.7 : 0
-    font.family: Shell.Theme.titleFontFamily
-    font.weight: Font.Normal
-    font.pixelSize: 32
-    verticalAlignment: Text.AlignVCenter
+  Rectangle {
+    x: (root.width - width) / 2
+    y: (root.height - height) / 2
+    width: Shell.Theme.settingsSessionCircle
+    height: width
+    radius: width / 2
+    color: root.hovered ? Shell.Theme.settingsSessionCircleHover : Shell.Theme.control
+    antialiasing: true
+
+    Behavior on color {
+      ColorAnimation { duration: Shell.Theme.settingsHoverDuration; easing.type: Easing.InOutCubic }
+    }
+
+    Image {
+      anchors.centerIn: parent
+      width: 20
+      height: 20
+      source: root.iconName !== "" ? Qt.resolvedUrl("../icons/" + root.iconName + ".svg") : ""
+      sourceSize: Qt.size(40, 40)
+      fillMode: Image.PreserveAspectFit
+      smooth: true
+    }
+  }
+
+  Rectangle {
+    x: Shell.Theme.settingsSessionDotX
+    y: Shell.Theme.settingsSessionDotY
+    width: Shell.Theme.settingsSessionDot
+    height: width
+    radius: width / 2
+    visible: root.showStatusDot
+    color: Shell.Theme.dangerText
+    opacity: root.hovered ? 0 : 1
+    antialiasing: true
 
     Behavior on opacity {
-      NumberAnimation {
-        duration: 100
-        easing.type: Easing.OutCubic
-      }
+      NumberAnimation { duration: Shell.Theme.settingsHoverDuration; easing.type: Easing.InOutCubic }
+    }
+  }
+
+  Shell.PanelBorder {
+    radius: Shell.Theme.settingsSessionRadius
+    topColor: root.hovered ? "transparent" : Shell.Theme.glassRimTop
+    midColor: root.hovered ? "transparent" : Shell.Theme.glassRimMid
+    bottomColor: root.hovered ? "transparent" : Shell.Theme.glassRimBottom
+    z: 2
+  }
+
+  Text {
+    x: root.width + Shell.Theme.settingsSessionLabelGap
+    y: (root.height - height) / 2
+    height: Shell.Theme.settingsCategoryNameHeight
+    verticalAlignment: Text.AlignVCenter
+    text: root.label
+    color: root.labelColor
+    opacity: root.labelShown && root.revealed ? 1 : 0
+    font.family: Shell.Theme.titleFontFamily
+    font.weight: Font.Normal
+    font.pixelSize: Shell.Theme.fontModalTitle
+
+    Behavior on opacity {
+      NumberAnimation { duration: Shell.Theme.settingsHoverDuration; easing.type: Easing.OutCubic }
     }
   }
 
   Timer {
     id: labelDelay
-    interval: 60
+    interval: Shell.Theme.settingsSessionLabelDelay
     onTriggered: {
       if (root.hovered && root.revealed)
         root.labelShown = true;
@@ -169,7 +180,6 @@ Item {
     enabled: root.revealed && root.opacity > 0.9
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
-
     onClicked: root.clicked()
   }
 }

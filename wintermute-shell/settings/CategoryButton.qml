@@ -1,148 +1,144 @@
 import QtQuick
-import QtQml.Models
+import QtQuick.Effects
 import Quickshell
-import "." as Settings
 import ".." as Shell
 
+// Cartão de categoria da tela inicial dos Ajustes (ficha 13; Figma 13:15811 e 13:15817).
+// Vidro de 264×264, raio 16, com o brilho do acento na base. Bloco do ícone de 48 em
+// (32,32) e nome em Geist Serif 32 em (32,184). No hover o vidro soma cardHover, o rim
+// vira accentRing, o bloco do ícone ganha accentSubtle com anel e aparece a seta
+// arrow-up-right em accentText em (212,32).
 Item {
   id: root
 
-  property url iconSource
-  property real iconBoxWidth: 72
-  property real iconBoxHeight: 72
-  property real iconWidth: iconBoxWidth
-  property real iconHeight: iconBoxHeight
+  property string iconName: ""
+  property string label: ""
   property bool revealed: false
-  property string accessibleName: ""
+  // Fixa o hover na vitrine.
+  property bool forceHovered: false
   signal clicked
 
-  readonly property bool hovered: pointer.containsMouse
+  readonly property bool hovered: forceHovered || (pointer.containsMouse && pointer.enabled)
   readonly property Region blurRegion: Region {
-    item: root.revealed && root.opacity > Shell.PanelStyle.blurRevealOpacity ? root : null
-    radius: Settings.Style.categoryRadius
+    item: root.revealed && root.opacity > Shell.Theme.blurRevealOpacity ? root : null
+    radius: Shell.Theme.radiusCard
   }
 
-  implicitWidth: 264
-  implicitHeight: 264
+  implicitWidth: Shell.Theme.settingsCategorySize
+  implicitHeight: Shell.Theme.settingsCategorySize
   visible: opacity > 0.001
   opacity: revealed ? 1 : 0
   scale: revealed ? 1 : 0.86
   transformOrigin: Item.Center
   onScaleChanged: blurRegion.changed()
 
+  Accessible.role: Accessible.Button
+  Accessible.name: label
+  Accessible.onPressAction: clicked()
+
   Behavior on opacity {
     NumberAnimation {
-      duration: root.revealed ? Settings.Style.revealDuration
-                              : Settings.Style.closeDuration
+      duration: root.revealed ? Shell.Theme.settingsCardAppear : Shell.Theme.settingsCloseDuration
       easing.type: Easing.OutCubic
     }
   }
 
   Behavior on scale {
     NumberAnimation {
-      duration: root.revealed ? Settings.Style.revealDuration
-                              : Settings.Style.closeDuration
+      duration: root.revealed ? Shell.Theme.settingsCardAppear : Shell.Theme.settingsCloseDuration
       easing.type: Easing.OutCubic
     }
   }
 
-  Rectangle {
-    id: background
+  Shell.Shadow {
     anchors.fill: parent
-    radius: Settings.Style.categoryRadius
-    color: "transparent"
-    clip: true
+    cornerRadius: Shell.Theme.radiusCard
+    shadows: Shell.Theme.glassShadows
+  }
 
-    property real gradientReveal: root.hovered ? 1 : 0
-    Behavior on gradientReveal {
-      NumberAnimation {
-        duration: Settings.Style.categoryHoverDuration
-        easing.type: Easing.InOutCubic
-      }
-    }
-    function blendColor(target: color): color {
-      const base = Settings.Style.menuCard;
-      const alpha = base.a + (target.a - base.a) * gradientReveal;
-      // Blend premultiplied colors so translucency stays continuous.
-      const weight = alpha > 0 ? target.a * gradientReveal / alpha : 0;
-      return Qt.rgba(base.r + (target.r - base.r) * weight,
-                     base.g + (target.g - base.g) * weight,
-                     base.b + (target.b - base.b) * weight, alpha);
-    }
+  Shell.GradientFill {
+    radius: Shell.Theme.radiusCard
+    hovered: root.hovered
+  }
 
-    Gradient {
-      id: hoverGradient
-      orientation: Settings.Style.menuCardHoverGradient
-          ? Settings.Style.menuCardHoverGradient.orientation : Gradient.Vertical
-    }
+  Rectangle {
+    id: iconTile
+    x: Shell.Theme.settingsCategoryInset
+    y: Shell.Theme.settingsCategoryInset
+    width: Shell.Theme.settingsIconTileSize
+    height: Shell.Theme.settingsIconTileSize
+    radius: Shell.Theme.radiusRow
+    color: root.hovered ? Shell.Theme.accentSubtle : Shell.Theme.control
+    border.width: 1
+    border.color: root.hovered ? Shell.Theme.accentRing : Qt.alpha(Shell.Theme.accentRing, 0)
+    antialiasing: true
 
-    Instantiator {
-      model: Settings.Style.menuCardHoverGradient
-          ? Settings.Style.menuCardHoverGradient.stops : []
-      delegate: GradientStop {
-        required property var modelData
-        position: modelData.position
-        color: background.blendColor(modelData.color)
-      }
-      onObjectAdded: (index, object) => hoverGradient.stops.push(object)
-      onObjectRemoved: (index, object) => {
-        const stopIndex = hoverGradient.stops.indexOf(object);
-        if (stopIndex >= 0) hoverGradient.stops.splice(stopIndex, 1);
-      }
+    Behavior on color {
+      ColorAnimation { duration: Shell.Theme.settingsCategoryHoverDuration; easing.type: Easing.InOutCubic }
+    }
+    Behavior on border.color {
+      ColorAnimation { duration: Shell.Theme.settingsCategoryHoverDuration; easing.type: Easing.InOutCubic }
     }
 
-    Shell.GradientFill {
-      fill: Settings.Style.menuCardHoverGradient
-          && background.gradientReveal > 0 // Bypass gradient rounding artifacts
-          ? hoverGradient : null
-      color: root.hovered ? Settings.Style.menuCardHover : Settings.Style.menuCard
-      // Keep this animation: dynamic stops do not notify the gradient to repaint.
-      Behavior on color {
-        ColorAnimation {
-          duration: Settings.Style.categoryHoverDuration
-          easing.type: Easing.InOutCubic
-        }
-      }
+    Image {
+      anchors.centerIn: parent
+      width: 20
+      height: 20
+      source: root.iconName !== "" ? Qt.resolvedUrl("../icons/" + root.iconName + ".svg") : ""
+      sourceSize: Qt.size(40, 40)
+      fillMode: Image.PreserveAspectFit
+      smooth: true
     }
+  }
 
-    Shell.PanelBorder {
-      color: root.hovered ? Settings.Style.menuCardHoverBorder : Settings.Style.menuCardBorder
-      radius: parent.radius
-      Behavior on color {
-        ColorAnimation {
-          duration: Settings.Style.categoryHoverDuration
-          easing.type: Easing.InOutCubic
-        }
-      }
+  Text {
+    x: Shell.Theme.settingsCategoryInset
+    y: Shell.Theme.settingsCategoryNameY
+    width: root.width - Shell.Theme.settingsCategoryInset * 2
+    height: Shell.Theme.settingsCategoryNameHeight
+    verticalAlignment: Text.AlignVCenter
+    elide: Text.ElideRight
+    text: root.label
+    color: Shell.Theme.text
+    font.family: Shell.Theme.titleFontFamily
+    font.weight: Font.Normal
+    font.pixelSize: Shell.Theme.fontModalTitle
+  }
+
+  Image {
+    x: Shell.Theme.settingsCategoryArrowX
+    y: Shell.Theme.settingsCategoryInset
+    width: 20
+    height: 20
+    source: Qt.resolvedUrl("../icons/arrow-up-right.svg")
+    sourceSize: Qt.size(40, 40)
+    fillMode: Image.PreserveAspectFit
+    smooth: true
+    opacity: root.hovered ? 1 : 0
+    layer.enabled: true
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.accentText }
+
+    Behavior on opacity {
+      NumberAnimation { duration: Shell.Theme.settingsCategoryHoverDuration; easing.type: Easing.InOutCubic }
     }
+  }
 
-    Item {
-      width: root.iconBoxWidth
-      height: root.iconBoxHeight
-      x: 30
-      y: 30
+  Shell.PanelBorder {
+    id: rim
+    radius: Shell.Theme.radiusCard
+    topColor: root.hovered ? Shell.Theme.accentRing : Shell.Theme.glassRimTop
+    midColor: root.hovered ? Shell.Theme.accentRing : Shell.Theme.glassRimMid
+    bottomColor: root.hovered ? Shell.Theme.accentRing : Shell.Theme.glassRimBottom
+    z: 2
 
-      Image {
-        anchors.centerIn: parent
-        width: root.iconWidth
-        height: root.iconHeight
-        source: root.iconSource
-        sourceSize: Qt.size(Math.ceil(root.iconWidth * 2),
-                            Math.ceil(root.iconHeight * 2))
-        fillMode: Image.PreserveAspectFit
-        smooth: true
-        antialiasing: true
-      }
+    Behavior on topColor {
+      ColorAnimation { duration: Shell.Theme.settingsCategoryHoverDuration; easing.type: Easing.InOutCubic }
     }
-
-    Text {
-      x: 30
-      y: parent.height - 35 - baselineOffset
-      text: root.accessibleName
-      color: Shell.Theme.colors.text
-      font.family: Shell.Theme.titleFontFamily
-      font.weight: Font.Normal
-      font.pixelSize: 32
+    Behavior on midColor {
+      ColorAnimation { duration: Shell.Theme.settingsCategoryHoverDuration; easing.type: Easing.InOutCubic }
+    }
+    Behavior on bottomColor {
+      ColorAnimation { duration: Shell.Theme.settingsCategoryHoverDuration; easing.type: Easing.InOutCubic }
     }
   }
 

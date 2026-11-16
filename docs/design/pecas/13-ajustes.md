@@ -17,6 +17,13 @@ Os textos desta ficha estão em português como referência de sentido. Na shell
 - Perfil de energia na borda direita: coluna 48×136 com três botões ícone 40 (Economia, Equilibrado selecionado, Desempenho). O ícone do Desempenho é `zap`, o mesmo do pop-up da bateria (P-07, 2026-11-15).
 - Selo de atualização embaixo: pílula `accentSubtle`, ícone + “N atualizações disponíveis” `accentText`. A contagem vem do estado do Cachy Update (decidido em 2026-11-14, P-32).
 - Entrada: cada cartão 0,86→1 em ordem aleatória, **28 ms** entre eles, cada um em 32 ms (`settings/Window.qml:369-421`). Fechar 180 ms.
+- Conferido no Figma em 2026-11-15 (`F4-T01`, nós `13:15797` e `13:15855`), o que esta ficha não dizia:
+  - Cartão em repouso: bloco do ícone em `control`, sem borda. No hover o bloco vira `accentSubtle` com anel `accentRing` de 1 px e o rim do cartão inteiro vira `accentRing`.
+  - Botão de sessão: vidro de raio 12 **sem** o brilho do acento, círculo em `control`. No hover o rim some, o círculo vira `#0D0E11` a 55% e o ícone continua `text`. O nome aparece com opacidade cheia (a origem usava 70%), em caixa de 48 a partir de x 144. O ponto do Desligar some no hover.
+  - Perfil de energia: vidro de raio 16 sem o brilho do acento. Ícones de repouso em `text` a 100%; o selecionado é o botão ícone Selecionado (`accent` + `onAccent`). Sem a aba de 16×5 em cima e sem o rótulo de hover que a origem tinha (P-44).
+  - Bandeja: só a borda `border` de 1 px, sem fundo nem desfoque; botões a cada 40 a partir de (4,4).
+  - Selo: 248×32, raio 8 (não é pílula de raio cheio), ícone `download` de 16 à esquerda em (12,8) e texto a partir de x 36. Os outros estados da origem (atualizando, concluída, reiniciar) usam a mesma pílula.
+  - A composição fica no centro da tela, como na origem. No quadro de 1120×680 do Figma ela começa em y 80, 8 px abaixo do centro, porque o quadro não é a tela real.
 
 ## Modal padrão
 

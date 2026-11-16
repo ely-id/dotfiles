@@ -195,6 +195,36 @@ Singleton {
   readonly property int settingsCategoryPitch: 272
   readonly property int settingsSessionSize: 128
   readonly property int settingsSessionPitch: 136
+  // Tela inicial dos Ajustes (ficha 13; Figma 13:15797 e 13:15855). A composição é 2 cartões
+  // + 1 coluna de sessão na largura (264 + 272 + 136 = 672) e 4 botões de sessão na altura (536).
+  readonly property int settingsCompositionWidth: settingsCategoryPitch * 2 + settingsSessionSize
+  readonly property int settingsCompositionHeight: settingsSessionPitch * 3 + settingsSessionSize
+  readonly property int settingsEdgeMargin: 16          // bandeja no topo, selo embaixo e perfil à direita
+  readonly property int settingsCategoryInset: 32       // bloco do ícone em (32,32) e nome em (32,184)
+  readonly property int settingsCategoryNameY: 184
+  readonly property int settingsCategoryNameHeight: 48
+  readonly property int settingsCategoryArrowX: 212     // seta arrow-up-right do hover
+  readonly property int settingsIconTileSize: 48        // raio radiusRow (12), ícone 20
+  readonly property int settingsSessionRadius: 12
+  readonly property int settingsSessionCircle: 80       // círculo em (24,24), ícone 20
+  readonly property int settingsSessionDot: 8           // ponto dangerText do Desligar, em (100,20)
+  readonly property int settingsSessionDotX: 100
+  readonly property int settingsSessionDotY: 20
+  readonly property int settingsSessionLabelGap: 16     // nome à direita: 128 + 16
+  readonly property color settingsSessionCircleHover: Qt.rgba(13 / 255, 14 / 255, 17 / 255, 0.55) // Figma 13:15899
+  readonly property int settingsTrayHeight: 44          // faixa de raio 8 com borda `border`
+  readonly property int settingsTrayRadius: 8
+  readonly property int settingsTrayPadding: 4
+  readonly property int settingsTrayButton: 36          // raio 6, ícone 16 a 80%
+  readonly property int settingsTrayButtonRadius: 6
+  readonly property real settingsTrayIconOpacity: 0.8
+  readonly property int settingsProfileWidth: 48        // coluna de vidro de raio 16 com 3 botões ícone 40
+  readonly property int settingsProfileHeight: 136
+  readonly property int settingsProfilePadding: 4
+  readonly property int settingsBadgeWidth: 248         // pílula accentSubtle de raio 8
+  readonly property int settingsBadgeHeight: 32
+  readonly property int settingsBadgeRadius: 8
+  readonly property int settingsBadgePadding: 12        // ícone 16 em (12,8), texto em 36
   readonly property int launcherWidth: 640
   readonly property int launcherSearchHeight: 56
   readonly property int launcherFooterHeight: 44
@@ -248,6 +278,7 @@ Singleton {
   readonly property int settingsCloseDuration: 180
   readonly property int settingsHoverDuration: 100
   readonly property int settingsCategoryHoverDuration: 250          // InOutCubic
+  readonly property int settingsSessionLabelDelay: 60               // nome do botão de sessão aparece 60 ms depois do hover (ficha 13)
   readonly property int toggleDuration: 200                         // Toggle.qml cubic-bezier(0.77, 0, 0.175, 1)
   readonly property var toggleCurve: [0.77, 0, 0.175, 1, 1, 1]
   readonly property int accordionDuration: 240                      // InOutCubic

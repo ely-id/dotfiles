@@ -7,14 +7,14 @@ import Quickshell.Widgets
 import "." as Settings
 import ".." as Shell
 
-// Status notifier items along the top of the overlay.
+// Bandeja do sistema no topo da tela inicial dos Ajustes (ficha 13; Figma 13:15799).
+// Faixa de raio 8 com borda `border` e sem vidro, a 16 do topo. Botões de 36, raio 6,
+// a cada 40, com ícone de 16 a 80%; hover de controle (`hover`). Com cinco itens a faixa
+// tem 204×44. `items` é a lista do SystemTray; a vitrine passa itens fictícios.
 Item {
   id: root
 
-  readonly property Region blurRegion: Region {
-    item: root.enabled && root.opacity > Shell.PanelStyle.blurRevealOpacity && bar.visible ? bar : null
-    radius: bar.radius
-  }
+  property var items: SystemTray.items
 
   property var menuItem: null
   property var menuPath: []
@@ -80,12 +80,14 @@ Item {
   Rectangle {
     id: bar
     anchors.horizontalCenter: parent.horizontalCenter
-    y: 15
-    width: buttons.width + 6
-    height: buttons.height + 6
-    radius: 8
+    y: Shell.Theme.settingsEdgeMargin
+    width: buttons.width + Shell.Theme.settingsTrayPadding * 2
+    height: Shell.Theme.settingsTrayHeight
+    radius: Shell.Theme.settingsTrayRadius
     color: "transparent"
-    border.color: Settings.Style.menuControl
+    border.width: 1
+    border.color: Shell.Theme.border
+    antialiasing: true
     visible: items.count > 0
 
     MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }
@@ -93,10 +95,11 @@ Item {
     Row {
       id: buttons
       anchors.centerIn: parent
+      spacing: Shell.Theme.settingsTrayPadding
 
       Repeater {
         id: items
-        model: SystemTray.items
+        model: root.items
 
         delegate: Rectangle {
           id: button
@@ -113,10 +116,10 @@ Item {
             Settings.State.close();
           }
 
-          width: 36
-          height: 36
-          radius: 6
-          color: highlighted ? Settings.Style.trayHover : Qt.alpha(Settings.Style.trayHover, 0)
+          width: Shell.Theme.settingsTrayButton
+          height: Shell.Theme.settingsTrayButton
+          radius: Shell.Theme.settingsTrayButtonRadius
+          color: highlighted ? Shell.Theme.hover : Qt.alpha(Shell.Theme.hover, 0)
           activeFocusOnTab: true
           Accessible.role: Accessible.Button
           Accessible.name: modelData.tooltipTitle || modelData.title || modelData.id
@@ -128,7 +131,7 @@ Item {
 
           Behavior on color {
             ColorAnimation {
-              duration: Settings.Style.hoverDuration
+              duration: Shell.Theme.settingsHoverDuration
               easing.type: Easing.InOutCubic
             }
           }
@@ -140,7 +143,7 @@ Item {
             height: 16
             source: button.modelData.icon
             asynchronous: true
-            opacity: 0.7
+            opacity: Shell.Theme.settingsTrayIconOpacity
           }
 
           MouseArea {

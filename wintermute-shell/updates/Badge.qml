@@ -2,26 +2,40 @@ import QtQuick
 import QtQuick.Effects
 import "." as Updates
 import ".." as Shell
-import "../settings" as Settings
 
+// Selo de atualização da tela inicial dos Ajustes (ficha 13; Figma 13:15849).
+// Pílula accentSubtle de 248×32, raio 8. Ícone de 16 em accentText em (12,8) e texto
+// Geist Medium 13 em accentText a partir de x 36. A contagem vem do Cachy Update (P-32).
+// O Figma desenha só "atualizações disponíveis"; os outros estados da origem (atualizando,
+// concluída, reiniciar) usam a mesma pílula com o próprio ícone. No hover de "reiniciar"
+// a pílula vira accent com o conteúdo em textOnAccent, e o Reiniciar acende (restartHovered).
+// Lê o estado por `service` (decisão 0011), com Updates.State como padrão.
 Rectangle {
   id: root
-  readonly property string status: Updates.State.status
+
+  property var service: Updates.State
+  signal restartRequested
+
+  readonly property string status: service.status
+  readonly property int count: service.availableCount
   readonly property bool actionable: status !== "updating"
   readonly property bool restartHovered: status === "restart" && pointer.containsMouse
-  readonly property color accent: status === "complete" ? "#cef058" : "#cba6f7"
-  readonly property color foreground: restartHovered ? "#3f1d68" : accent
+  readonly property color foreground: restartHovered ? Shell.Theme.textOnAccent : Shell.Theme.accentText
+  readonly property string iconName: ({
+    available: "download", complete: "circle-check", restart: "rotate-ccw"
+  })[status] ?? ""
 
   function activate() {
-    if (status === "available") Updates.State.start();
-    else if (status === "complete") Updates.State.status = "";
-    else if (status === "restart") Settings.State.requestSessionAction("reboot");
+    if (status === "available") service.start();
+    else if (status === "complete") service.status = "";
+    else if (status === "restart") restartRequested();
   }
 
-  implicitWidth: content.width + 24
-  implicitHeight: 40
-  radius: 8
-  color: restartHovered ? accent : Qt.alpha(accent, 0.1)
+  implicitWidth: Shell.Theme.settingsBadgeWidth
+  implicitHeight: Shell.Theme.settingsBadgeHeight
+  radius: Shell.Theme.settingsBadgeRadius
+  color: restartHovered ? Shell.Theme.accent : Shell.Theme.accentSubtle
+  antialiasing: true
   activeFocusOnTab: actionable
   Accessible.role: actionable ? Accessible.Button : Accessible.StaticText
   Accessible.name: label.text
@@ -29,54 +43,48 @@ Rectangle {
   Keys.onReturnPressed: activate()
   Keys.onSpacePressed: activate()
 
-  Row {
-    id: content
-    anchors.centerIn: parent
-    spacing: 6
+  Behavior on color {
+    ColorAnimation { duration: Shell.Theme.hoverDuration; easing.type: Easing.OutCubic }
+  }
 
-    Image {
-      anchors.verticalCenter: parent.verticalCenter
-      width: 16; height: 16
-      visible: root.status === "complete"
-      source: Qt.resolvedUrl("../icons/circle-check.svg")
-      sourceSize: Qt.size(32, 32)
-      layer.enabled: true
-      layer.effect: MultiEffect { colorization: 1; colorizationColor: root.foreground }
-    }
-    Image {
-      anchors.verticalCenter: parent.verticalCenter
-      width: 16; height: 16
-      visible: root.status === "restart"
-      source: Qt.resolvedUrl("../icons/rotate-ccw.svg")
-      sourceSize: Qt.size(32, 32)
-      layer.enabled: true
-      layer.effect: MultiEffect { colorization: 1; colorizationColor: root.foreground }
-    }
-    Updates.Indicator {
-      anchors.verticalCenter: parent.verticalCenter
-      visible: root.status === "updating"
-    }
-    Text {
-      id: label
-      anchors.verticalCenter: parent.verticalCenter
-      text: ({
-        available: "Update available", updating: "Updating",
-        complete: "Update complete", restart: "Restart recommended"
-      })[root.status] ?? ""
-      color: root.foreground
-      font.family: Shell.Theme.fontFamily
-      font.pixelSize: 13
-      font.weight: Font.Medium
-    }
-    Image {
-      anchors.verticalCenter: parent.verticalCenter
-      width: 16; height: 16
-      visible: root.status === "available"
-      source: Qt.resolvedUrl("../icons/download.svg")
-      sourceSize: Qt.size(32, 32)
-      layer.enabled: true
-      layer.effect: MultiEffect { colorization: 1; colorizationColor: root.foreground }
-    }
+  Image {
+    x: Shell.Theme.settingsBadgePadding
+    y: (root.height - height) / 2
+    width: 16
+    height: 16
+    visible: root.iconName !== ""
+    source: root.iconName !== "" ? Qt.resolvedUrl("../icons/" + root.iconName + ".svg") : ""
+    sourceSize: Qt.size(32, 32)
+    fillMode: Image.PreserveAspectFit
+    smooth: true
+    layer.enabled: true
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: root.foreground }
+  }
+
+  Updates.Indicator {
+    x: Shell.Theme.settingsBadgePadding
+    y: (root.height - height) / 2
+    visible: root.status === "updating"
+  }
+
+  Text {
+    id: label
+    x: Shell.Theme.settingsBadgePadding + 16 + 8
+    width: root.width - x - Shell.Theme.settingsBadgePadding
+    height: root.height
+    verticalAlignment: Text.AlignVCenter
+    elide: Text.ElideRight
+    text: ({
+      available: root.count === 1 ? "1 update available"
+          : root.count > 1 ? root.count + " updates available" : "Updates available",
+      updating: "Updating",
+      complete: "Update complete",
+      restart: "Restart recommended"
+    })[root.status] ?? ""
+    color: root.foreground
+    font.family: Shell.Theme.fontFamily
+    font.pixelSize: Shell.Theme.fontBody
+    font.weight: Font.Medium
   }
 
   Text {
@@ -85,9 +93,9 @@ Rectangle {
     anchors.baselineOffset: -14
     visible: root.restartHovered
     text: "Click to restart"
-    color: "#cba6f7"
+    color: Shell.Theme.accentText
     font.family: Shell.Theme.fontFamily
-    font.pixelSize: 13
+    font.pixelSize: Shell.Theme.fontBody
     font.weight: Font.Medium
   }
 

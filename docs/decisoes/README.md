@@ -15,6 +15,7 @@ Cada arquivo registra uma decisão: o contexto em que ela foi tomada, o que esco
 | [0009](0009-compatibilidade-do-tema-ate-a-f6.md) | Tema Armitage único, com uma camada de compatibilidade até a F6 | Aceita |
 | [0010](0010-ferramental-de-agente-em-agents.md) | Ferramental de agente comum em `.agents/`, para o Claude Code e o Antigravity | Aceita |
 | [0011](0011-pecas-leem-service-e-vitrine-com-dados-ficticios.md) | As peças leem o estado por `service`, e a vitrine usa a peça real com dados fictícios | Aceita |
+| [0012](0012-interface-em-ingles.md) | A interface da shell fala inglês | Aceita |
 
 ## Modelo
 

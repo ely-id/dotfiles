@@ -53,7 +53,7 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
 - Altura máxima da lista: 460, com rolagem (Pond `Picker.qml`).
 - Inclua “Inglês (EUA, internacional)” / `us · intl` — é o layout do escopo.
 
-## Tela — 580×644
+## Tela — 580×704 (580×644 no Figma, que não tem a linha Orientation)
 
 - Desenho dos monitores **520×280** (Pond 520×281; alinhado à grade) raio 16, fundo `cardHover`, em (30,84).
 - Monitores com raio 8; o selecionado usa `accentSubtle` + `accentRing` 2. Botão “Organizar”.
@@ -63,10 +63,11 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
   - Monitor em repouso: `raised` com borda `borderStrong` de 1. Nome "N · nome" em 13 Medium `text` e conector em 11 Medium `muted`, em duas linhas de 20 centradas juntas. No selecionado o conector passa a `text` (regra 5 do tema). Monitores vizinhos ficam com folga de 4.
   - Botão “Organizar”: o secundário pequeno da ficha 00 (`control` com borda `border`, raio 8, 13 Medium), 96×32, a 16 da direita e da base do desenho. Só aparece com mais de um monitor, como na origem.
   - Valores: a escala em porcentagem ("125%"; a origem mostrava "1.25x") e a resolução com "×".
+- A segunda linha de cada monitor é só o nome do conector (`eDP-1`, `HDMI-A-1`), sem o "principal" do board (P-48, 2026-11-16: "utilize apenas os nomes dos monitores").
+- **Orientação** (P-49, 2026-11-16: "Quero de volta", de um jeito intuitivo e coerente com o desenho, a partir de uma referência com a linha "Orientation" e quatro opções). A rotação volta como a primeira linha da Tela, acima da Escala, com o menu suspenso das outras linhas. As opções são Landscape, Portrait right, Portrait left e Landscape (flipped), e cada uma traz à esquerda o ícone `monitor` de 16 girado do jeito que o monitor vai ficar (0°, 90° no sentido horário, 90° no anti-horário e 180°); o texto anda para x 36. O desenho dos monitores muda de forma ao aplicar. No Niri o `transform` gira no sentido anti-horário, então Portrait right é `90` e Portrait left é `270`; uma tela espelhada (`flipped-*`) continua espelhada. A linha aparece sempre que há um monitor selecionado, e o modal passa a 704 com as cinco linhas.
 - Escolhas minhas na `F4-T03`, onde o Figma não decide:
   - A numeração põe a tela embutida primeiro e segue pelo nome do conector, o que dá o "1 · Notebook, 2 · Monitor" do board. O nome da tela embutida fica "Built-in", o da origem; o externo usa o modelo, também como na origem.
-  - O board escreve "eDP-1 · principal" no monitor selecionado. O Niri não tem monitor principal, e no board de Organizar o mesmo monitor aparece só como "eDP-1"; por isso mostro só o conector até responder a P-48.
-  - Os dois botões de girar a tela da origem não estão no Figma e saíram da página. O `control.py` continua sabendo girar (P-49).
+  - Os dois botões de girar a tela da origem não estão no Figma e saíram da página na primeira versão da `F4-T03`; a rotação voltou como linha (ver acima).
   - Hover e foco do monitor não estão desenhados: uso o `raised` com a camada `hover` por cima, o token dos botões e linhas.
 
 ### Organizar monitores — 580×500
@@ -116,5 +117,5 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
 - ~~Ícone do perfil Desempenho na home: `zap` aqui vs `rocket` no pop-up da bateria (ficha 08).~~ Definido em 2026-11-15 (P-07): `zap` nos dois lugares.
 - ~~O tutorial do Manual da Pond era um SVG de 2,9 MB não baixado. Seguir o layout do Figma (440×240).~~ Definido em 2026-11-15 (P-10): segue o Figma.
 - ~~Lista definitiva de atalhos.~~ Definida em 2026-11-15 (P-11), na seção do Manual.
-- O "principal" do conector no monitor selecionado da Tela (P-48).
-- A rotação da tela volta, e onde (P-49).
+- ~~O "principal" do conector no monitor selecionado da Tela.~~ Definido em 2026-11-16 (P-48): só o nome do conector.
+- ~~A rotação da tela volta, e onde.~~ Definido em 2026-11-16 (P-49): linha "Orientation" no topo das linhas da Tela.

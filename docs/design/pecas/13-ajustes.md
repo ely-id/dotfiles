@@ -38,12 +38,12 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
 
 - Dois sliders de **480** (trilho 12 raio 6, 9 marcas a cada 60, alça 24 `knob`), rótulo 15 + valor `muted`. Conferido no Figma (`13:15927`): marcas `borderStrong` de 1×8 a 8 px do trilho, valor "N de 9" 13 Medium, legendas "Lento" e "Rápido" 11 Medium `muted` a 20 px do trilho, alça com a sombra do vidro pela metade. Um slider é o **touchpad** e o outro é o **mouse**, cada um com o próprio `accel-speed`: o passo 5 é o 0 do Niri e cada passo anda 0,25. O `scroll-factor` da origem não aparece mais.
 - Chave “Aceleração do ponteiro”.
-- Linha “Rolagem natural” com seletor Touchpad / Mouse. A nota do Figma diz "rolagem natural por aparelho": cada metade liga ou desliga a rolagem natural do próprio aparelho e a metade acesa é a que está ligada (as duas podem ficar acesas ou apagadas). Confirmar na P-47.
+- Linha “Rolagem natural” com seletor Touchpad / Mouse. A nota do Figma diz "rolagem natural por aparelho": cada metade liga ou desliga a rolagem natural do próprio aparelho e a metade acesa é a que está ligada (as duas podem ficar acesas ou apagadas). Confirmado em 2026-11-15 (P-47): "ambas são uma espécie de toggle".
 
 ### Bloqueio e suspensão — 580×420
 
 - Seletor “Na tomada” / “Na bateria”.
-- Valores: Bloquear a tela, Desligar a tela, Suspender. Chave “Pedir senha ao acordar”. Conferido no Figma (`13:15971`): o seletor fica em (30,84) e as linhas começam em 144, sem número na frente (a origem numerava). Sem bateria o seletor some e as linhas sobem para 84, como na origem. A chave fica guardada no arquivo dos tempos de inatividade e passa a valer com a tela de bloqueio da F7. Cada valor abre o menu suspenso da origem, que não tem desenho Armitage ainda (P-46).
+- Valores: Bloquear a tela, Desligar a tela, Suspender. Chave “Pedir senha ao acordar”. Conferido no Figma (`13:15971`): o seletor fica em (30,84) e as linhas começam em 144, sem número na frente (a origem numerava). Sem bateria o seletor some e as linhas sobem para 84, como na origem. A chave fica guardada no arquivo dos tempos de inatividade e passa a valer com a tela de bloqueio da F7. Cada valor abre o menu suspenso da origem, que não tem desenho Armitage ainda; fica assim por enquanto (P-46, 2026-11-15: "Manter como está no original por enquanto").
 
 ### Idioma do teclado / Fuso horário
 

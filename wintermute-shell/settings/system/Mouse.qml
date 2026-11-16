@@ -7,8 +7,8 @@ import "../.." as Shell
 // Página Mouse e touchpad (ficha 13; Figma 13:15927): modal de 580×452. Velocidade do touchpad e do
 // mouse em 9 passos cada, chave "Pointer acceleration" em y 300 e a linha "Natural scrolling" em y 360
 // com o seletor de 168×40 em (346,6). A rolagem natural é por aparelho (nota do Figma): cada metade do
-// seletor liga ou desliga a rolagem natural do próprio aparelho, e a metade acesa é a que está ligada
-// (P-47). As mudanças vão para o input.kdl do Niri 300 ms depois do último movimento.
+// seletor liga ou desliga a rolagem natural do próprio aparelho, e a metade acesa é a que está ligada;
+// as duas podem ficar acesas ou apagadas (P-47). As mudanças vão para o input.kdl do Niri 300 ms depois do último movimento.
 Settings.Modal {
   id: root
   objectName: "mousePanel"

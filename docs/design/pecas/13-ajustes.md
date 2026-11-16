@@ -20,7 +20,7 @@ Os textos desta ficha estão em português como referência de sentido. Na shell
 - Conferido no Figma em 2026-11-15 (`F4-T01`, nós `13:15797` e `13:15855`), o que esta ficha não dizia:
   - Cartão em repouso: bloco do ícone em `control`, sem borda. No hover o bloco vira `accentSubtle` com anel `accentRing` de 1 px e o rim do cartão inteiro vira `accentRing`.
   - Botão de sessão: vidro de raio 12 **sem** o brilho do acento, círculo em `control`. No hover o rim some, o círculo vira `#0D0E11` a 55% e o ícone continua `text`. O nome aparece com opacidade cheia (a origem usava 70%), em caixa de 48 a partir de x 144. O ponto do Desligar some no hover.
-  - Perfil de energia: vidro de raio 16 sem o brilho do acento. Ícones de repouso em `text` a 100%; o selecionado é o botão ícone Selecionado (`accent` + `onAccent`). Sem a aba de 16×5 em cima e sem o rótulo de hover que a origem tinha (P-44).
+  - Perfil de energia: vidro de raio 16 sem o brilho do acento. Ícones de repouso em `text` a 100%; o selecionado é o botão ícone Selecionado (`accent` + `onAccent`). Sem a aba de 16×5 em cima e sem o rótulo de hover que a origem tinha (P-44, 2026-11-15: "Pode manter igual o Figma").
   - Bandeja: só a borda `border` de 1 px, sem fundo nem desfoque; botões a cada 40 a partir de (4,4).
   - Selo: 248×32, raio 8 (não é pílula de raio cheio), ícone `download` de 16 à esquerda em (12,8) e texto a partir de x 36. Os outros estados da origem (atualizando, concluída, reiniciar) usam a mesma pílula.
   - A composição fica no centro da tela, como na origem. No quadro de 1120×680 do Figma ela começa em y 80, 8 px abaixo do centro, porque o quadro não é a tela real.
@@ -30,25 +30,26 @@ Os textos desta ficha estão em português como referência de sentido. Na shell
 - Largura **580**, raio 32, título Geist Serif 32 em (30,20) caixa (w−80)×44. X pendurado em (w−20, 7).
 - Linhas de ajuste 520×52 a cada **60** (Pond 51), x 30, a partir de y 84.
 
-## Sistema — 580×348
+## Sistema — 580×288
 
-Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado, Fuso horário.
+Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O Figma desenha 580×348 com uma quarta linha, Fuso horário, que saiu na `F4-T02` (ver abaixo); com três linhas o modal tem 84 + 3 × 60 − 8 + 32 = 288. O valor do Mouse é "Default" quando os dois aparelhos estão no passo 5 e "Custom" fora disso.
 
 ### Mouse e touchpad — 580×452
 
-- Dois sliders de **480** (trilho 12 raio 6, 9 marcas a cada 60, alça 24 `knob`), rótulo 15 + valor `muted`.
+- Dois sliders de **480** (trilho 12 raio 6, 9 marcas a cada 60, alça 24 `knob`), rótulo 15 + valor `muted`. Conferido no Figma (`13:15927`): marcas `borderStrong` de 1×8 a 8 px do trilho, valor "N de 9" 13 Medium, legendas "Lento" e "Rápido" 11 Medium `muted` a 20 px do trilho, alça com a sombra do vidro pela metade. Um slider é o **touchpad** e o outro é o **mouse**, cada um com o próprio `accel-speed`: o passo 5 é o 0 do Niri e cada passo anda 0,25. O `scroll-factor` da origem não aparece mais.
 - Chave “Aceleração do ponteiro”.
-- Linha “Rolagem natural” com seletor Touchpad / Mouse.
+- Linha “Rolagem natural” com seletor Touchpad / Mouse. A nota do Figma diz "rolagem natural por aparelho": cada metade liga ou desliga a rolagem natural do próprio aparelho e a metade acesa é a que está ligada (as duas podem ficar acesas ou apagadas). Confirmar na P-47.
 
 ### Bloqueio e suspensão — 580×420
 
 - Seletor “Na tomada” / “Na bateria”.
-- Valores: Bloquear a tela, Desligar a tela, Suspender. Chave “Pedir senha ao acordar”.
+- Valores: Bloquear a tela, Desligar a tela, Suspender. Chave “Pedir senha ao acordar”. Conferido no Figma (`13:15971`): o seletor fica em (30,84) e as linhas começam em 144, sem número na frente (a origem numerava). Sem bateria o seletor some e as linhas sobem para 84, como na origem. A chave fica guardada no arquivo dos tempos de inatividade e passa a valer com a tela de bloqueio da F7. Cada valor abre o menu suspenso da origem, que não tem desenho Armitage ainda (P-46).
 
 ### Idioma do teclado / Fuso horário
 
 - Fuso horário: a origem troca o fuso com uma regra de `sudo` sem senha. Procuro um caminho sem essa regra; se não houver um caminho limpo, a página de fuso sai e o relógio segue o horário do sistema (decidido em 2026-11-14, P-34).
-- Modal com busca 520×44 (caret no acento) + lista 520×44. Escolhida: fundo `accentSubtle`, check `accentText`, código Mono 11 vira `text` (não `muted`).
+- **Resultado da pesquisa (2026-11-15, `F4-T02`):** não há caminho limpo. O `timedatectl` passa pelo `systemd-timedated`, cuja ação `org.freedesktop.timedate1.set-timezone` pede `auth_admin_keep` até para a sessão ativa, e a sessão do Niri não tem agente do polkit para mostrar o pedido de senha. Os caminhos que sobram são uma regra de `sudo`, uma regra do polkit ou instalar um agente do polkit na sessão. **A página de fuso saiu**, o relógio segue o horário do sistema e o `control.py` deixou de precisar do PyQt6.
+- Modal com busca 520×44 (caret no acento) + lista 520×44. Escolhida: fundo `accentSubtle`, check `accentText`, código Mono 11 vira `text` (não `muted`). Conferido no Figma (`13:15984`): busca em `control` com anel `accentRing` de 1 px quando tem foco e lupa de 16 em `text` em (16,14), texto 15 em x 44; opções a partir de y 140, nome 13 Medium em x 16, código alinhado à direita em 476, check em (488,14), hover `hover`. O código sai do identificador do layout (`br(dvorak)` vira `br · dvorak`). O chip "Shortcut" da origem não está no Figma e saiu; o atalho de troca de layout vai para o Manual.
 - Altura máxima da lista: 460, com rolagem (Pond `Picker.qml`).
 - Inclua “Inglês (EUA, internacional)” / `us · intl` — é o layout do escopo.
 
@@ -78,6 +79,7 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado, Fus
   - Super+E: launcher.
   - Super+Shift+E: gerenciador de arquivos (Files).
   - Super+Escape: tela inicial dos Ajustes.
+  - Super+Shift+Escape: atalho de emergência que devolve o teclado quando um app em tela cheia o segura (P-43). A lista de atalhos do Niri, que está nessa tecla hoje, depende da P-45.
   - Super+L: tela de bloqueio.
   - Capturas: Super+Shift+1, 2 e 3, como anotei no arquivo (hoje Ctrl+Shift+1, 2 e 3).
   - A área de transferência ainda não tem atalho; entra na lista quando a F6 definir.

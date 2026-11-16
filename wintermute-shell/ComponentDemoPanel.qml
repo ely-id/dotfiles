@@ -13,6 +13,7 @@ import "installs" as Installs
 import "settings" as Settings
 import "settings/appearance" as Appearance
 import "settings/system" as System
+import "settings/display" as Display
 
 // Painel de demonstração visual da F1, da F2 e da F3 (fichas 00 a 05, boards 13:11217, 13:11463, 13:12277, 13:11395 e 13:13604).
 // Abre com: qs -p ~/Projects/dotfiles/wintermute-shell ipc call demo toggle
@@ -957,6 +958,32 @@ PanelWindow {
                     options: demoSystem.languages; selected: demoSystem.selectedLanguages
                     onPicked: id => demoSystem.toggleLanguage(id)
                   }
+                }
+              }
+
+              Demo.DisplayService { id: demoDisplay }
+              Demo.DisplayService {
+                id: demoDisplayArrange
+                // O externo mais alto que a tela embutida, encostado à direita, como no board 13:16062.
+                geometry: [
+                  { name: "DP-1", identity: "Fictitious DP-1", x: 2048, y: 0, width: 2560, height: 1440 },
+                  { name: "eDP-1", identity: "Fictitious eDP-1", x: 0, y: 560, width: 2048, height: 1280 }
+                ]
+              }
+
+              SectionBlock {
+                title: "Tela (ficha 13, boards 13:16041 e 13:16062) · páginas reais com dados fictícios"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Display 580×644 · desenho 520×280 em (30,84), selecionado em accentSubtle + accentRing 2, hover em Refresh rate"
+                  stageWidth: 600; stageHeight: 657
+                  Display.Panel { y: 13; service: demoDisplay; hoverRow: "refresh" }
+                }
+                Specimen {
+                  caption: "Arrange displays 580×500 · área 520×320, monitor arrastado com guia de encaixe em accentText"
+                  stageWidth: 600; stageHeight: 513
+                  Display.Arrange { y: 13; service: demoDisplayArrange; demoDragIndex: 0 }
                 }
               }
             }

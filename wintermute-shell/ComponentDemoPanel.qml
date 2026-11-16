@@ -976,8 +976,8 @@ PanelWindow {
                 itemGap: 40
 
                 Specimen {
-                  caption: "Display 580×644 · desenho 520×280 em (30,84), selecionado em accentSubtle + accentRing 2, hover em Refresh rate"
-                  stageWidth: 600; stageHeight: 657
+                  caption: "Display 580×704 · desenho 520×280 em (30,84), selecionado em accentSubtle + accentRing 2, Orientation no topo (P-49), hover em Refresh rate"
+                  stageWidth: 600; stageHeight: 717
                   Display.Panel { y: 13; service: demoDisplay; hoverRow: "refresh" }
                 }
                 Specimen {

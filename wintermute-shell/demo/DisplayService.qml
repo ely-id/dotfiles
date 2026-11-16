@@ -19,7 +19,7 @@ QtObject {
         { label: "1920 × 1200", value: "1920x1200" }
       ],
       rates: [{ label: "165 Hz", value: "165000" }, { label: "60 Hz", value: "60000" }],
-      vrrSupported: true, vrrEnabled: true
+      vrrSupported: true, vrrEnabled: true, orientation: "Normal"
     },
     {
       name: "DP-1", label: "Monitor", builtin: false, number: 2,
@@ -31,7 +31,7 @@ QtObject {
         { label: "1920 × 1080", value: "1920x1080" }
       ],
       rates: [{ label: "144 Hz", value: "144000" }, { label: "60 Hz", value: "60000" }],
-      vrrSupported: true, vrrEnabled: false
+      vrrSupported: true, vrrEnabled: false, orientation: "Normal"
     }
   ]
   property var geometry: monitors.map(m => Object.assign({ name: m.name, identity: "Fictitious " + m.name }, m.logical))
@@ -50,6 +50,13 @@ QtObject {
       if (field === "vrr") next.vrrEnabled = value === "on";
       else if (field === "scale") next.scale = Number(value);
       else if (field === "refresh") next.refresh = Number(value);
+      else if (field === "orientation") {
+        const portrait = value === "90" || value === "270";
+        const wasPortrait = m.orientation === "90" || m.orientation === "270";
+        if (portrait !== wasPortrait)
+          next.logical = Object.assign({}, m.logical, { width: m.logical.height, height: m.logical.width });
+        next.orientation = value;
+      }
       else if (field === "resolution") { const size = value.split("x"); next.width = Number(size[0]); next.height = Number(size[1]); }
       return next;
     });

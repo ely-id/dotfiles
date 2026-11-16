@@ -85,6 +85,13 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
 - 7 linhas, passo 48. Número em círculo 24 (Geist Mono 11). Rótulo 15 `muted`. Valor Geist Serif 17.
 - Use **dados fictícios** (como na prévia: CachyOS · Linux 6.17, máquina “Wintermute”, etc.). Não leia hardware real para preencher prints de documentação; no runtime, a Pond já busca valores em `information/State.qml` — pode manter a leitura, mas nada de serial, MAC ou hostname pessoal em material compartilhado.
 - Botão Manual 520×64. Rodapé “Wintermute Shell” Serif 17 + versão Mono 11 `muted`. Grade de “+” 7×3 que some aos poucos no hover dos contatos (opacidade 1 / 0,6 / 0,3) — herdar a graça da Pond, nas medidas do Figma (152×56 em (398,536)).
+- Conferido no Figma em 2026-11-16 (`F4-T04`, board `13:16083`):
+  - Linhas a partir de y 84, uma a cada 48. O círculo do número é `control` com borda `border` de 1, número em Geist Mono 11 Medium `text`. Rótulo 15 Medium `muted` em x 66, com 120 de largura; valor Serif 17 `text` em x 186, até a borda direita. Divisor `border` de 1 entre as linhas, não depois da última.
+  - Rótulos: Sistema, Máquina, Placa, CPU, GPU, Memória, Disco (na shell: System, Machine, Board, CPU, GPU, Memory, Disk). A origem usava OS e Host.
+  - Botão Manual em (30,436): `control` com borda `border`, raio 12. Bloco de 40×40, raio 10, em `accentSubtle` em (12,12), com o `book-open` de 20 em `accentText`; "Manual" 15 Medium `text` e "Atalhos e gestos" 13 Regular `muted` em x 64, em linhas de 20 a partir de y 12; seta `chevron-right` de 16 em `text` em (488,24). O hover não está desenhado: uso o `pressed`, como as linhas dos Ajustes.
+  - Rodapé: "Wintermute Shell" em (30,536) numa caixa de 24, a versão "V0.1 · prévia" logo abaixo numa caixa de 20. Na grade, cada "+" é Geist Mono 11 Medium `muted`, centrado em (10 + 20·coluna, 7 + 20·linha), e as opacidades 1 / 0,6 / 0,3 seguem em sequência pela grade.
+  - Os logotipos e os contatos da origem (X, Instagram, site e e-mail da marca dela) não estão no Figma e saíram. Sem contatos desenhados, a grade fica parada até eu definir os contatos (P-50).
+- Formato dos valores, seguindo os do Figma: "CachyOS · Linux 6.17" (sistema e kernel), o nome da máquina, a placa, "Ryzen 7 · 8 cores" (modelo sem o fabricante e núcleos físicos), "Radeon · 16 GB" (a VRAM só na GPU dedicada), a memória total e "1 TB NVMe · 412 GB free" (disco em unidades decimais, livre para o usuário). Os exemplos são os do Figma, fictícios. O "DDR5" do Figma fica de fora: o fastfetch só lê o tipo da memória pelo SMBIOS, que pede root. A origem atualizava memória e disco a cada 3 s; como o Figma mostra totais, leio uma vez por abertura.
 
 ## Manual — 500×656, sem título no modal
 
@@ -119,3 +126,4 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
 - ~~Lista definitiva de atalhos.~~ Definida em 2026-11-15 (P-11), na seção do Manual.
 - ~~O "principal" do conector no monitor selecionado da Tela.~~ Definido em 2026-11-16 (P-48): só o nome do conector.
 - ~~A rotação da tela volta, e onde.~~ Definido em 2026-11-16 (P-49): linha "Orientation" no topo das linhas da Tela.
+- Os contatos das Informações e o que faz a grade de "+" sumir (P-50).

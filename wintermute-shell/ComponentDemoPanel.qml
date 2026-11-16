@@ -12,6 +12,7 @@ import "notifications" as Notifications
 import "installs" as Installs
 import "settings" as Settings
 import "settings/appearance" as Appearance
+import "settings/system" as System
 
 // Painel de demonstração visual da F1, da F2 e da F3 (fichas 00 a 05, boards 13:11217, 13:11463, 13:12277, 13:11395 e 13:13604).
 // Abre com: qs -p ~/Projects/dotfiles/wintermute-shell ipc call demo toggle
@@ -922,6 +923,40 @@ PanelWindow {
                   caption: "Hover em Restart · o mesmo padrão com o acento · selo no estado \"Restart recommended\""
                   stageWidth: 1120; stageHeight: 680
                   Demo.SettingsHomeSpecimen { hover: "reboot"; updateStatus: "restart" }
+                }
+              }
+
+              Demo.SystemService { id: demoSystem }
+              Demo.IdleService { id: demoIdle }
+
+              SectionBlock {
+                title: "Sistema (ficha 13, board 13:15787) · páginas reais com dados fictícios"
+                itemGap: 40
+
+                Specimen {
+                  caption: "System 580×288 · três linhas com seta a cada 60 (o Fuso horário saiu, P-34)"
+                  stageWidth: 600; stageHeight: 301
+                  System.Panel { y: 13; service: demoSystem; idle: demoIdle }
+                }
+                Specimen {
+                  caption: "Mouse & touchpad 580×452 · 9 passos por aparelho, rolagem natural por aparelho (P-47)"
+                  stageWidth: 600; stageHeight: 465
+                  System.Mouse { y: 13; service: demoSystem }
+                }
+                Specimen {
+                  caption: "Lock & sleep 580×420 · tomada e bateria, chave da senha ao acordar (vale na F7)"
+                  stageWidth: 600; stageHeight: 433
+                  System.Lock { y: 13; idle: demoIdle; batteryPresent: true }
+                }
+                Specimen {
+                  caption: "Keyboard language · busca 520×44 e opções de 44, escolhida em accentSubtle com check"
+                  stageWidth: 600; stageHeight: 361
+                  System.Picker {
+                    y: 13
+                    title: "Keyboard language"; placeholder: "Search languages"; multiple: true
+                    options: demoSystem.languages; selected: demoSystem.selectedLanguages
+                    onPicked: id => demoSystem.toggleLanguage(id)
+                  }
                 }
               }
             }

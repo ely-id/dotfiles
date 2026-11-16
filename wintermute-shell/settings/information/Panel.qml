@@ -1,88 +1,202 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Effects
 import "." as Information
 import ".." as Settings
 import "../.." as Shell
-import QtQuick.Controls
 
+// Página Informações (ficha 13; Figma 13:16083): modal de 580×620. Sete linhas a cada 48 a partir de
+// y 84, cada uma com o número num círculo de 24 (control com borda border, Mono 11 Medium), o rótulo 15
+// Medium em muted em x 66 e o valor em Serif 17 em x 186, com divisor border de 1 entre elas. Embaixo,
+// o botão Manual de 520×64 (bloco accentSubtle com book-open em accentText, "Manual" e a legenda, seta
+// em text) e o rodapé com o nome, a versão e a grade de "+". Lê os fatos por `service` (decisão 0011).
 Settings.Modal {
-  id:root
-  objectName:"informationPanel"
-  title:"Information"
-  contentHeight:556
-  onBackRequested:Settings.State.back()
-  Keys.onEscapePressed:Settings.State.back()
+  id: root
+  objectName: "informationPanel"
+
+  property var service: Information.State
+  // Só para a vitrine: fixa o hover no botão Manual.
+  property bool manualHovered: false
+
+  title: "Information"
+  bodyTop: 0
+  contentHeight: Shell.Theme.settingsInfoHeight
+  onBackRequested: Settings.State.back()
+  Keys.onEscapePressed: Settings.State.back()
+
   readonly property var rows: [
-    {key:"os", label:"OS", y:92, line:130},
-    {key:"host", label:"Host", y:144, line:184},
-    {key:"board", label:"Board", y:198, line:236},
-    {key:"cpu", label:"CPU", y:250, line:288},
-    {key:"gpu", label:"GPU", y:302, line:340},
-    {key:"memory", label:"Memory", y:354, line:392},
-    {key:"disk", label:"Disk", y:406, line:0}
+    { key: "os", label: "System" },
+    { key: "host", label: "Machine" },
+    { key: "board", label: "Board" },
+    { key: "cpu", label: "CPU" },
+    { key: "gpu", label: "GPU" },
+    { key: "memory", label: "Memory" },
+    { key: "disk", label: "Disk" }
   ]
+
+  function openManual() { Settings.State.openPage("manual"); }
+
   Repeater {
-    model:root.rows
+    model: root.rows
     delegate: Item {
-      id:row
+      id: row
       required property var modelData
       required property int index
-      x:30; y:modelData.y-82; width:520; height:24
+      x: Shell.Theme.settingsBodyInset
+      y: Shell.Theme.settingsBodyTop + index * Shell.Theme.settingsInfoRowPitch
+      width: Shell.Theme.settingsRowWidth
+      height: Shell.Theme.settingsInfoRowPitch
+
       Rectangle {
-        width:24; height:24; radius:12
-        color:"transparent"; border.width:1; border.color:Qt.rgba(1, 1, 1, 0.15)
-        Information.Label {
-          x:0; width:24; capY:8; text:row.index+1
-          font.family:Shell.Theme.monoFontFamily; font.weight:Font.DemiBold
-          horizontalAlignment:Text.AlignHCenter; color:"#80ffffff"
+        y: (parent.height - height) / 2
+        width: Shell.Theme.settingsInfoNumberSize
+        height: width
+        radius: width / 2
+        color: Shell.Theme.control
+        border.width: 1
+        border.color: Shell.Theme.border
+        antialiasing: true
+        Text {
+          anchors.fill: parent
+          horizontalAlignment: Text.AlignHCenter
+          verticalAlignment: Text.AlignVCenter
+          text: row.index + 1
+          color: Shell.Theme.text
+          font.family: Shell.Theme.monoFontFamily
+          font.weight: Font.Medium
+          font.pixelSize: Shell.Theme.fontMonoCaption
+          font.letterSpacing: 0
         }
       }
-      Information.Label {
-        x:54; capY:7; text:row.modelData.label
-        font.pixelSize:15; font.weight:Font.Medium; font.letterSpacing:0
-        color:Qt.alpha(Shell.Theme.colors.text, 0.6)
+
+      Text {
+        x: Shell.Theme.settingsInfoLabelX - Shell.Theme.settingsBodyInset
+        width: Shell.Theme.settingsInfoLabelWidth
+        height: parent.height
+        verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
+        text: row.modelData.label
+        color: Shell.Theme.muted
+        font.family: Shell.Theme.fontFamily
+        font.weight: Font.Medium
+        font.pixelSize: Shell.Theme.fontLabel
+        font.letterSpacing: 0
       }
-      Information.Label {
-        id:valueText
-        objectName:"informationValue-" + row.modelData.key
-        x:130; capY:6; width:390
-        text:Information.State.value(row.modelData.key)
-        font.family:Shell.Theme.titleFontFamily; font.pixelSize:17
-        font.letterSpacing:0; color:Shell.Theme.colors.text; elide:Text.ElideRight
-        ToolTip.visible:valueHover.hovered && truncated
-        ToolTip.text:text
-        HoverHandler { id:valueHover }
+
+      Text {
+        id: valueText
+        objectName: "informationValue-" + row.modelData.key
+        x: Shell.Theme.settingsInfoValueX - Shell.Theme.settingsBodyInset
+        width: parent.width - x
+        height: parent.height
+        verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
+        text: root.service.value(row.modelData.key)
+        color: Shell.Theme.text
+        font.family: Shell.Theme.titleFontFamily
+        font.weight: Font.Normal
+        font.pixelSize: Shell.Theme.fontInfoValue
+        font.letterSpacing: 0
+        ToolTip.visible: valueHover.hovered && truncated
+        ToolTip.text: text
+        HoverHandler { id: valueHover }
       }
+
       Rectangle {
-        visible:row.modelData.line>0
-        y:row.modelData.line-row.modelData.y-1; width:520; height:1
-        color:Shell.PanelStyle.outline
+        visible: row.index < root.rows.length - 1
+        y: parent.height
+        width: parent.width
+        height: 1
+        color: Shell.Theme.border
       }
     }
   }
+
   Rectangle {
-    id:manual
-    objectName:"informationManual"
-    x:30; y:376; width:520; height:64; radius:12
-    color:manualHover.hovered || activeFocus ? Shell.PanelStyle.rowHover : Qt.alpha(Shell.PanelStyle.rowHover, 0)
-    border.width:1; border.color:Shell.PanelStyle.outline
-    activeFocusOnTab:true
-    Accessible.role:Accessible.Button
-    Accessible.name:"Manual"
-    Accessible.onPressAction:Settings.State.openPage("manual")
-    Keys.onReturnPressed:Settings.State.openPage("manual")
-    Keys.onSpacePressed:Settings.State.openPage("manual")
-    Behavior on color { ColorAnimation { duration:Settings.Style.hoverDuration; easing.type:Easing.OutCubic } }
+    id: manual
+    objectName: "informationManual"
+    readonly property bool hot: root.manualHovered || manualHover.hovered || activeFocus
+    x: Shell.Theme.settingsBodyInset
+    y: Shell.Theme.settingsInfoManualTop
+    width: Shell.Theme.settingsRowWidth
+    height: Shell.Theme.settingsInfoManualHeight
+    radius: Shell.Theme.radiusRow
+    color: hot ? Shell.Theme.pressed : Shell.Theme.control
+    border.width: 1
+    border.color: Shell.Theme.border
+    antialiasing: true
+    activeFocusOnTab: true
+    Accessible.role: Accessible.Button
+    Accessible.name: "Manual, shortcuts and gestures"
+    Accessible.onPressAction: root.openManual()
+    Keys.onReturnPressed: root.openManual()
+    Keys.onSpacePressed: root.openManual()
+
+    Behavior on color {
+      ColorAnimation { duration: Shell.Theme.settingsHoverDuration; easing.type: Easing.OutCubic }
+    }
+
+    Rectangle {
+      x: 12; y: 12
+      width: Shell.Theme.settingsInfoManualBlock
+      height: width
+      radius: Shell.Theme.settingsInfoManualBlockRadius
+      color: Shell.Theme.accentSubtle
+      antialiasing: true
+      Image {
+        anchors.centerIn: parent
+        width: 20; height: 20
+        source: Qt.resolvedUrl("../../icons/book-open.svg")
+        sourceSize: Qt.size(40, 40)
+        smooth: true
+        layer.enabled: true
+        layer.effect: MultiEffect {
+          colorization: 1
+          colorizationColor: Shell.Theme.accentText
+        }
+      }
+    }
+
+    Text {
+      x: Shell.Theme.settingsInfoManualTextX
+      y: 12
+      height: Shell.Theme.settingsDisplayLineHeight
+      verticalAlignment: Text.AlignVCenter
+      text: "Manual"
+      color: Shell.Theme.text
+      font.family: Shell.Theme.fontFamily
+      font.weight: Font.Medium
+      font.pixelSize: Shell.Theme.fontLabel
+      font.letterSpacing: 0
+    }
+    Text {
+      x: Shell.Theme.settingsInfoManualTextX
+      y: 32
+      height: Shell.Theme.settingsDisplayLineHeight
+      verticalAlignment: Text.AlignVCenter
+      text: "Shortcuts & gestures"
+      color: Shell.Theme.muted
+      font.family: Shell.Theme.fontFamily
+      font.weight: Font.Normal
+      font.pixelSize: Shell.Theme.fontBody
+      font.letterSpacing: 0
+    }
+
     Image {
-      x:20; y:20; width:24; height:24
-      source:Qt.resolvedUrl("../../icons/book-open.svg")
+      x: 488; y: 24
+      width: 16; height: 16
+      source: Qt.resolvedUrl("../../icons/chevron-right.svg")
+      sourceSize: Qt.size(32, 32)
+      smooth: true
     }
-    Information.Label {
-      x:54; capY:26; text:"Manual"; color:Shell.Theme.colors.text
-      font.family:Shell.Theme.titleFontFamily; font.pixelSize:17; font.letterSpacing:0
-    }
-    HoverHandler { id:manualHover; cursorShape:Qt.PointingHandCursor }
-    TapHandler { onTapped:Settings.State.openPage("manual") }
+
+    HoverHandler { id: manualHover; cursorShape: Qt.PointingHandCursor }
+    TapHandler { onTapped: root.openManual() }
   }
-  Footer { objectName:"informationFooter"; y:438 }
+
+  Information.Footer {
+    objectName: "informationFooter"
+    y: Shell.Theme.settingsInfoFooterTop
+  }
 }

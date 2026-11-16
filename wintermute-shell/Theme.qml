@@ -249,6 +249,21 @@ Singleton {
   readonly property int settingsArrangeHintWidth: 300       // dica 13 Regular, linha de 20, muted
   readonly property int settingsArrangeButtonWidth: 104     // "Cancel" e "Done" de 104×40, raio 10, 16 entre eles
   readonly property int settingsArrangeBottomPadding: 40    // modal de 580×500
+  // Informações (ficha 13; Figma 13:16083): modal de 580×620.
+  readonly property int settingsInfoHeight: 620
+  readonly property int settingsInfoRowPitch: 48         // 7 linhas a partir de y 84, divisor border de 1 entre elas
+  readonly property int settingsInfoNumberSize: 24       // círculo control com borda border, Mono 11 Medium em text
+  readonly property int settingsInfoLabelX: 66           // rótulo 15 Medium muted, 120 de largura
+  readonly property int settingsInfoLabelWidth: 120
+  readonly property int settingsInfoValueX: 186          // valor Serif 17 em text, até a borda direita (364)
+  readonly property int settingsInfoManualTop: 436       // botão Manual de 520×64, raio 12
+  readonly property int settingsInfoManualHeight: 64
+  readonly property int settingsInfoManualBlock: 40      // bloco accentSubtle de raio 10 em (12,12), book-open 20 em accentText
+  readonly property int settingsInfoManualBlockRadius: 10
+  readonly property int settingsInfoManualTextX: 64      // "Manual" 15 Medium e a legenda 13 Regular muted, linhas de 20
+  readonly property int settingsInfoFooterTop: 536       // "Wintermute Shell" Serif 17 (caixa de 24) e a versão Mono 11 muted
+  readonly property int settingsInfoGridX: 398           // grade de "+" 7×3 de 152×56, passo 20
+  readonly property int settingsInfoGridCell: 20
   readonly property int launcherWidth: 640
   readonly property int launcherSearchHeight: 56
   readonly property int launcherFooterHeight: 44

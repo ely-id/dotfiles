@@ -20,7 +20,7 @@ PanelWindow {
   required property var panelScreen
   property bool opened: false
   property bool sidebarDemoCards: false
-  property int selectedPhaseTab: 2 // 0 = F2 (Barra e organizador), 1 = F1 (Componentes base), 2 = F3 (Pop-ups e painéis)
+  property int selectedPhaseTab: 3 // 0 = F2 (Barra e organizador), 1 = F1 (Componentes base), 2 = F3 (Pop-ups e painéis), 3 = F4 (Ajustes)
   signal toggleSidebarDemoCards
   signal closeRequested
 
@@ -798,7 +798,9 @@ PanelWindow {
           Text {
             x: 0
             anchors.verticalCenter: parent.verticalCenter
-            text: (root.selectedPhaseTab === 2
+            text: (root.selectedPhaseTab === 3
+                ? "4 · Ajustes · "
+                : root.selectedPhaseTab === 2
                 ? "3 · Pop-ups e painéis · "
                 : root.selectedPhaseTab === 0
                 ? "2 · Barra lateral e organizador · "
@@ -815,6 +817,13 @@ PanelWindow {
             anchors.rightMargin: 24
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
+
+            Chip {
+              text: "F4 · Ajustes"
+              iconName: "settings"
+              selected: root.selectedPhaseTab === 3
+              onClicked: root.selectedPhaseTab = 3
+            }
 
             Chip {
               text: "F3 · Painéis"
@@ -886,6 +895,36 @@ PanelWindow {
             id: contentColumn
             width: scrollArea.width
             spacing: 32
+
+            // =================================================================
+            // Aba F4 — Ajustes (ficha 13)
+            // =================================================================
+            Column {
+              visible: root.selectedPhaseTab === 3
+              width: parent.width
+              spacing: 32
+
+              SectionBlock {
+                title: "Tela inicial (ficha 13, board 13:15787) · tela real com dados fictícios"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Repouso · hover no cartão Appearance · composição 672×536, cartões 264 em passo 272, sessão 128 em passo 136"
+                  stageWidth: 1120; stageHeight: 680
+                  Demo.SettingsHomeSpecimen { hover: "appearance" }
+                }
+                Specimen {
+                  caption: "Hover em Power off · danger e o nome em dangerText 60 ms depois"
+                  stageWidth: 1120; stageHeight: 680
+                  Demo.SettingsHomeSpecimen { hover: "shutdown" }
+                }
+                Specimen {
+                  caption: "Hover em Restart · o mesmo padrão com o acento · selo no estado \"Restart recommended\""
+                  stageWidth: 1120; stageHeight: 680
+                  Demo.SettingsHomeSpecimen { hover: "reboot"; updateStatus: "restart" }
+                }
+              }
+            }
 
             // =================================================================
             // Aba F3 — Pop-ups e painéis (fichas 05 a 12)

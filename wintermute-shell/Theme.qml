@@ -236,6 +236,19 @@ Singleton {
   readonly property int settingsPickerRowHeight: 44      // opção de 520×44, raio 12
   readonly property int settingsPickerListTop: 140       // busca de 44 em y 84 e 12 de folga
   readonly property int settingsPickerMaxHeight: 460     // altura máxima do modal; a lista rola dentro
+  // Tela e Organizar monitores (ficha 13; Figma 13:16041 e 13:16062).
+  readonly property int settingsDisplayPreviewHeight: 280   // desenho dos monitores de 520×280, raio 16, em (30,84)
+  readonly property int settingsDisplayRowsTop: 380         // primeira linha 16 abaixo do desenho
+  readonly property int settingsDisplayTileRadius: 8        // monitor; selecionado com anel accentRing de 2
+  readonly property int settingsDisplayTileInset: 2         // folga de 4 entre monitores vizinhos na Tela
+  readonly property int settingsDisplayLineHeight: 20       // nome 13 Medium e conector 11 Medium, centrados juntos
+  readonly property int settingsDisplayArrangeWidth: 96     // botão "Arrange" de 96×32 a 16 da direita e da base
+  readonly property int settingsArrangeAreaHeight: 320      // área de arraste de 520×320, raio 16, em (30,84)
+  readonly property int settingsArrangeGuideInset: 24       // guia de encaixe de 1 px, a 24 das bordas da área
+  readonly property int settingsArrangeFooterTop: 420       // dica e botões 16 abaixo da área
+  readonly property int settingsArrangeHintWidth: 300       // dica 13 Regular, linha de 20, muted
+  readonly property int settingsArrangeButtonWidth: 104     // "Cancel" e "Done" de 104×40, raio 10, 16 entre eles
+  readonly property int settingsArrangeBottomPadding: 40    // modal de 580×500
   readonly property int launcherWidth: 640
   readonly property int launcherSearchHeight: 56
   readonly property int launcherFooterHeight: 44

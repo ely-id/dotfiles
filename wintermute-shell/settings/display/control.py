@@ -95,17 +95,21 @@ def status(data=None):
                         if (m['width'], m['height']) == (mode['width'], mode['height'])}, reverse=True)
         # Fractional scaling is a compositor capability, not an EDID mode list.
         scales = sorted(set(SCALES) | {monitor['logical']['scale']})
-        label = 'Built-in' if name.startswith(('eDP-', 'LVDS-', 'DSI-', 'DPI-')) else monitor.get('model') or monitor.get('make') or name
-        monitors.append(dict(name=name, label=label,
+        builtin = name.startswith(('eDP-', 'LVDS-', 'DSI-', 'DPI-'))
+        label = 'Built-in' if builtin else monitor.get('model') or monitor.get('make') or name
+        monitors.append(dict(name=name, label=label, builtin=builtin,
             identity=identity(monitor), logical=placement(monitor), mode=mode_id(mode),
             width=mode['width'], height=mode['height'], refresh=mode['refresh_rate'],
             scale=monitor['logical']['scale'], scales=scales,
-            resolutions=[dict(label=f'{w} x {h}', value=f'{w}x{h}') for w, h in resolutions],
+            resolutions=[dict(label=f'{w} \u00d7 {h}', value=f'{w}x{h}') for w, h in resolutions],
             rates=[dict(label=f'{rate / 1000:.3f}'.rstrip('0').rstrip('.') + ' Hz', value=str(rate)) for rate in rates],
             vrrSupported=bool(monitor.get('vrr_supported')), vrrEnabled=bool(monitor.get('vrr_enabled'))))
     labels = [m['label'] for m in monitors]
     for m in monitors:
         if labels.count(m['label']) > 1: m['label'] += ' (' + m['name'] + ')'
+    # Numeração do board 13:16041: a tela embutida primeiro, depois pelo nome do conector.
+    for number, m in enumerate(sorted(monitors, key=lambda m: (not m['builtin'], m['name'])), 1):
+        m['number'] = number
     return dict(monitors=monitors, geometry=geometry(data))
 
 

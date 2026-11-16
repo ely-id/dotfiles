@@ -27,7 +27,7 @@ Quatro botões 40×40 empilhados em x 4, y 4 / 44 / 84 / 124. Ícone 16 em (12,1
 O cartão vai a 156×80 (300 ms / mediaReveal? a Pond cresce o cartão no hover — herdar o tempo de `BottomControls.qml`). Os quatro botões descem para y 36. Em cima:
 
 - **Hover no Wi-Fi:** download e upload atuais, ícones 16 + texto 11 `muted`, divisor vertical. (Valores de exemplo nas prévias: 12 MB/s e 1,2 MB/s.)
-- **Hover no Som:** slider compacto, trilho 132×8 raio 4 em (12,14), preenchimento `accent`, alça 16 `knob`.
+- **Hover no Som:** slider compacto, trilho 132×8 raio 4 em (12,14), preenchimento `accent`, alça 16 `knob`. O percentual aparece em Geist Mono 11 à direita do slider, que encurta o trilho para caber (P-42, 2026-11-15: "Percentual em Geist Mono"). A largura do trilho e a cor do número são conferidas no Figma na `F4-T10`.
 
 ## Comportamento a herdar
 

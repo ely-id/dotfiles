@@ -5,6 +5,8 @@
 **PNG:** `referencias/armitage/06-ajustes-chiba.png`  
 **QML da Pond:** `settings/Window.qml`, `Modal.qml`, `CategoryButton.qml`, `SessionButton.qml`, `Tray.qml`, `Style.qml`, `Switcher.qml`, `Dropdown.qml`, `Field.qml`, `system/Panel.qml`, `Mouse.qml`, `Lock.qml`, `Idle.qml`, `Picker.qml`, `State.qml`, `display/Panel.qml`, `Arrange.qml`, `Monitor.qml`, `information/Panel.qml`, `Label.qml`, `Footer.qml`, `manual/Panel.qml`, `NavigationTutorial.qml`, `appearance/WallpaperPicker.qml`, `WallpaperTile.qml` (spec §3.20–3.25, §3.27)
 
+Os textos desta ficha estão em português como referência de sentido. Na shell eles aparecem em inglês (decisão 0012, 2026-11-15).
+
 ## Tela inicial
 
 - Tela cheia com véu `scrim` 80%. Composição **672×536** (cartões + sessão).
@@ -62,8 +64,17 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado, Fus
 ## Manual — 500×656, sem título no modal
 
 - Seletor Teclado / Touchpad no topo.
-- Tutorial 440×240 raio 16 (a Pond tinha 440×420 + um SVG grande que **não** está neste pacote). O Figma é a referência visual a seguir, não o SVG antigo.
-- Lista de atalhos (teclas + texto `muted`): Super+Roda, Super+Shift+Roda, Super+Espaço (launcher), Print (captura), Super+V (clipboard), Super+B (recolher a barra). Posso trocar os binds depois, então eles ficam num único arquivo.
+- Tutorial 440×240 raio 16 (a Pond tinha 440×420 + um SVG grande que **não** está neste pacote). Sigo o layout do Figma, não o SVG antigo (P-10, 2026-11-15: "Segue o do Figma").
+- Lista de atalhos (teclas + texto `muted`). A lista sai das binds que configurei em `~/.config/niri/cfg/keybinds.kdl` e das anotações dele, mais estas, que defini em 2026-11-15 (P-11):
+  - Super+Return: Terminal (a descrição fica só "Terminal").
+  - Super+\`: recolher/expandir a barra da Wintermute. Substitui o Super+B.
+  - Super+E: launcher.
+  - Super+Shift+E: gerenciador de arquivos (Files).
+  - Super+Escape: tela inicial dos Ajustes.
+  - Super+L: tela de bloqueio.
+  - Capturas: Super+Shift+1, 2 e 3, como anotei no arquivo (hoje Ctrl+Shift+1, 2 e 3).
+  - A área de transferência ainda não tem atalho; entra na lista quando a F6 definir.
+- Os textos da lista ficam em inglês (decisão 0012). Posso trocar os binds depois, então eles ficam num único arquivo (`F4-T07`).
 - Abre sozinho na primeira vez (`shell.qml:55-65`). Botão “Entendi” primário 440×40.
 
 ## Papel de parede — modal 624×608
@@ -77,4 +88,5 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado, Fus
 ## A CONFIRMAR
 
 - ~~Ícone do perfil Desempenho na home: `zap` aqui vs `rocket` no pop-up da bateria (ficha 08).~~ Definido em 2026-11-15 (P-07): `zap` nos dois lugares.
-- O tutorial do Manual da Pond era um SVG de 2,9 MB não baixado. Seguir o layout do Figma (440×240).
+- ~~O tutorial do Manual da Pond era um SVG de 2,9 MB não baixado. Seguir o layout do Figma (440×240).~~ Definido em 2026-11-15 (P-10): segue o Figma.
+- ~~Lista definitiva de atalhos.~~ Definida em 2026-11-15 (P-11), na seção do Manual.

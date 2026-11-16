@@ -58,10 +58,26 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
 - Desenho dos monitores **520×280** (Pond 520×281; alinhado à grade) raio 16, fundo `cardHover`, em (30,84).
 - Monitores com raio 8; o selecionado usa `accentSubtle` + `accentRing` 2. Botão “Organizar”.
 - Linhas: Escala, Resolução, Taxa de atualização, Sincronia adaptativa (VRR). Só aparecem quando há opção (comportamento da Pond).
+- Conferido no Figma em 2026-11-16 (`F4-T03`, nó `13:16041`), o que esta ficha não dizia:
+  - O desenho tem borda `border` de 1. As linhas começam em y 380, 16 abaixo dele, e o modal fecha em 644 com 32 de base.
+  - Monitor em repouso: `raised` com borda `borderStrong` de 1. Nome "N · nome" em 13 Medium `text` e conector em 11 Medium `muted`, em duas linhas de 20 centradas juntas. No selecionado o conector passa a `text` (regra 5 do tema). Monitores vizinhos ficam com folga de 4.
+  - Botão “Organizar”: o secundário pequeno da ficha 00 (`control` com borda `border`, raio 8, 13 Medium), 96×32, a 16 da direita e da base do desenho. Só aparece com mais de um monitor, como na origem.
+  - Valores: a escala em porcentagem ("125%"; a origem mostrava "1.25x") e a resolução com "×".
+- Escolhas minhas na `F4-T03`, onde o Figma não decide:
+  - A numeração põe a tela embutida primeiro e segue pelo nome do conector, o que dá o "1 · Notebook, 2 · Monitor" do board. O nome da tela embutida fica "Built-in", o da origem; o externo usa o modelo, também como na origem.
+  - O board escreve "eDP-1 · principal" no monitor selecionado. O Niri não tem monitor principal, e no board de Organizar o mesmo monitor aparece só como "eDP-1"; por isso mostro só o conector até responder a P-48.
+  - Os dois botões de girar a tela da origem não estão no Figma e saíram da página. O `control.py` continua sabendo girar (P-49).
+  - Hover e foco do monitor não estão desenhados: uso o `raised` com a camada `hover` por cima, o token dos botões e linhas.
 
 ### Organizar monitores — 580×500
 
 - Área de arraste 520×320. Guia de encaixe 1 px em `accentText`. Monitor arrastado com sombra. “Cancelar” / “Concluído”.
+- Conferido no Figma em 2026-11-16 (`F4-T03`, nó `13:16062`):
+  - Área em (30,84), `cardHover` com borda `border` de 1, raio 16. Os monitores encostam uns nos outros, sem folga. A grade de linhas da origem não está no Figma e saiu.
+  - Monitor arrastado: `accentSubtle` com anel `accentRing` de 2 e a sombra do vidro; a segunda linha vira "arrastando" em `text` e o glifo `move` de 16 em `accentText` fica 22 abaixo do centro. Os outros monitores ficam no repouso da Tela.
+  - Guia de encaixe: 1 px em `accentText` sobre a borda em comum com o vizinho, a 24 das bordas da área (vertical quando encostam de lado, horizontal quando encostam em cima ou embaixo). Aparece só durante o arraste.
+  - Dica em (30,420), 13 Regular com linha de 20, `muted`, 300 de largura. O erro (ou o aviso de que os monitores mudaram) aparece no lugar dela, em `dangerText`.
+  - “Cancelar” (secundário) e “Concluído” (primário), ambos de 104×40 com raio 10, em y 420, alinhados à direita com 16 entre eles. O modal fecha em 500, com 40 de base.
 
 ## Informações — 580×620
 
@@ -79,7 +95,8 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
   - Super+E: launcher.
   - Super+Shift+E: gerenciador de arquivos (Files).
   - Super+Escape: tela inicial dos Ajustes.
-  - Super+Shift+Escape: atalho de emergência que devolve o teclado quando um app em tela cheia o segura (P-43). A lista de atalhos do Niri, que está nessa tecla hoje, depende da P-45.
+  - Super+Shift+Escape: atalho de emergência que devolve o teclado quando um app em tela cheia o segura (P-43).
+  - Super+Shift+/: lista de atalhos do Niri (`show-hotkey-overlay`), que sai do Super+Shift+Escape para dar lugar ao atalho de emergência (P-45, 2026-11-16). No `keybinds.kdl` a tecla se escreve `Mod+Shift+Slash`.
   - Super+L: tela de bloqueio.
   - Capturas: Super+Shift+1, 2 e 3, como anotei no arquivo (hoje Ctrl+Shift+1, 2 e 3).
   - A área de transferência ainda não tem atalho; entra na lista quando a F6 definir.
@@ -99,3 +116,5 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
 - ~~Ícone do perfil Desempenho na home: `zap` aqui vs `rocket` no pop-up da bateria (ficha 08).~~ Definido em 2026-11-15 (P-07): `zap` nos dois lugares.
 - ~~O tutorial do Manual da Pond era um SVG de 2,9 MB não baixado. Seguir o layout do Figma (440×240).~~ Definido em 2026-11-15 (P-10): segue o Figma.
 - ~~Lista definitiva de atalhos.~~ Definida em 2026-11-15 (P-11), na seção do Manual.
+- O "principal" do conector no monitor selecionado da Tela (P-48).
+- A rotação da tela volta, e onde (P-49).

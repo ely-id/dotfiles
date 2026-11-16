@@ -110,7 +110,7 @@ PanelWindow {
     active: root.presented && (root.modalOpen || opacity > 0)
     sourceComponent: ({
       wallpaper: wallpaperPage, information: informationPage, manual: manualPage, display: displayPage, arrange: arrangePage,
-      system: systemPage, mouse: mousePage, lock: lockPage, keyboard: keyboardPage, timezone: timezonePage
+      system: systemPage, mouse: mousePage, lock: lockPage, keyboard: keyboardPage
     })[root.displayedPage] || appearancePage
     enabled: root.modalOpen
     opacity: root.modalOpen ? 1 : 0
@@ -184,19 +184,9 @@ PanelWindow {
   Component {
     id: keyboardPage
     System.Picker {
-      title: "Keyboard language"; placeholder: "Search languages"; multiple: true
+      title: "Keyboard language"; closeLabel: "Back to System"; placeholder: "Search languages"; multiple: true
       options: System.State.languages; selected: System.State.selectedLanguages
       onPicked: id => System.State.toggleLanguage(id)
-      availableHeight: Math.max(200, root.height - 70)
-      scale: Math.min(1, (root.width - 60) / implicitWidth)
-    }
-  }
-  Component {
-    id: timezonePage
-    System.Picker {
-      title: "Timezone"; placeholder: "Search timezone"
-      options: System.State.timezones; selected: [System.State.timezone]
-      onPicked: id => System.State.setTimezone(id)
       availableHeight: Math.max(200, root.height - 70)
       scale: Math.min(1, (root.width - 60) / implicitWidth)
     }

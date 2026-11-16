@@ -225,6 +225,17 @@ Singleton {
   readonly property int settingsBadgeHeight: 32
   readonly property int settingsBadgeRadius: 8
   readonly property int settingsBadgePadding: 12        // ícone 16 em (12,8), texto em 36
+  // Modais das subpáginas (ficha 13; Figma 13:15915, 13:15927, 13:15971 e 13:15984).
+  readonly property int settingsBodyTop: 84              // primeira linha, seletor ou busca em (30,84)
+  readonly property int settingsBodyInset: 30
+  readonly property int settingsBottomPadding: 32
+  readonly property int settingsStepSliderWidth: 480     // trilho de 12, raio 6, em x 50; 9 marcas de 1×8 a cada 60
+  readonly property int settingsStepSliderPitch: 60
+  readonly property int settingsStepSliderKnob: 24
+  readonly property int settingsStepSliderGroup: 104     // do rótulo de um slider ao rótulo do seguinte
+  readonly property int settingsPickerRowHeight: 44      // opção de 520×44, raio 12
+  readonly property int settingsPickerListTop: 140       // busca de 44 em y 84 e 12 de folga
+  readonly property int settingsPickerMaxHeight: 460     // altura máxima do modal; a lista rola dentro
   readonly property int launcherWidth: 640
   readonly property int launcherSearchHeight: 56
   readonly property int launcherFooterHeight: 44

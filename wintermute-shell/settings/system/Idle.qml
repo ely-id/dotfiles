@@ -5,12 +5,15 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.UPower
 
+// Tempos de inatividade por fonte de energia e o "Ask for password on wake" (ficha 13), num arquivo de
+// preferências. O pedido de senha ao acordar fica guardado aqui e só passa a valer com a tela de bloqueio da F7.
 Singleton {
   id: root
   readonly property var defaults: ({lock: 0, display: 0, sleep: 0})
   readonly property var choices: [0, 60, 120, 180, 300, 600, 900, 1200, 1500, 1800, 2700, 3600, 7200, 10800, 14400, 18000]
   readonly property var options: choices.map(seconds => ({label: label(seconds), value: String(seconds)}))
   property var timeouts: ({pluggedIn: defaults, battery: defaults})
+  property bool askPasswordOnWake: true
   readonly property string source: UPower.onBattery ? "battery" : "pluggedIn"
   readonly property var current: timeouts[source]
 
@@ -18,11 +21,18 @@ Singleton {
     if (!seconds) return "Never";
     const hours = seconds >= 3600;
     const count = Math.round(seconds / (hours ? 3600 : 60));
-    return count + (hours ? " hour" : " min") + (count === 1 ? "" : "s");
+    return hours ? count + (count === 1 ? " hour" : " hours") : count + " min";
   }
   function set(power, key, seconds) {
     timeouts = Object.assign({}, timeouts, {[power]: Object.assign({}, timeouts[power], {[key]: seconds})});
-    file.setText(JSON.stringify(timeouts) + "\n");
+    save();
+  }
+  function setAskPasswordOnWake(enabled) {
+    askPasswordOnWake = enabled;
+    save();
+  }
+  function save() {
+    file.setText(JSON.stringify(Object.assign({}, timeouts, {askPasswordOnWake: askPasswordOnWake})) + "\n");
   }
 
   FileView {
@@ -38,6 +48,7 @@ Singleton {
           pluggedIn: Object.assign({}, root.defaults, saved.pluggedIn),
           battery: Object.assign({}, root.defaults, saved.battery)
         };
+        root.askPasswordOnWake = saved.askPasswordOnWake !== false;
       } catch (e) { console.warn("Idle timeouts:", e); }
     }
   }

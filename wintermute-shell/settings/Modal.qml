@@ -11,7 +11,7 @@ Rectangle {
   property string title
   property real bodyTop: 82
   property real titleOpacity: 1
-  property string closeLabel: "Voltar para os ajustes"
+  property string closeLabel: "Back to Settings"
   property alias overlay: overlays.data
   property alias scrollItem: body
   property real contentHeight: 0
@@ -37,9 +37,9 @@ Rectangle {
   Shell.GradientFill { fill: root.fill }
   // Stop dialog clicks from reaching the outside-dismiss area.
   MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }
-  // Título Serif 32 em (30,20), caixa 400×44 (ficha 11).
+  // Título Serif 32 em (30,20), caixa (w − 80)×44 (fichas 11 e 13).
   Text {
-    x: 30; y: 20; width: 400; height: 44
+    x: 30; y: 20; width: root.width - 80; height: 44
     verticalAlignment: Text.AlignVCenter
     elide: Text.ElideRight
     text: root.title

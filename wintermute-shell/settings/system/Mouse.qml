@@ -1,110 +1,148 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Templates as T
 import "." as System
 import ".." as Settings
 import "../.." as Shell
 
+// Página Mouse e touchpad (ficha 13; Figma 13:15927): modal de 580×452. Velocidade do touchpad e do
+// mouse em 9 passos cada, chave "Pointer acceleration" em y 300 e a linha "Natural scrolling" em y 360
+// com o seletor de 168×40 em (346,6). A rolagem natural é por aparelho (nota do Figma): cada metade do
+// seletor liga ou desliga a rolagem natural do próprio aparelho, e a metade acesa é a que está ligada
+// (P-47). As mudanças vão para o input.kdl do Niri 300 ms depois do último movimento.
 Settings.Modal {
   id: root
   objectName: "mousePanel"
-  title: "Mouse sensitivity"; closeLabel: "Back to System"; bodyTop: 92
-  contentHeight: fields.height + 30
-  property string naturalKey: "naturalTouchpad"
+
+  property var service: System.State
+
+  title: "Mouse & touchpad"
+  closeLabel: "Back to System"
+  bodyTop: 0
+  contentHeight: 452
   onBackRequested: Settings.State.back()
   Keys.onEscapePressed: Settings.State.back()
-  Column {
-    id: fields
-    x: 30; width: root.width - 60; spacing: 6
-    Repeater {
-      model: [{key: "speed", title: "Mouse sensitivity", to: 1}, {key: "scroll", title: "Scrolling sensitivity", to: 2}]
-      delegate: Rectangle {
-        id: field
-        required property var modelData
-        width: fields.width; height: 107; radius: 12
-        color: slider.visualFocus ? Shell.PanelStyle.controlHover : Shell.Theme.colors.settingsRow
-        Text {
-          x: 20; y: (51 - height) / 2
-          text: field.modelData.title; color: Qt.alpha(Shell.Theme.colors.text, 0.7)
-          font.family: Shell.Theme.fontFamily; font.pixelSize: 15
-        }
-        Text {
-          anchors.right: parent.right; anchors.rightMargin: 20; y: (51 - height) / 2
-          text: Math.round(slider.value * 100) + "%"; color: Qt.alpha(Shell.Theme.colors.text, 0.7)
-          font.family: Shell.Theme.fontFamily; font.pixelSize: 15
-        }
-        Repeater {
-          model: 11
-          delegate: Rectangle {
-            required property int index
-            x: 20 + index * 47.6; y: 83; width: 4; height: 4; radius: 2
-            color: "#d9d9d9"; opacity: 0.2
-          }
-        }
-        T.Slider {
-          id: slider
-          objectName: "mouse" + field.modelData.key
-          x: 20; y: 55; width: 480; height: 24
-          leftPadding: 2; rightPadding: 2
-          to: field.modelData.to; value: System.State.mouse[field.modelData.key]
-          Accessible.name: field.modelData.title
-          onMoved: System.State.setMouse(field.modelData.key, value)
-          background: Rectangle {
-            y: 4; width: slider.width; height: 16; radius: 8
-            color: Shell.PanelStyle.sliderTrack
-            Rectangle {
-              x: 1; y: 1; width: slider.leftPadding + slider.visualPosition * slider.availableWidth - 1
-              height: 14; radius: 7
-              color: "#d9d9d9"
-            }
-          }
-          handle: Rectangle {
-            x: slider.leftPadding + slider.visualPosition * slider.availableWidth - width / 2
-            width: 24; height: 24; radius: 12
-            color: "#e7e7e7"; border.width: 2; border.color: Qt.tint(root.color, field.color)
-          }
-          HoverHandler { cursorShape: Qt.PointingHandCursor }
-        }
-      }
-    }
-    Settings.Field {
-      objectName: "mouseAcceleration"
-      width: parent.width; toggle: true
-      title: "Pointer acceleration"; checked: System.State.mouse.acceleration
-      onToggled: checked => System.State.setMouse("acceleration", checked)
-    }
-    Rectangle {
-      width: parent.width; height: 108; radius: 12
-      color: Shell.Theme.colors.settingsRow
-      Text {
-        x: 20; y: (51 - height) / 2
-        text: "Natural scrolling"; color: Qt.alpha(Shell.Theme.colors.text, 0.7)
-        font.family: Shell.Theme.fontFamily; font.pixelSize: 15
-      }
-      Settings.Switcher {
-        objectName: "mouseNatural"
-        x: 20; y: 47; radius: 8
-        model: [{key: "naturalTouchpad", label: "Trackpad", width: 80}, {key: "naturalMouse", label: "Mouse", width: 84}]
-        current: root.naturalKey
-        onSelected: key => root.naturalKey = key
-      }
-      Shell.Toggle {
-        objectName: "mouseNaturalToggle"
-        x: parent.width - width - 20; y: 54
-        activeFocusOnTab: true
-        Accessible.role: Accessible.CheckBox
-        Accessible.name: "Natural scrolling"
-        Accessible.checked: checked
-        Keys.onReturnPressed: toggled(!checked)
-        Keys.onSpacePressed: toggled(!checked)
-        checked: System.State.mouse[root.naturalKey]
-        onToggled: checked => System.State.setMouse(root.naturalKey, checked)
-      }
-    }
+
+  System.StepSlider {
+    objectName: "touchpadSpeed"
+    x: Shell.Theme.settingsBodyInset
+    y: Shell.Theme.settingsBodyTop
+    title: "Touchpad speed"
+    value: root.service.mouse.touchpadSpeed
+    onMoved: value => root.service.setMouse("touchpadSpeed", value)
+  }
+
+  System.StepSlider {
+    objectName: "mouseSpeed"
+    x: Shell.Theme.settingsBodyInset
+    y: Shell.Theme.settingsBodyTop + Shell.Theme.settingsStepSliderGroup
+    title: "Mouse speed"
+    value: root.service.mouse.mouseSpeed
+    onMoved: value => root.service.setMouse("mouseSpeed", value)
+  }
+
+  Settings.Field {
+    objectName: "mouseAcceleration"
+    x: Shell.Theme.settingsBodyInset
+    y: 300
+    toggle: true
+    title: "Pointer acceleration"
+    checked: root.service.mouse.acceleration
+    onToggled: checked => root.service.setMouse("acceleration", checked)
+  }
+
+  Rectangle {
+    x: Shell.Theme.settingsBodyInset
+    y: 300 + Shell.Theme.settingsRowPitch
+    width: Shell.Theme.settingsRowWidth
+    height: Shell.Theme.settingsRowHeight
+    radius: Shell.Theme.radiusRow
+    color: Shell.Theme.control
+    antialiasing: true
+
     Text {
-      width: parent.width; visible: !!System.State.error
-      text: System.State.error; color: "#ffb4ab"; wrapMode: Text.Wrap
-      font.family: Shell.Theme.fontFamily; font.pixelSize: 13
+      x: 20
+      height: parent.height
+      verticalAlignment: Text.AlignVCenter
+      text: "Natural scrolling"
+      color: Shell.Theme.text
+      font.family: Shell.Theme.fontFamily
+      font.weight: Font.Normal
+      font.pixelSize: Shell.Theme.fontLabel
     }
+
+    // Mesmo desenho do seletor segmentado (ficha 00), com as duas metades independentes.
+    Rectangle {
+      objectName: "mouseNatural"
+      x: 346
+      y: 6
+      width: 168
+      height: 40
+      radius: 12
+      color: "transparent"
+      border.width: 1
+      border.color: Shell.Theme.border
+      antialiasing: true
+
+      Repeater {
+        model: [
+          { key: "naturalTouchpad", label: "Touchpad" },
+          { key: "naturalMouse", label: "Mouse" }
+        ]
+
+        delegate: Rectangle {
+          id: half
+          required property var modelData
+          required property int index
+          readonly property bool on: !!root.service.mouse[modelData.key]
+
+          x: 4 + index * 80
+          y: 4
+          width: 80
+          height: 32
+          radius: 8
+          color: on ? Shell.Theme.accentSubtle : Qt.alpha(Shell.Theme.accentSubtle, 0)
+          antialiasing: true
+          activeFocusOnTab: true
+          Accessible.role: Accessible.CheckBox
+          Accessible.name: "Natural scrolling, " + modelData.label
+          Accessible.checked: on
+          Accessible.onPressAction: toggle()
+          Keys.onSpacePressed: toggle()
+          Keys.onReturnPressed: toggle()
+
+          function toggle() { root.service.setMouse(modelData.key, !on); }
+
+          Behavior on color {
+            ColorAnimation { duration: Shell.Theme.controlDuration; easing.type: Easing.OutCubic }
+          }
+
+          Text {
+            anchors.fill: parent
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: half.modelData.label
+            color: half.on || halfHover.hovered ? Shell.Theme.text : Shell.Theme.muted
+            font.family: Shell.Theme.fontFamily
+            font.weight: Font.Medium
+            font.pixelSize: Shell.Theme.fontBody
+          }
+
+          HoverHandler { id: halfHover; cursorShape: Qt.PointingHandCursor }
+          TapHandler { onTapped: half.toggle() }
+        }
+      }
+    }
+  }
+
+  Text {
+    x: Shell.Theme.settingsBodyInset
+    y: 300 + Shell.Theme.settingsRowPitch * 2
+    width: Shell.Theme.settingsRowWidth
+    visible: root.service.error !== ""
+    text: root.service.error
+    wrapMode: Text.Wrap
+    color: Shell.Theme.dangerText
+    font.family: Shell.Theme.fontFamily
+    font.pixelSize: Shell.Theme.fontBody
   }
 }

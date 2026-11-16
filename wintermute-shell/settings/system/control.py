@@ -7,13 +7,12 @@ import sys
 import time
 import xml.etree.ElementTree as ET
 
-from PyQt6.QtCore import QDateTime, QLocale, QTimeZone
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from kdl import atomic_write, get_properties, set_properties
 
 INPUT = Path(os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config')) / 'niri/cfg/input.kdl'
-ENGLISH = QLocale('en_US')
+# Velocidade do ponteiro em 9 passos (ficha 13): o passo 5 é o accel-speed 0 do Niri, e cada passo anda 0,25.
+STEPS = 9
 
 
 def run(*args, timeout=15):
@@ -45,50 +44,33 @@ def keyboard():
     return json.loads(run('niri', 'msg', '-j', 'keyboard-layouts'))
 
 
-def zone(identifier, now):
-    tz = QTimeZone(identifier.encode())
-    offset = tz.offsetFromUtc(now)
-    label = tz.displayName(now, QTimeZone.NameType.LongName, ENGLISH)
-    return {'id': identifier, 'label': label, 'minutes': offset // 60,
-            'offset': f'GMT{"-" if offset < 0 else "+"}{abs(offset) // 3600:02}:{abs(offset) // 60 % 60:02}',
-            'search': label + ' ' + tz.abbreviation(now)}
+def step(speed):
+    return max(1, min(STEPS, round((float(speed) + 1) * (STEPS - 1) / 2) + 1))
 
 
-def timezones(current):
-    with open('/usr/share/zoneinfo/zone.tab') as table:
-        identifiers = sorted(line.split('\t')[2].strip() for line in table if not line.startswith('#'))
-    now = QDateTime.currentDateTimeUtc()
-    groups = {}
-    for i in [current, 'UTC', *identifiers]:
-        z = zone(i, now)
-        groups.setdefault((z['label'], z['minutes'], QTimeZone(i.encode()).offsetFromUtc(now.addMonths(6))), z)
-    labels = [z['label'] for z in groups.values()]
-    for z in groups.values():
-        if labels.count(z['label']) > 1: z['label'] += ' – ' + z['id'].rpartition('/')[2].replace('_', ' ')
-    return sorted(groups.values(), key=lambda z: (z['minutes'], z['label']))
+def speed(step):
+    return round((int(step) - 1) * 2 / (STEPS - 1) - 1, 2)
 
 
 def mouse():
     text = INPUT.read_text()
-    values = get_properties(text, ('input', 'mouse'))
-    return {'speed': (values.get('accel-speed', 0) + 1) / 2, 'scroll': values.get('scroll-factor', 1),
-            'acceleration': values.get('accel-profile') != 'flat',
-            'naturalTouchpad': 'natural-scroll' in get_properties(text, ('input', 'touchpad')),
-            'naturalMouse': 'natural-scroll' in values}
+    pointer = get_properties(text, ('input', 'mouse'))
+    touchpad = get_properties(text, ('input', 'touchpad'))
+    return {'touchpadSpeed': step(touchpad.get('accel-speed', 0)), 'mouseSpeed': step(pointer.get('accel-speed', 0)),
+            'acceleration': pointer.get('accel-profile') != 'flat',
+            'naturalTouchpad': 'natural-scroll' in touchpad, 'naturalMouse': 'natural-scroll' in pointer}
 
 
 def status():
     ids = {item['label']: item['id'] for item in layouts()}
     names = keyboard()['names']
-    timezone = bytes(QTimeZone.systemTimeZoneId()).decode()
     return {'selectedLanguages': [ids.get(name, name) for name in names], 'languageNames': names,
-            'timezone': timezone, 'timezoneLabel': zone(timezone, QDateTime.currentDateTimeUtc())['label'],
             'mouse': mouse()}
 
 
 def load():
     result = status()
-    return dict(result, languages=languages(result['languageNames']), timezones=timezones(result['timezone']))
+    return dict(result, languages=languages(result['languageNames']))
 
 
 def apply_languages(text, names):
@@ -125,16 +107,13 @@ def toggle_language(identifier):
     return status()
 
 
-def set_timezone(identifier):
-    run('sudo', '-n', '/usr/bin/timedatectl', 'set-timezone', identifier)
-    return status()
-
-
-def set_mouse(speed, scroll, acceleration, natural_touchpad, natural_mouse):
+# Cada aparelho tem a própria velocidade e a própria rolagem natural; a aceleração vale para os dois.
+# O scroll-factor não aparece mais na página (o Figma tirou), então não mexo nele.
+def set_mouse(touchpad_speed, mouse_speed, acceleration, natural_touchpad, natural_mouse):
     text = INPUT.read_text()
-    for device, natural in (('mouse', natural_mouse), ('touchpad', natural_touchpad)):
+    for device, value, natural in (('touchpad', touchpad_speed, natural_touchpad), ('mouse', mouse_speed, natural_mouse)):
         text = set_properties(text, ('input', device), {
-            'accel-speed': round(float(speed) * 2 - 1, 2), 'scroll-factor': round(max(float(scroll), .1), 2),
+            'accel-speed': speed(value),
             'accel-profile': 'adaptive' if acceleration == 'true' else 'flat',
             'natural-scroll': natural == 'true'})
     atomic_write(INPUT, text)
@@ -145,7 +124,7 @@ def set_mouse(speed, scroll, acceleration, natural_touchpad, natural_mouse):
 if __name__ == '__main__':
     try:
         action, *args = sys.argv[1:]
-        print(json.dumps({'load': load, 'keyboard': toggle_language, 'timezone': set_timezone, 'mouse': set_mouse}[action](*args)))
+        print(json.dumps({'load': load, 'keyboard': toggle_language, 'mouse': set_mouse}[action](*args)))
     except Exception as error:
         print(json.dumps({'error': str(error)}))
         sys.exit(1)

@@ -19,6 +19,9 @@ Rectangle {
 
   readonly property bool highlighted: selected || dragging
   readonly property int lineHeight: Shell.Theme.settingsDisplayLineHeight
+  // Num monitor estreito (em retrato) o nome quebra em até duas linhas; o bloco continua centrado.
+  readonly property int nameLines: Math.max(1, Math.min(2, name.lineCount))
+  readonly property real blockTop: Math.round(height / 2 - (nameLines + 1) * lineHeight / 2)
 
   radius: Shell.Theme.settingsDisplayTileRadius
   color: highlighted ? Shell.Theme.accentSubtle
@@ -39,12 +42,17 @@ Rectangle {
   }
 
   Text {
+    id: name
     x: 0; width: parent.width
-    y: parent.height / 2 - root.lineHeight
-    height: root.lineHeight
+    y: root.blockTop
+    // Sem altura fixa: com ela o elide cortaria antes de quebrar e lineCount ficaria em 1.
     leftPadding: 8; rightPadding: 8
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter
+    wrapMode: Text.Wrap
+    maximumLineCount: 2
+    lineHeightMode: Text.FixedHeight
+    lineHeight: root.lineHeight
     elide: Text.ElideRight
     text: root.label
     color: Shell.Theme.text
@@ -56,7 +64,7 @@ Rectangle {
 
   Text {
     x: 0; width: parent.width
-    y: parent.height / 2
+    y: root.blockTop + root.nameLines * root.lineHeight
     height: root.lineHeight
     leftPadding: 8; rightPadding: 8
     horizontalAlignment: Text.AlignHCenter
@@ -73,7 +81,7 @@ Rectangle {
 
   Image {
     anchors.horizontalCenter: parent.horizontalCenter
-    y: parent.height / 2 + 22
+    y: root.blockTop + (root.nameLines + 1) * root.lineHeight + 2
     width: 16; height: 16
     visible: root.dragging && y + height <= parent.height - 4
     source: Qt.resolvedUrl("../../icons/move.svg")

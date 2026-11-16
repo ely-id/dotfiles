@@ -110,7 +110,7 @@ Settings.Modal {
         y: root.py(rect.y)
         width: Math.max(20, root.px(rect.x + rect.width) - x)
         height: Math.max(20, root.py(rect.y + rect.height) - y)
-        label: monitor ? monitor.number + " · " + monitor.label : rect.name
+        label: monitor ? monitor.number + "\u00a0\u00b7 " + monitor.label : rect.name
         detail: rect.name
         dragging: root.activeIndex === index
         hovered: dragArea.containsMouse

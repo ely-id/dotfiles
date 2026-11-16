@@ -52,8 +52,18 @@ FocusScope {
         Accessible.role: modelData.separator ? Accessible.Separator : Accessible.MenuItem; Accessible.name: modelData.label
         Accessible.checked: !!modelData.checked
         Accessible.onPressAction: root.pick(modelData)
+        // Ícone opcional à esquerda (a linha Orientation da Tela usa o monitor girado, P-49).
+        Image {
+          id: leading
+          visible: !!option.modelData.icon
+          x: 12; anchors.verticalCenter: parent.verticalCenter
+          width: 16; height: 16; sourceSize: Qt.size(32, 32)
+          rotation: option.modelData.iconRotation || 0
+          source: option.modelData.icon ? Qt.resolvedUrl("../icons/" + option.modelData.icon + ".svg") : ""
+        }
         Text {
-          x: 12; width: parent.width - (trailing.visible ? 52 : 24); anchors.verticalCenter: parent.verticalCenter
+          x: leading.visible ? 36 : 12
+          width: parent.width - x - (trailing.visible ? 40 : 12); anchors.verticalCenter: parent.verticalCenter
           text: option.modelData.label; elide: Text.ElideRight
           color: Shell.Theme.colors.text; opacity: option.modelData.disabled ? 0.3 : 1
           font.family: Shell.Theme.fontFamily; font.pixelSize: 13; font.weight: Font.Medium

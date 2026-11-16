@@ -63,6 +63,22 @@ def logical_size(m):
     return w, h
 
 
+# Orientação da linha "Orientation" (P-49). O transform do Niri gira no sentido anti-horário:
+# Portrait right (o monitor virado para a direita) é 90 e Portrait left é 270.
+ORIENTATIONS = ('Normal', '90', '180', '270')
+
+
+def orientation(transform):
+    return transform.replace('Flipped', '') or 'Normal'
+
+
+def oriented_transform(transform, value):
+    if value not in ORIENTATIONS: raise ValueError('Unsupported display orientation')
+    if not transform.startswith('Flipped'): return value
+    # Uma tela espelhada continua espelhada.
+    return 'Flipped' if value == 'Normal' else 'Flipped' + value
+
+
 def rotated_transform(transform, direction):
     rotations = ('Flipped', 'Flipped90', 'Flipped180', 'Flipped270') if transform.startswith('Flipped') else ('Normal', '90', '180', '270')
     step = {'clockwise': -1, 'counterclockwise': 1}[direction]
@@ -103,7 +119,8 @@ def status(data=None):
             scale=monitor['logical']['scale'], scales=scales,
             resolutions=[dict(label=f'{w} \u00d7 {h}', value=f'{w}x{h}') for w, h in resolutions],
             rates=[dict(label=f'{rate / 1000:.3f}'.rstrip('0').rstrip('.') + ' Hz', value=str(rate)) for rate in rates],
-            vrrSupported=bool(monitor.get('vrr_supported')), vrrEnabled=bool(monitor.get('vrr_enabled'))))
+            vrrSupported=bool(monitor.get('vrr_supported')), vrrEnabled=bool(monitor.get('vrr_enabled')),
+            orientation=orientation(monitor['logical']['transform'])))
     labels = [m['label'] for m in monitors]
     for m in monitors:
         if labels.count(m['label']) > 1: m['label'] += ' (' + m['name'] + ')'
@@ -300,8 +317,9 @@ def apply(action, name='', value='', expected_identity=''):
                 if not math.isfinite(scale) or scale not in set(SCALES) | {m['logical']['scale']}: raise ValueError('Unsupported display scale')
                 m['logical']['scale'] = scale
                 changes[name] = {'scale': f'scale {scale:g}'}
-            elif action == 'rotate':
-                transform = rotated_transform(m['logical']['transform'], value)
+            elif action in ('rotate', 'orientation'):
+                rotate = rotated_transform if action == 'rotate' else oriented_transform
+                transform = rotate(m['logical']['transform'], value)
                 m['logical']['transform'] = transform
                 changes[name] = {'transform': 'transform ' + json.dumps(TRANSFORMS[transform])}
             elif action in ('resolution', 'refresh'):
@@ -320,7 +338,7 @@ def apply(action, name='', value='', expected_identity=''):
             else: raise ValueError('Unknown display action')
             w, h = map(int, logical_size(m))
             m['logical'].update(width=w, height=h)
-            rects = reflow(before, wanted) if action in ('scale', 'resolution', 'rotate') else geometry(before)
+            rects = reflow(before, wanted) if action in ('scale', 'resolution', 'rotate', 'orientation') else geometry(before)
         if action not in ('refresh', 'vrr'): validate_layout(rects)
         for r in rects:
             wanted[r['name']]['logical'].update(x=r['x'], y=r['y'])

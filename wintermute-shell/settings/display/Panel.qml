@@ -5,19 +5,19 @@ import ".." as Settings
 import "../.." as Shell
 import "Geometry.js" as Geometry
 
-// Página Tela (ficha 13; Figma 13:16041): modal de 580×644. Desenho dos monitores de 520×280, raio 16,
+// Página Tela (ficha 13; Figma 13:16041): modal de 580×704. Desenho dos monitores de 520×280, raio 16,
 // em cardHover com borda border, em (30,84); com mais de um monitor, o selecionado fica em accentSubtle
 // com anel accentRing de 2 e o botão "Arrange" (96×32) aparece a 16 da direita e da base. Linhas de
-// 520×52 a cada 60 a partir de y 380: Scale, Resolution, Refresh rate e Adaptive sync (VRR), cada uma
-// só quando há o que escolher, como na origem. Os valores abrem o menu suspenso da origem (P-46).
-// Os botões de girar a tela da origem não estão no Figma e saíram da página; o control.py continua
-// sabendo girar (P-49). Lê o estado por `service` (decisão 0011).
+// 520×52 a cada 60 a partir de y 380. A primeira é Orientation (P-49), que não está no Figma: o menu
+// mostra cada posição com o ícone do monitor girado do jeito que ele vai ficar. Depois vêm Scale,
+// Resolution, Refresh rate e Adaptive sync (VRR), cada uma só quando há o que escolher, como na origem.
+// Os valores abrem o menu suspenso da origem (P-46). Lê o estado por `service` (decisão 0011).
 Settings.Modal {
   id: root
   objectName: "displayPanel"
 
   property var service: Display.State
-  // Só para a vitrine: fixa o hover numa linha ("scale", "resolution", "refresh" ou "vrr").
+  // Só para a vitrine: fixa o hover numa linha ("orientation", "scale", "resolution", "refresh" ou "vrr").
   property string hoverRow: ""
 
   title: "Display"
@@ -34,10 +34,22 @@ Settings.Modal {
   function percent(scale) { return Math.round(scale * 100) + "%"; }
   function hertz(refresh) { return (refresh / 1000).toFixed(3).replace(/\.?0+$/, "") + " Hz"; }
 
+  // O transform do Niri gira no sentido anti-horário: o monitor virado para a direita é o "90".
+  // O ícone gira no sentido em que o monitor vai ficar.
+  readonly property var orientations: [
+    { label: "Landscape", value: "Normal", icon: "monitor", iconRotation: 0 },
+    { label: "Portrait right", value: "90", icon: "monitor", iconRotation: 90 },
+    { label: "Portrait left", value: "270", icon: "monitor", iconRotation: -90 },
+    { label: "Landscape (flipped)", value: "180", icon: "monitor", iconRotation: 180 }
+  ]
+
   readonly property var rows: {
     const m = monitor;
     if (!m) return [];
     const result = [];
+    const orientation = orientations.find(o => o.value === m.orientation) || orientations[0];
+    result.push({ key: "orientation", title: "Orientation", value: orientation.label, current: orientation.value,
+                  options: orientations });
     if (m.scales.length > 1)
       result.push({ key: "scale", title: "Scale", value: percent(m.scale), current: String(m.scale),
                     options: m.scales.map(s => ({ label: percent(s), value: String(s) })) });
@@ -107,7 +119,7 @@ Settings.Modal {
           y: Math.round(originY + previewArea.inset)
           width: Math.max(20, Math.round(originX + modelData.logical.width * previewArea.layout.scale - previewArea.inset) - x)
           height: Math.max(20, Math.round(originY + modelData.logical.height * previewArea.layout.scale - previewArea.inset) - y)
-          label: modelData.number + " · " + modelData.label
+          label: modelData.number + "\u00a0\u00b7 " + modelData.label
           detail: modelData.name
           selected: root.several && modelData.name === root.service.selectedName
           hovered: tileHover.hovered

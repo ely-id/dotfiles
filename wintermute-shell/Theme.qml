@@ -264,6 +264,22 @@ Singleton {
   readonly property int settingsInfoFooterTop: 536       // "Wintermute Shell" Serif 17 (caixa de 24) e a versão Mono 11 muted
   readonly property int settingsInfoGridX: 398           // grade de "+" 7×3 de 152×56, passo 20
   readonly property int settingsInfoGridCell: 20
+  // Manual (Figma 13:16158): modal de 500×656 sem título
+  readonly property int settingsManualWidth: 500
+  readonly property int settingsManualHeight: 656
+  readonly property int settingsManualSwitcherTop: 24     // seletor Keyboard / Touchpad de 168×40, centrado
+  readonly property int settingsManualContentWidth: 440   // tutorial, lista e botão, em x 30
+  readonly property int settingsManualTutorialTop: 80     // tutorial de 440×240, raio 16, cardHover com borda border
+  readonly property int settingsManualTutorialHeight: 240
+  readonly property int settingsManualCaptionTop: 192     // legenda 13 Medium muted numa caixa de 440×24
+  readonly property int settingsManualCaptionHeight: 24
+  readonly property int settingsManualListTop: 336        // linhas de 44; a área de seis linhas rola (P-52)
+  readonly property int settingsManualRowPitch: 44
+  readonly property int settingsManualVisibleRows: 6
+  readonly property int settingsManualKeyGap: 4           // entre as teclas de uma linha
+  readonly property int settingsManualLabelWidth: 230     // descrição 13 Medium muted, alinhada à direita
+  readonly property int settingsManualButtonTop: 604      // "Got it" de 440×40, raio 10
+  readonly property int settingsManualButtonHeight: 40
   readonly property int launcherWidth: 640
   readonly property int launcherSearchHeight: 56
   readonly property int launcherFooterHeight: 44

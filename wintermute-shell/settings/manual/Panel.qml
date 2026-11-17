@@ -1,120 +1,151 @@
+pragma ComponentBehavior: Bound
 import QtQuick
-import Quickshell.Widgets
+import "." as Manual
 import ".." as Settings
 import "../.." as Shell
 
+// Manual (ficha 13; Figma 13:16158): modal de 500×656 sem título. Em cima, o seletor Keyboard / Touchpad
+// de 168×40, que só troca o tutorial de 440×240. Embaixo, a lista de atalhos em linhas de 44 (teclas à
+// esquerda, descrição 13 Medium muted à direita, divisor border de 1) e o botão "Got it" de 440×40.
+// A lista é a minha, completa (P-11 e P-52): ela rola na área das seis linhas do Figma e o botão fica
+// fixo. Lê a lista por `service` (decisão 0011).
 Settings.Modal {
   id: root
   objectName: "manualPanel"
-  color: Settings.Style.card
-  fill: null
-  showOutline: false
+
+  property var service: Manual.State
+  property string mode: "keyboard"
+  // Só para a vitrine e os prints: tutorial parado e a lista já rolada até uma linha.
+  property bool animated: true
+  property int firstRow: 0
+
+  readonly property int pitch: Shell.Theme.settingsManualRowPitch
+
   title: ""
-  implicitWidth: 500
-  implicitHeight: Math.min(672, availableHeight)
+  implicitWidth: Shell.Theme.settingsManualWidth
   bodyTop: 0
-  contentHeight: manual.height
-  roundedContent: true
-  closeButtonY: -17
+  contentHeight: Shell.Theme.settingsManualHeight
   closeLabel: "Close manual"
   Accessible.role: Accessible.Dialog
-  Accessible.name: "User Manual"
+  Accessible.name: "Manual"
   onBackRequested: Settings.State.back()
   Keys.onEscapePressed: Settings.State.back()
-  Keys.onDownPressed: scrollBy(56)
-  Keys.onUpPressed: scrollBy(-56)
+  Keys.onReturnPressed: Settings.State.back()
+  Keys.onEnterPressed: Settings.State.back()
+  Keys.onDownPressed: scrollBy(pitch)
+  Keys.onUpPressed: scrollBy(-pitch)
   Keys.onPressed: event => {
     if (event.key === Qt.Key_PageDown || event.key === Qt.Key_PageUp) {
-      scrollBy((scrollItem.height - 40) * (event.key === Qt.Key_PageDown ? 1 : -1));
+      scrollBy((list.height - 1 - pitch) * (event.key === Qt.Key_PageDown ? 1 : -1));
       event.accepted = true;
     } else if (event.key === Qt.Key_Home) {
-      scrollItem.contentY = 0;
+      list.contentY = 0;
       event.accepted = true;
     } else if (event.key === Qt.Key_End) {
-      scrollItem.contentY = Math.max(0, contentHeight - scrollItem.height);
+      list.contentY = Math.max(0, list.contentHeight - list.height);
       event.accepted = true;
     }
   }
 
   function scrollBy(distance) {
-    scrollItem.contentY = Math.max(0, Math.min(contentHeight - scrollItem.height, scrollItem.contentY + distance));
+    list.contentY = Math.max(0, Math.min(list.contentHeight - list.height, list.contentY + distance));
   }
 
-  Item {
-    id: manual
-    objectName: "manualContent"
-    width: 500; height: 3422
-    Item {
-      width: 500; height: 1538
-      clip: true
-      Image {
-        width: 500; height: 2984
-        source: Qt.resolvedUrl("../../assets/manual/manual.svg")
-        sourceSize.width: width * Screen.devicePixelRatio
-      }
-    }
-    Item {
-      y: 1976; width: 500; height: 1446
-      clip: true
-      Image {
-        y: -1538; width: 500; height: 2984
-        source: Qt.resolvedUrl("../../assets/manual/manual.svg")
-        sourceSize.width: width * Screen.devicePixelRatio
-      }
-    }
-    NavigationTutorial {
-      x: 30; y: 1566
-      active: y + height > root.scrollItem.contentY && y < root.scrollItem.contentY + root.scrollItem.height
-    }
-    Item {
-      id: note
-      objectName: "manualSuperNote"
-      x: 30; y: 961; width: 440; height: 66
-      HoverHandler { id: noteHover }
-      Image {
-        anchors.fill: parent
-        visible: noteHover.hovered
-        source: Qt.resolvedUrl("../../assets/manual/super-note-hover.svg")
-        sourceSize.width: width * Screen.devicePixelRatio
-      }
-    }
+  Shell.SegmentedSelector {
+    objectName: "manualMode"
+    x: Math.round((root.width - width) / 2)
+    y: Shell.Theme.settingsManualSwitcherTop
+    model: [{ key: "keyboard", label: "Keyboard", width: 80 }, { key: "touchpad", label: "Touchpad", width: 80 }]
+    current: root.mode
+    onSelected: key => root.mode = key
+  }
 
-    Row {
-      x: 180; y: 3332; spacing: 10
-      FooterButton { service: "discord" }
-      FooterButton { service: "x" }
-      FooterButton { service: "mail" }
+  Manual.NavigationTutorial {
+    objectName: "manualTutorial"
+    x: Shell.Theme.settingsBodyInset
+    y: Shell.Theme.settingsManualTutorialTop
+    mode: root.mode
+    active: root.animated
+  }
+
+  Flickable {
+    id: list
+    objectName: "manualShortcuts"
+    x: Shell.Theme.settingsBodyInset
+    y: Shell.Theme.settingsManualListTop
+    width: Shell.Theme.settingsManualContentWidth
+    // O divisor de cada linha cai no primeiro pixel da linha seguinte, por isso o 1 a mais.
+    height: Shell.Theme.settingsManualVisibleRows * root.pitch + 1
+    contentHeight: root.service.rows.length * root.pitch + 1
+    contentY: Math.max(0, Math.min(contentHeight - height, root.firstRow * root.pitch))
+    clip: true
+    boundsBehavior: Flickable.StopAtBounds
+    interactive: contentHeight > height
+    Shell.ScrollWheel { view: list }
+
+    Repeater {
+      model: root.service.rows
+      delegate: Item {
+        id: row
+        required property var modelData
+        required property int index
+        y: index * root.pitch
+        width: list.width
+        height: root.pitch
+        Accessible.role: Accessible.ListItem
+        Accessible.name: modelData.keys.join(" + ") + ": " + modelData.label
+
+        Row {
+          anchors.verticalCenter: parent.verticalCenter
+          spacing: Shell.Theme.settingsManualKeyGap
+          Repeater {
+            model: row.modelData.keys
+            delegate: Shell.KeyCap {
+              required property string modelData
+              text: modelData
+            }
+          }
+        }
+
+        Text {
+          x: parent.width - width
+          width: Shell.Theme.settingsManualLabelWidth
+          height: parent.height
+          horizontalAlignment: Text.AlignRight
+          verticalAlignment: Text.AlignVCenter
+          elide: Text.ElideRight
+          text: row.modelData.label
+          color: Shell.Theme.muted
+          font.family: Shell.Theme.fontFamily
+          font.weight: Font.Medium
+          font.pixelSize: Shell.Theme.fontBody
+          font.letterSpacing: 0
+        }
+
+        Rectangle {
+          y: parent.height
+          width: parent.width
+          height: 1
+          color: Shell.Theme.border
+        }
+      }
     }
   }
 
-  // Keep the visualizer outside the rounded, scrolling document clip.
-  overlay: Item {
-    objectName: "manualSuperKeyTip"
-    x: root.width + 10; y: note.y - 33 - root.scrollItem.contentY
-    width: 231; height: 144
-    visible: noteHover.hovered
-    Accessible.role: Accessible.ToolTip
-    Accessible.name: "The Super key is between Ctrl and Alt."
-
-    Item {
-      anchors { fill: parent; margins: -90; bottomMargin: -180 }
-      layer.enabled: true
-      layer.format: ShaderEffectSource.RGBA16F
-      Shell.Shadow {
-        anchors { fill: parent; margins: 90; bottomMargin: 180 }
-        cornerRadius: 24
-        shadows: Shell.PanelStyle.controlShadows.map(s => Object.assign({}, s, { blur: s.blur * 2.4 }))
-      }
-    }
-    ClippingRectangle {
-      anchors.fill: parent
-      radius: 24
-      color: Settings.Style.card
-      Image {
-        anchors.fill: parent
-        source: Qt.resolvedUrl("../../assets/manual/super-tip.svg")
-        sourceSize.width: width * Screen.devicePixelRatio
-      }
-    }
+  Shell.ActionButton {
+    objectName: "manualGotIt"
+    x: Shell.Theme.settingsBodyInset
+    y: Shell.Theme.settingsManualButtonTop
+    width: Shell.Theme.settingsManualContentWidth
+    height: Shell.Theme.settingsManualButtonHeight
+    kind: "primary"
+    compact: true
+    text: "Got it"
+    activeFocusOnTab: true
+    Accessible.role: Accessible.Button
+    Accessible.name: text
+    Accessible.onPressAction: Settings.State.back()
+    Keys.onSpacePressed: Settings.State.back()
+    onClicked: Settings.State.back()
   }
 }

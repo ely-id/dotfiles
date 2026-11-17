@@ -36,6 +36,8 @@ Com a shell aberta, aciono ações pelo IPC do Quickshell (`qs -p ~/Projects/dot
 - **Tema e tokens (`Theme.qml`):** única fonte de verdade em código para cores, tipografia, raios, sombras, medidas e durações. Espelha `../docs/design/tokens/tokens.json`.
 - **Variação ativa (`~/.config/wintermute-shell/theme.json`):** guarda a escolha entre `"chiba"`, `"freeside"` e `"sprawl"`. Pode ser trocada pelos três discos da página **Aparência** nos Ajustes ou gravando `{"theme": "chiba"}` no arquivo; o `FileView` de `Theme.qml` observa o arquivo e aplica a mudança na hora.
 - **Atalhos e IPC (`Shortcuts.qml` e `shell.qml`):** definem os receptores IPC que os atalhos do Niri chamam.
+- **Lista de atalhos do Manual (`settings/manual/shortcuts.json`):** um atalho por linha, com `keys` (as teclas, na ordem) e `label` (o que ele faz, em inglês). A ordem do arquivo é a ordem da lista. O arquivo só descreve os atalhos; quem os define é a configuração do Niri.
+- **Primeira execução (`~/.local/state/wintermute-shell/manual-shown`):** o Manual abre sozinho na primeira vez que a shell roda e cria esse arquivo. Apagar o arquivo faz o Manual abrir de novo na próxima vez.
 
 ## Mapa das pastas
 

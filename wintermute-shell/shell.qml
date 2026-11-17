@@ -40,14 +40,18 @@ ShellRoot {
 
   IdleFade {}
 
-  // A abertura automática do Manual na primeira execução fica desligada até a
-  // F4 redesenhar settings/manual/Panel.qml (o SVG de 2,9 MB da origem não foi
-  // baixado). O caminho já aponta para wintermute-shell/manual-shown.
+  // O Manual abre sozinho na primeira vez que a shell roda (ficha 13). O arquivo
+  // manual-shown marca que ele já foi visto; sem o arquivo, abro o Manual e o crio.
   FileView {
     path: Quickshell.screens.length
         ? (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/wintermute-shell/manual-shown"
         : ""
     printErrors: false
+    onLoadFailed: error => {
+      if (error !== FileViewError.FileNotFound) return;
+      Settings.State.open("", "manual");
+      Qt.callLater(() => setText("shown\n"));
+    }
   }
 
   IpcHandler {

@@ -1,147 +1,154 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import Quickshell.Widgets
-import "../information" as Information
-import ".." as Settings
+import QtQuick.Effects
 import "../.." as Shell
 
-Item {
+// Tutorial do Manual (ficha 13; Figma 13:16161): quadro de 440×240, raio 16, em cardHover com borda
+// border, e a legenda 13 Medium muted numa caixa de 440×24 em y 192.
+// - Touchpad (desenhado no Figma): touchpad de 200×128 em (120,48), control com borda borderStrong,
+//   três dedos de 16 em accentText a 90% e quatro setas chevron de 16 em accentText.
+// - Keyboard (P-53): o Figma não desenha. É o mini teclado de 209×86 e o mouse de 40×56 da origem, em
+//   (84,69), com as cores dos tokens. Colunas são Super + A / D, como no meu keybinds.kdl (P-54).
+// A sequência e os tempos da animação são os da origem (P-55). Parado, mostra o quadro do Figma.
+Rectangle {
   id: root
-  property bool active: true
+
   property string mode: "keyboard"
+  property bool active: true
   readonly property bool live: active && visible
 
-  readonly property color accent: Shell.PanelStyle.accent
-  readonly property color outline: "#4a4a4a"
+  readonly property color accent: Shell.Theme.accentText
+  readonly property color outline: Shell.Theme.borderStrong
 
-  readonly property real columnStep: 313
-  readonly property real rowStep: 206
-  property real panX: 0
-  property real panY: 0
+  // Dedos no quadro do Figma, e até onde deslizam: 8 px antes de cada seta.
+  readonly property real fingersRestX: 64
+  readonly property real fingersRestY: 56
+  readonly property real swipeX: 16
+  readonly property real swipeY: 8
 
   property real superFill: 0
-  property color shiftOutline: outline
-  property real shiftFill: 0
+  property real leftFill: 0
+  property real rightFill: 0
+  property color columnOutline: outline
   property real wheelFill: 0
   property real wheelY: 0
   readonly property real wheelCenter: 10 + 16 * wheelY
 
-  property real fingersX: 64
-  property real fingersY: 42
-  property real fingersFill: 0
+  property real fingersX: fingersRestX
+  property real fingersY: fingersRestY
+  property real fingersFill: 1
   property real fingersOpacity: 1
 
   property real trailOpacity: 0
   property real trailDir: 1
   property real trailTail: 0
-  property bool trailVertical: false
   readonly property real wheelHead: trailDir > 0 ? Math.max(trailTail, wheelCenter - 5) : Math.min(trailTail, wheelCenter + 5)
-  readonly property real swipeLead: trailVertical
-      ? (trailDir < 0 ? fingersY + 28 : fingersY - 10)
-      : (trailDir < 0 ? fingersX + 54 : fingersX - 10)
-  readonly property real swipeHead: trailDir < 0 ? Math.min(trailTail, swipeLead) : Math.max(trailTail, swipeLead)
 
-  implicitWidth: 440
-  implicitHeight: 420
+  implicitWidth: Shell.Theme.settingsManualContentWidth
+  implicitHeight: Shell.Theme.settingsManualTutorialHeight
+  radius: Shell.Theme.radiusCard
+  color: Shell.Theme.cardHover
+  border.width: 1
+  border.color: Shell.Theme.border
+  antialiasing: true
+
+  onModeChanged: {
+    if (mode === "touchpad") { fingersX = fingersRestX; fingersY = fingersRestY; fingersOpacity = 1; }
+    if (live) switchMotion.restart();
+  }
+  onLiveChanged: if (!live) rest()
+
+  // O quadro parado: o do Figma na aba Touchpad, e o teclado só com a Super contornada.
+  function rest() {
+    switchMotion.stop();
+    resetKeyboard();
+    resetTouchpad();
+    fingersFill = 1;
+  }
 
   function resetKeyboard() {
-    panX = 0; panY = 0; trailOpacity = 0;
-    shiftOutline = outline; superFill = 0; shiftFill = 0; wheelFill = 0; wheelY = 0;
+    trailOpacity = 0;
+    columnOutline = outline; superFill = 0; leftFill = 0; rightFill = 0; wheelFill = 0; wheelY = 0;
   }
 
-  function resetTrackpad() {
-    panX = 0; panY = 0; trailOpacity = 0;
-    fingersX = 64; fingersY = 42; fingersFill = 0; fingersOpacity = 1;
+  function resetTouchpad() {
+    fingersX = fingersRestX; fingersY = fingersRestY; fingersFill = 0; fingersOpacity = 1;
   }
 
-  function startTrail(move, to) {
-    const from = root[move];
-    trailDir = to < from ? -1 : 1;
-    trailVertical = move !== "fingersX";
-    trailTail = move === "wheelY" ? wheelCenter - 6 * trailDir
-        : trailDir < 0 ? from + (trailVertical ? 18 : 44) : from;
+  function startTrail(to) {
+    trailDir = to < wheelY ? -1 : 1;
+    trailTail = wheelCenter - 6 * trailDir;
     trailOpacity = 1;
-  }
-
-  function select(next) {
-    if (next === mode) return;
-    if (next === "trackpad") { fingersX = 64; fingersY = 42; fingersOpacity = 1; }
-    switchMotion.restart();
-    mode = next;
-  }
-
-  component MiniWindow: Rectangle {
-    id: miniWindow
-    height: 200
-    radius: 8
-    color: "#303030"
-    Repeater {
-      model: 3
-      Rectangle {
-        required property int index
-        x: miniWindow.width - 14 - 12 * index; y: 6
-        width: 8; height: 8; radius: 4
-        color: "transparent"
-        border.width: 1; border.color: Qt.rgba(1, 1, 1, 0.2)
-      }
-    }
-    Rectangle { x: 6; y: 20; width: miniWindow.width - 12; height: 1; color: Qt.rgba(1, 1, 1, 0.2) }
   }
 
   component Trail: Rectangle {
     id: trail
-    property bool vertical: true
     property real tail: 0
     property real head: 0
     property real cross: 0
-    property real thickness: 1
+    property real thickness: 2
     property color tailColor: "transparent"
-    property color headColor: Shell.Theme.colors.text
+    property color headColor: Shell.Theme.text
     readonly property bool reversed: head < tail
     readonly property real length: Math.abs(head - tail)
-    x: vertical ? Math.round(cross - thickness / 2) : Math.min(tail, head)
-    y: vertical ? Math.min(tail, head) : Math.round(cross - thickness / 2)
-    width: vertical ? thickness : length
-    height: vertical ? length : thickness
+    x: Math.round(cross - thickness / 2)
+    y: Math.min(tail, head)
+    width: thickness
+    height: length
     radius: thickness / 2
     visible: opacity > 0 && length > 0
     gradient: Gradient {
-      orientation: trail.vertical ? Gradient.Vertical : Gradient.Horizontal
       GradientStop { position: 0; color: trail.reversed ? trail.headColor : trail.tailColor }
       GradientStop { position: 1; color: trail.reversed ? trail.tailColor : trail.headColor }
     }
   }
 
-  component Gesture: SequentialAnimation {
-    id: gesture
+  // Super + roda: acende, a roda anda com o rastro, apaga.
+  component Scroll: SequentialAnimation {
+    id: scroll
     property Item host
-    property string fills
-    property string move
-    property real moveTo
-    property string pan
-    property real panTo
-    readonly property bool keyboard: move === "wheelY"
-    NumberAnimation { target: gesture.host; properties: gesture.fills; to: 1; duration: gesture.keyboard ? 160 : 220; easing.type: Easing.OutCubic }
-    PauseAnimation { duration: gesture.keyboard ? 140 : 160 }
-    ScriptAction { script: gesture.host.startTrail(gesture.move, gesture.moveTo) }
+    property real to
+    NumberAnimation { target: scroll.host; properties: "superFill,wheelFill"; to: 1; duration: 160; easing.type: Easing.OutCubic }
+    PauseAnimation { duration: 140 }
+    ScriptAction { script: scroll.host.startTrail(scroll.to) }
+    NumberAnimation { target: scroll.host; property: "wheelY"; to: scroll.to; duration: 720; easing.type: Easing.InOutCubic }
     ParallelAnimation {
-      NumberAnimation { target: gesture.host; property: gesture.move; to: gesture.moveTo; duration: 720; easing.type: Easing.InOutCubic }
-      NumberAnimation { target: gesture.host; property: gesture.pan; to: gesture.panTo; duration: 720; easing.type: Easing.InOutCubic }
-    }
-    ParallelAnimation {
-      NumberAnimation { target: gesture.host; property: "trailOpacity"; to: 0; duration: 450; easing.type: Easing.OutCubic }
-      NumberAnimation { target: gesture.host; properties: gesture.fills; to: 0; duration: gesture.keyboard ? 240 : 280; easing.type: Easing.OutCubic }
+      NumberAnimation { target: scroll.host; property: "trailOpacity"; to: 0; duration: 450; easing.type: Easing.OutCubic }
+      NumberAnimation { target: scroll.host; properties: "superFill,wheelFill"; to: 0; duration: 240; easing.type: Easing.OutCubic }
     }
   }
 
-  component MoveFingers: SequentialAnimation {
-    id: moveFingers
+  // Super + uma tecla: acende, segura o tempo de um gesto, apaga.
+  component Press: SequentialAnimation {
+    id: press
     property Item host
-    property real toX
-    property real toY
-    NumberAnimation { target: moveFingers.host; property: "fingersOpacity"; to: 0; duration: 200; easing.type: Easing.InCubic }
-    ScriptAction { script: { moveFingers.host.fingersX = moveFingers.toX; moveFingers.host.fingersY = moveFingers.toY; } }
-    NumberAnimation { target: moveFingers.host; property: "fingersOpacity"; to: 1; duration: 280; easing.type: Easing.OutCubic }
+    property string fills
+    NumberAnimation { target: press.host; properties: press.fills; to: 1; duration: 160; easing.type: Easing.OutCubic }
+    PauseAnimation { duration: 140 + 720 }
+    ParallelAnimation {
+      PauseAnimation { duration: 450 }
+      NumberAnimation { target: press.host; properties: press.fills; to: 0; duration: 240; easing.type: Easing.OutCubic }
+    }
+  }
+
+  // Três dedos: encostam, deslizam, soltam.
+  component Swipe: SequentialAnimation {
+    id: swipe
+    property Item host
+    property string move
+    property real to
+    NumberAnimation { target: swipe.host; property: "fingersFill"; to: 1; duration: 220; easing.type: Easing.OutCubic }
+    PauseAnimation { duration: 160 }
+    NumberAnimation { target: swipe.host; property: swipe.move; to: swipe.to; duration: 720; easing.type: Easing.InOutCubic }
+    NumberAnimation { target: swipe.host; property: "fingersFill"; to: 0; duration: 280; easing.type: Easing.OutCubic }
+  }
+
+  component Recenter: SequentialAnimation {
+    id: recenter
+    property Item host
+    NumberAnimation { target: recenter.host; property: "fingersOpacity"; to: 0; duration: 200; easing.type: Easing.InCubic }
+    ScriptAction { script: { recenter.host.fingersX = recenter.host.fingersRestX; recenter.host.fingersY = recenter.host.fingersRestY; } }
+    NumberAnimation { target: recenter.host; property: "fingersOpacity"; to: 1; duration: 280; easing.type: Easing.OutCubic }
   }
 
   component Fade: Behavior {
@@ -158,146 +165,96 @@ Item {
     loops: Animation.Infinite
     ScriptAction { script: root.resetKeyboard() }
     PauseAnimation { duration: 300 }
-    Gesture { host: root; fills: "superFill,wheelFill"; move: "wheelY"; moveTo: 1; pan: "panY"; panTo: -root.rowStep }
+    Scroll { host: root; to: 1 }
     PauseAnimation { duration: 450 }
-    Gesture { host: root; fills: "superFill,wheelFill"; move: "wheelY"; moveTo: 0; pan: "panY"; panTo: 0 }
+    Scroll { host: root; to: 0 }
     PauseAnimation { duration: 150 }
-    ColorAnimation { target: root; property: "shiftOutline"; to: root.accent; duration: 280 }
+    ColorAnimation { target: root; property: "columnOutline"; to: root.accent; duration: 280 }
     PauseAnimation { duration: 300 }
-    Gesture { host: root; fills: "superFill,shiftFill,wheelFill"; move: "wheelY"; moveTo: 1; pan: "panX"; panTo: -root.columnStep }
+    Press { host: root; fills: "superFill,leftFill" }
     PauseAnimation { duration: 450 }
-    Gesture { host: root; fills: "superFill,shiftFill,wheelFill"; move: "wheelY"; moveTo: 0; pan: "panX"; panTo: 0 }
+    Press { host: root; fills: "superFill,rightFill" }
     PauseAnimation { duration: 150 }
-    ColorAnimation { target: root; property: "shiftOutline"; to: root.outline; duration: 280 }
+    ColorAnimation { target: root; property: "columnOutline"; to: root.outline; duration: 280 }
   }
 
   SequentialAnimation {
-    id: trackpadLoop
-    running: root.live && root.mode === "trackpad" && !switchMotion.running
+    id: touchpadLoop
+    running: root.live && root.mode === "touchpad" && !switchMotion.running
     loops: Animation.Infinite
-    ScriptAction { script: root.resetTrackpad() }
+    ScriptAction { script: root.resetTouchpad() }
     PauseAnimation { duration: 150 }
-    Gesture { host: root; fills: "fingersFill"; move: "fingersX"; moveTo: 16; pan: "panX"; panTo: -root.columnStep }
-    PauseAnimation { duration: 450 }
-    Gesture { host: root; fills: "fingersFill"; move: "fingersX"; moveTo: 64; pan: "panX"; panTo: 0 }
+    Swipe { host: root; move: "fingersX"; to: root.fingersRestX - root.swipeX }
     PauseAnimation { duration: 100 }
-    MoveFingers { host: root; toX: 40; toY: 68 }
+    Recenter { host: root }
     PauseAnimation { duration: 150 }
-    Gesture { host: root; fills: "fingersFill"; move: "fingersY"; moveTo: 16; pan: "panY"; panTo: -root.rowStep }
-    PauseAnimation { duration: 450 }
-    Gesture { host: root; fills: "fingersFill"; move: "fingersY"; moveTo: 68; pan: "panY"; panTo: 0 }
+    Swipe { host: root; move: "fingersX"; to: root.fingersRestX + root.swipeX }
     PauseAnimation { duration: 100 }
-    MoveFingers { host: root; toX: 64; toY: 42 }
+    Recenter { host: root }
+    PauseAnimation { duration: 150 }
+    Swipe { host: root; move: "fingersY"; to: root.fingersRestY - root.swipeY }
+    PauseAnimation { duration: 100 }
+    Recenter { host: root }
+    PauseAnimation { duration: 150 }
+    Swipe { host: root; move: "fingersY"; to: root.fingersRestY + root.swipeY }
+    PauseAnimation { duration: 100 }
+    Recenter { host: root }
   }
 
   SequentialAnimation {
     id: switchMotion
     ParallelAnimation {
-      NumberAnimation { target: root; properties: "panX,panY"; to: 0; duration: 720; easing.type: Easing.InOutCubic }
       NumberAnimation { target: root; property: "trailOpacity"; to: 0; duration: 220; easing.type: Easing.OutCubic }
-      NumberAnimation { target: root; properties: "superFill,shiftFill,wheelFill,fingersFill,wheelY"; to: 0; duration: 300; easing.type: Easing.OutCubic }
-      ColorAnimation { target: root; property: "shiftOutline"; to: root.outline; duration: 300 }
+      NumberAnimation { target: root; properties: "superFill,leftFill,rightFill,wheelFill,fingersFill,wheelY"; to: 0; duration: 300; easing.type: Easing.OutCubic }
+      ColorAnimation { target: root; property: "columnOutline"; to: root.outline; duration: 300 }
     }
     PauseAnimation { duration: 200 }
   }
 
-  ClippingRectangle {
-    width: 440; height: 224; radius: 18.457
-    color: "transparent"
-    Item {
-      x: root.panX; y: root.panY
-      MiniWindow { x: 12; y: 12; width: 307 }
-      MiniWindow { x: 325; y: 12; width: 205 }
-      MiniWindow { x: 536; y: 12; width: 205 }
-      MiniWindow { x: 12; y: 218; width: 240 }
-      MiniWindow { x: 258; y: 218; width: 170 }
-      MiniWindow { x: 434; y: 218; width: 307 }
-    }
-  }
-
-  Rectangle {
-    width: 440; height: 224; radius: 18.457
-    color: "transparent"
-    border.width: 1; border.color: root.outline
-  }
-
-  Rectangle {
-    x: 110; y: 204; width: 220; height: 40; radius: 20
-    color: "#1d1d1d"
-    border.width: 1; border.color: root.outline
-    Rectangle {
-      x: root.mode === "keyboard" ? 4 : 110; y: 4
-      width: 106; height: 32; radius: 16
-      color: Qt.alpha(root.accent, 0.1)
-    }
-    Repeater {
-      model: [{id: "keyboard", label: "Keyboard"}, {id: "trackpad", label: "Trackpad"}]
-      delegate: MouseArea {
-        id: tab
-        required property var modelData
-        required property int index
-        readonly property bool selected: root.mode === modelData.id
-        x: index === 0 ? 4 : 110; y: 4
-        width: 106; height: 32
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: root.select(modelData.id)
-        Rectangle {
-          anchors.fill: parent; radius: 16
-          color: Qt.rgba(1, 1, 1, 0.1)
-          opacity: tab.containsMouse && !tab.selected ? 1 : 0
-          Behavior on opacity { NumberAnimation { duration: Settings.Style.hoverDuration } }
-        }
-        Information.Label {
-          width: parent.width; capY: 11
-          horizontalAlignment: Text.AlignHCenter
-          text: tab.modelData.label
-          font.pixelSize: 13; font.weight: Font.Medium; font.letterSpacing: 0
-          color: tab.selected ? root.accent : Shell.Theme.colors.text
-          opacity: tab.selected || tab.containsMouse ? 1 : 0.6
-          Behavior on color { ColorAnimation { duration: 240 } }
-          Behavior on opacity { NumberAnimation { duration: Settings.Style.hoverDuration } }
-        }
-      }
-    }
-  }
-
+  // ---- aba Keyboard: mini teclado e mouse da origem ----
   Item {
-    y: 274 + 8 * (1 - opacity)
-    width: 440; height: 86
+    objectName: "manualTutorialKeyboard"
+    x: 84; y: 69 + 8 * (1 - opacity)
+    width: 273; height: 86
     opacity: root.mode === "keyboard" ? 1 : 0
     visible: opacity > 0
     Fade on opacity {}
+
     Repeater {
       model: [
         [0, 0, 28, "tl"], [30, 0, 20], [52, 0, 20], [75, 0, 20], [97, 0, 20], [119, 0, 20], [141, 0, 20], [163, 0, 20], [185, 0, 24, "tr"],
-        [0, 22, 32], [34, 22, 20], [56, 22, 20], [78, 22, 20], [100, 22, 20], [122, 22, 20], [144, 22, 20], [166, 22, 20], [188, 22, 21],
-        [0, 44, 36, "shift"], [38, 44, 20], [60, 44, 20], [82, 44, 20], [104, 44, 20], [126, 44, 20], [148, 44, 20], [170, 44, 39],
+        [0, 22, 32], [34, 22, 20, "left"], [56, 22, 20], [78, 22, 20, "right"], [100, 22, 20], [122, 22, 20], [144, 22, 20], [166, 22, 20], [188, 22, 21],
+        [0, 44, 36], [38, 44, 20], [60, 44, 20], [82, 44, 20], [104, 44, 20], [126, 44, 20], [148, 44, 20], [170, 44, 39],
         [0, 66, 20, "bl"], [22, 66, 20, "super"], [45, 66, 20], [67, 66, 76], [145, 66, 20], [167, 66, 20], [189, 66, 20, "br"]
       ]
       delegate: Rectangle {
         required property var modelData
         readonly property string role: modelData[3] || ""
-        x: 84 + modelData[0]; y: modelData[1]
+        readonly property real fill: role === "super" ? root.superFill
+            : role === "left" ? root.leftFill
+            : role === "right" ? root.rightFill : 0
+        x: modelData[0]; y: modelData[1]
         width: modelData[2]; height: 20
         topLeftRadius: role === "tl" ? 8 : 2
         topRightRadius: role === "tr" ? 8 : 2
         bottomRightRadius: role === "br" ? 8 : 2
         bottomLeftRadius: role === "bl" ? 8 : 2
-        color: role === "super" ? Qt.alpha(root.accent, root.superFill) : role === "shift" ? Qt.alpha(root.accent, root.shiftFill) : "transparent"
+        color: Qt.alpha(root.accent, fill)
         border.width: 1
-        border.color: role === "super" ? root.accent : role === "shift" ? root.shiftOutline : root.outline
+        border.color: role === "super" ? root.accent
+            : role === "left" || role === "right" ? root.columnOutline : root.outline
+        antialiasing: true
       }
     }
+
     Rectangle {
-      x: 317; width: 40; height: 56; radius: 12
+      x: 233; width: 40; height: 56; radius: 12
       color: "transparent"
       border.width: 1; border.color: root.outline
+      antialiasing: true
       Trail {
-        vertical: true
         tail: root.trailTail; head: root.wheelHead; cross: 20
-        thickness: 2
-        tailColor: "#00776191"; headColor: root.accent
+        tailColor: Qt.alpha(root.accent, 0); headColor: root.accent
         opacity: root.trailOpacity
       }
       Rectangle {
@@ -305,40 +262,77 @@ Item {
         width: 10; height: 10; radius: 5
         color: Qt.alpha(root.accent, root.wheelFill)
         border.width: 1; border.color: root.accent
+        antialiasing: true
       }
     }
   }
 
+  // ---- aba Touchpad: Figma 13:16162 ----
   Rectangle {
-    x: 158; y: 274 + 8 * (1 - opacity)
-    width: 124; height: 102; radius: 12
-    color: "transparent"
+    objectName: "manualTutorialTouchpad"
+    x: 120; y: 48 + 8 * (1 - opacity)
+    width: 200; height: 128
+    radius: Shell.Theme.radiusRow
+    color: Shell.Theme.control
     border.width: 1; border.color: root.outline
-    opacity: root.mode === "trackpad" ? 1 : 0
+    antialiasing: true
+    opacity: root.mode === "touchpad" ? 1 : 0
     visible: opacity > 0
     Fade on opacity {}
-    Trail {
-      vertical: root.trailVertical
-      tail: root.trailTail; head: root.swipeHead
-      cross: root.trailVertical ? root.fingersX + 22 : root.fingersY + 9
-      thickness: 1
-      tailColor: Qt.alpha(root.accent, 0); headColor: root.accent
-      opacity: root.trailOpacity
+
+    Repeater {
+      model: [["up", 92, 24], ["down", 92, 88], ["left", 24, 56], ["right", 160, 56]]
+      delegate: Image {
+        required property var modelData
+        x: modelData[1]; y: modelData[2]
+        width: 16; height: 16
+        source: Qt.resolvedUrl("../../icons/chevron-" + modelData[0] + ".svg")
+        sourceSize: Qt.size(32, 32)
+        smooth: true
+        layer.enabled: true
+        layer.effect: MultiEffect { colorization: 1; colorizationColor: root.accent }
+      }
     }
+
     Item {
       x: root.fingersX; y: root.fingersY
-      width: 44; height: 18
+      width: 72; height: 16
       opacity: root.fingersOpacity
       Repeater {
-        model: [[0, 6], [16, 0], [32, 6]]
+        model: 3
         delegate: Rectangle {
-          required property var modelData
-          x: modelData[0]; y: modelData[1]
-          width: 12; height: 12; radius: 6
-          color: Qt.alpha(root.accent, root.fingersFill)
-          border.width: 1; border.color: root.accent
+          required property int index
+          x: 28 * index
+          width: 16; height: 16; radius: 8
+          color: Qt.alpha(root.accent, 0.9 * root.fingersFill)
+          border.width: 1; border.color: Qt.alpha(root.accent, 0.9)
+          antialiasing: true
         }
       }
+    }
+  }
+
+  Repeater {
+    model: [
+      { mode: "keyboard", text: "Super + wheel ↕ workspaces · Super + A / D ↔ columns" },
+      { mode: "touchpad", text: "3 fingers ↕ workspaces · 3 fingers ↔ columns" }
+    ]
+    delegate: Text {
+      required property var modelData
+      y: Shell.Theme.settingsManualCaptionTop
+      width: root.width
+      height: Shell.Theme.settingsManualCaptionHeight
+      horizontalAlignment: Text.AlignHCenter
+      verticalAlignment: Text.AlignVCenter
+      text: modelData.text
+      color: Shell.Theme.muted
+      font.family: Shell.Theme.fontFamily
+      font.weight: Font.Medium
+      font.pixelSize: Shell.Theme.fontBody
+      font.letterSpacing: 0
+      opacity: root.mode === modelData.mode ? 1 : 0
+      visible: opacity > 0
+      Fade on opacity {}
     }
   }
 }

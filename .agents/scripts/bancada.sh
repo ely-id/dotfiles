@@ -129,10 +129,11 @@ for v in $variacoes; do
   kill "$pid" 2>/dev/null || true
   wait "$pid" 2>/dev/null || true
 
-  # O ruído do textinput do Wayland é do Qt e é inofensivo (nota da F10).
+  # Dois ruídos do Qt ficam de fora: o do textinput do Wayland (nota da F10) e o
+  # do portal, que recusa registrar um segundo app ID na mesma conexão.
   erros=$(grep -E 'ERROR|TypeError|ReferenceError|is not a type|is not installed|Cannot assign|Cannot override|BANCADA: não' "$log" \
-    | grep -v 'qt.qpa.wayland.textinput' || true)
-  avisos=$(grep -E 'WARN' "$log" | grep -v 'qt.qpa.wayland.textinput' || true)
+    | grep -vE 'qt.qpa.wayland.textinput|Failed to register with host portal' || true)
+  avisos=$(grep -E 'WARN' "$log" | grep -vE 'qt.qpa.wayland.textinput|Failed to register with host portal' || true)
   n_erros=$(printf '%s' "$erros" | grep -c . || true)
   n_avisos=$(printf '%s' "$avisos" | grep -c . || true)
   erros_total=$(( erros_total + n_erros ))

@@ -93,6 +93,8 @@ Singleton {
 
   function toggleOutputMute() {
     if (!hasOutput) return;
+    // Esta função já avisa abaixo; sem a janela, o observador de mudo avisaria uma segunda vez.
+    suppressExternalChanges(350);
     sink.audio.muted = !sink.audio.muted;
     keyboardOutputVolumeChanged(outputVolume);
   }
@@ -138,6 +140,48 @@ Singleton {
     if (Date.now() >= suppressExternalUntil)
       keyboardOutputVolumeChanged(outputVolume);
   }
+
+  // A tecla de mudo do Niri roda `wpctl set-mute ... toggle`, que muda o mudo sem mexer no volume,
+  // então o tratador do volume acima nunca vê essa troca. Este observador avisa o OSD quando o mudo
+  // muda por fora da shell.
+  //
+  // Não reaproveito o `observedSinkId` do volume: aquele tratador engole a primeira mudança de cada
+  // aparelho, e aqui isso faria a primeira tecla de mudo depois da subida sumir. Guardo em vez disso
+  // o último par (aparelho, mudo) que vi e o atualizo sempre, avisando só quando o aparelho é o
+  // mesmo e o mudo trocou. A subida (sem saída ou aparelho novo aparecendo) e a troca de aparelho só
+  // atualizam o par; a primeira tecla depois delas já encontra um par válido e avisa.
+  // Um detalhe sustenta isso: o `audio` do nó aparece com o mudo desligado e o valor de verdade chega
+  // alguns milissegundos depois, como uma troca de mudo no mesmo aparelho. Quem cala esse passo é a
+  // janela de 500 ms que o `onDefaultAudioSinkChanged`, mais abaixo, abre. Encurtar aquela janela faz
+  // o OSD aparecer sozinho na subida com a saída muda.
+  //
+  // Leio o aparelho direto do Pipewire, e não de `sink` e `outputMuted`, porque estes três sinais
+  // chegam em ordem indefinida e uma leitura atrasada de uma propriedade derivada faria o par errar.
+  QtObject {
+    id: muteWatch
+    property int sinkId: -1
+    property bool muted: false
+
+    function observe() {
+      const node = Pipewire.ready ? Pipewire.defaultAudioSink : null;
+      const audio = node ? node.audio : null;
+      const currentId = audio ? Number(node.id) : -1;
+      const currentMuted = !!(audio && audio.muted);
+      const sameDevice = currentId !== -1 && currentId === sinkId;
+      const changed = currentMuted !== muted;
+      sinkId = currentId;
+      muted = currentMuted;
+      if (sameDevice && changed && Date.now() >= root.suppressExternalUntil)
+        root.keyboardOutputVolumeChanged(root.outputVolume);
+    }
+  }
+
+  // Se o Pipewire já estiver pronto quando a shell sobe, nenhum sinal de mudança chega; sem esta
+  // chamada o par ficaria vazio e a primeira tecla de mudo seria tomada como "aparelho novo".
+  Component.onCompleted: muteWatch.observe()
+  onOutputMutedChanged: muteWatch.observe()
+  onSinkChanged: muteWatch.observe()
+  onHasOutputChanged: muteWatch.observe()
 
   Connections {
     target: Pipewire

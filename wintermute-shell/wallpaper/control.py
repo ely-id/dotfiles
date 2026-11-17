@@ -5,7 +5,8 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import subprocess
+import random
+import re
 import sys
 import tempfile
 
@@ -16,6 +17,8 @@ CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
 THUMBNAILS = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "pond-interface/wallpapers"
 THUMBNAIL_WIDTH = 800
 INCLUDED_WALLPAPERS = Path(__file__).resolve().parent / "included"
+PORTAL = "org.freedesktop.portal.Desktop"
+IMAGE_PATTERNS = ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.bmp", "*.gif", "*.svg", "*.PNG", "*.JPG", "*.JPEG"]
 
 
 def atomic_write(path, text):
@@ -147,16 +150,89 @@ def wallpaper(mode, path=""):
     return wallpapers()
 
 
+def portal_pick_file(title, filters, folder, failure):
+    """Abro o seletor de arquivo do sistema pelo portal e devolvo o caminho escolhido.
+
+    Devolvo None se eu cancelar e levanto RuntimeError(failure) nos demais casos.
+    O primeiro filtro da lista é o que abre selecionado; folder pode ser None.
+    O import do gi fica aqui dentro para o list e o set não pagarem por ele.
+    """
+    from gi.repository import Gio, GLib
+
+    def first_line(error):
+        # O strip_remote_error do Gio altera o GError in loco, e o PyGObject entrega uma cópia
+        # dele; por isso tiro o prefixo "GDBus.Error:nome.do.erro: " eu mesmo.
+        lines = re.sub(r"^GDBus\.Error:\S+:\s*", "", error.message.strip()).splitlines()
+        return lines[0] if lines else ""
+
+    def serialize(name, patterns):
+        return (name, [(0, pattern) for pattern in patterns])
+
+    try:
+        bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+    except GLib.Error as error:
+        raise RuntimeError(f"{failure}: {first_line(error)}") from None
+    # O caminho do pedido é previsível pelo nome da minha conexão e pelo token.
+    # Assino o Response antes de chamar, para a resposta não passar antes da assinatura.
+    token = f"wintermute_{random.randrange(10**9, 10**10)}"
+    expected = f"/org/freedesktop/portal/desktop/request/{bus.get_unique_name()[1:].replace('.', '_')}/{token}"
+    outcome = {}
+    loop = GLib.MainLoop()
+
+    def on_response(connection, sender, path, interface, signal, parameters, data):
+        outcome["response"], outcome["results"] = parameters.unpack()
+        loop.quit()
+
+    def on_vanished(connection, name):
+        # Se o portal sumir com o diálogo aberto, ninguém mais vai responder.
+        loop.quit()
+
+    def subscribe(path):
+        return bus.signal_subscribe(PORTAL, "org.freedesktop.portal.Request", "Response", path, None,
+                                    Gio.DBusSignalFlags.NONE, on_response, None)
+
+    subscription = subscribe(expected)
+    watch = None
+    try:
+        options = {"handle_token": GLib.Variant("s", token),
+                   "filters": GLib.Variant("a(sa(us))", [serialize(*item) for item in filters]),
+                   "current_filter": GLib.Variant("(sa(us))", serialize(*filters[0]))}
+        if folder is not None:
+            options["current_folder"] = GLib.Variant("ay", os.fsencode(folder) + b"\0")
+        try:
+            reply = bus.call_sync(PORTAL, "/org/freedesktop/portal/desktop", "org.freedesktop.portal.FileChooser",
+                                  "OpenFile", GLib.Variant("(ssa{sv})", ("", title, options)),
+                                  GLib.VariantType("(o)"), Gio.DBusCallFlags.NONE, -1, None)
+        except GLib.Error as error:
+            raise RuntimeError(f"{failure}: {first_line(error)}") from None
+        # Portais antigos devolvem outro caminho; nesse caso troco a assinatura (Request.xml).
+        handle = reply.unpack()[0]
+        if handle != expected:
+            bus.signal_unsubscribe(subscription)
+            subscription = subscribe(handle)
+        watch = Gio.bus_watch_name_on_connection(bus, PORTAL, Gio.BusNameWatcherFlags.NONE, None, on_vanished)
+        # Sem prazo: o diálogo fica aberto o tempo que eu quiser.
+        loop.run()
+    finally:
+        bus.signal_unsubscribe(subscription)
+        if watch is not None:
+            Gio.bus_unwatch_name(watch)
+    if outcome.get("response") == 1:
+        return None
+    uris = outcome.get("results", {}).get("uris") if outcome.get("response") == 0 else None
+    path = Gio.File.new_for_uri(uris[0]).get_path() if uris else None
+    if not path:
+        raise RuntimeError(failure)
+    return path
+
+
 def pick_wallpaper():
-    result = subprocess.run(["zenity", "--file-selection", "--title=Choose a wallpaper",
-                             f"--filename={wallpaper_folder()}/",
-                             "--file-filter=Images | *.png *.jpg *.jpeg *.webp *.bmp *.gif *.svg *.PNG *.JPG *.JPEG",
-                             "--file-filter=All files | *"], capture_output=True, text=True)
-    if result.returncode == 1:
+    folder = wallpaper_folder()
+    chosen = portal_pick_file("Choose a wallpaper", [("Images", IMAGE_PATTERNS), ("All files", ["*"])],
+                              folder if folder.is_dir() else None, "Could not open the image picker")
+    if chosen is None:
         return {"cancelled": True}
-    if result.returncode:
-        raise RuntimeError(result.stderr.strip() or "Could not open the image picker")
-    return wallpaper("custom", result.stdout.rstrip("\n"))
+    return wallpaper("custom", chosen)
 
 
 def main():

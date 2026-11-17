@@ -18,4 +18,6 @@
 - Medidas conferidas no print: modal de 580×456 (260 + 3 linhas de 52 + 2 espaços de 8 + 24 embaixo); “Variação” em (30,64); discos em y 88 e nomes em y 188; linhas a partir de y 260. Como essas medidas são do modal inteiro, a página Aparência usa `bodyTop: 0` (as outras páginas continuam com 82 até a F4). O brilho aberto mostra o slider (altura 111).
 - O desenho mora em `settings/appearance/Body.qml`, sem ler estado; `Panel.qml` liga o estado real e a vitrine liga valores fictícios.
 
+- **Brilho indisponível** (`F4-T14`, 2026-11-17). A linha "Brilho da tela" continua desligada com "Indisponível", e o motivo aparece no texto de erro que a página já tinha, abaixo das linhas, em `dangerText` 13: "Brightness for this display needs ddcutil, which is not installed.", "No permission to control this display. Add your user to the i2c group." ou "Brightness is unavailable for this display: " com a primeira linha do erro. Outro erro da página (do tema ou do papel de parede) toma o lugar do motivo enquanto existir. O modal cresce 25 com uma linha de erro, como já crescia.
+
 O papel de parede em si está na ficha 13 (seletor). “Brilho” e “Tela” navegam para as páginas já existentes.

@@ -57,6 +57,17 @@ Li os seis estados pelo `get_design_context`: vazio `13:17130`, aberto pelo "+" 
 - **Sem resultado (332):** círculo de 48, `control`, em (296,80), com o `search-x` de 20; título Geist Medium 15 `text` centrado numa caixa de 640×24 em y 136 ("Nada encontrado para “xyzzy”", com aspas curvas); dica Geist Regular 13 `muted` centrada numa caixa de 640×20 em y 160; duas linhas de ação em y 196 e 240, sem rótulo de seção, com a busca entre aspas no detalhe e tipo "Ação"; divisor do rodapé em 288.
 - As notas do board, palavra por palavra: "Mesmo launcher, com o contexto “No workspace 3”: o app escolhido abre nesse workspace (substitui o Vicinae)."; "Sugestão fantasma completa a palavra (Tab aceita). Resultados atualizam a cada tecla."; "Grupos fixos: Aplicativos, Arquivos, Ajustes, Comandos. ↑↓ navegam, ↵ abre. Comandos perigosos com ícone em tom de perigo."; "Expressões viram resultado na hora; ↵ copia. Vírgula decimal (pt-BR)."; "Sugere buscar na web ou nos arquivos."
 
+## Cálculo: como funciona (`F5-T03`, propostas da P-70 e da P-71)
+
+- **Quando a busca vira cálculo:** quando o texto inteiro é uma expressão com pelo menos uma operação entre dois valores. Um número sozinho (`42`, `-5`) não é; expressão incompleta (`2+`), divisão por zero e texto comum também não, e a busca segue normal. Enquanto é cálculo, o launcher inteiro é o cálculo: nenhum outro resultado aparece, e não há sugestão fantasma.
+- **Operações:** `+`, `-`, `*`, `/` e parênteses, com o sinal na frente de um valor (`2*-3`). Também aceito `×`, `÷` e `−`, os símbolos que o cartão mostra. A análise é minha (`launcher/Calculator.js`), sem `eval`: o texto vem do teclado e nunca vira código.
+- **Números:** a expressão aceita vírgula e ponto como separador decimal, sem separador de milhar. O resultado sai com o separador do locale do sistema (`Qt.locale()`: ponto nesta máquina, pela decisão 0012; a ficha e o board dizem vírgula pt-BR, e isso é a P-70), com até 10 casas decimais, sem zeros no fim. Resultado de módulo a partir de 10²¹ não vira cálculo.
+- **Cartão:** a expressão aparece formatada, com um espaço de cada lado do operador e `×`, `÷` e `−` no lugar de `*`, `/` e `-`; o que não cabe na caixa de 260 é cortado com reticências, e o valor inteiro fica na linha "Copy result".
+- **Linhas de ação:** "Copy result" (a selecionada ao entrar no modo) e, só quando o resultado é inteiro e não negativo, "In hexadecimal" (`0x1CC`). Enter ou clique copia o texto da linha (o resultado como aparece, ou o hexadecimal) e fecha o launcher. A cópia é o `wl-copy`, com o texto como argumento.
+- **Altura:** 368 com as duas linhas (o board tem 360: P-68) e 324 só com "Copy result".
+- **Rodapé:** ícone `calculator`, "Calculator" e uma ação só, "Copy ↵". O "Colar Ctrl ↵" do board ficou de fora: escrever na janela que estava em foco pede uma ferramenta que a shell não traz (P-71).
+- **Tokens:** `fontLauncherExpression` (28) e `fontLauncherResult` (40), em Geist Serif, e os `launcherCalc*` do `Theme.qml`, com o nó do Figma no comentário.
+
 ## Textos em inglês (decisão 0012)
 
 A ficha e o board estão em português; a shell mostra o equivalente em inglês. Escolhi assim:

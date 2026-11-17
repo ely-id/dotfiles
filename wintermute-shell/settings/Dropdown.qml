@@ -65,7 +65,7 @@ FocusScope {
           x: leading.visible ? 36 : 12
           width: parent.width - x - (trailing.visible ? 40 : 12); anchors.verticalCenter: parent.verticalCenter
           text: option.modelData.label; elide: Text.ElideRight
-          color: Shell.Theme.colors.text; opacity: option.modelData.disabled ? 0.3 : 1
+          color: Shell.Theme.text; opacity: option.modelData.disabled ? 0.3 : 1
           font.family: Shell.Theme.fontFamily; font.pixelSize: 13; font.weight: Font.Medium
         }
         Image {

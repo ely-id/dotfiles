@@ -35,7 +35,7 @@ Singleton {
   }
   // DDC/CI brightness reads stall the GPU's display driver for a few hundred
   // ms, freezing every animating window. Only query once the page is static.
-  Timer { id: settleDelay; interval: Settings.Style.closeDuration + 60; onTriggered: root.refresh() }
+  Timer { id: settleDelay; interval: Shell.Theme.settingsCloseDuration + 60; onTriggered: root.refresh() }
   Connections {
     target: Settings.State
     function onOutputNameChanged() { root.display = ({}); if (root.active) root.refresh(); }

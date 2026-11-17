@@ -475,12 +475,11 @@ Singleton {
   // apaga daqui o que a peça dela deixou de ler. Código novo não usa nada deste
   // bloco.
   //
-  // Só o acento e o texto principal já vêm dos tokens, para que trocar a
-  // variação troque o acento da shell inteira desde a F0.
-  readonly property LegacyColors colors: LegacyColors {
-    accent: root.accent
-    text: root.text
-  }
+  // Sobraram só os papéis que ainda têm leitor: `translucent`, lido pela shell
+  // inteira; e `sidebarDivider`, lido só pelo menu suspenso dos Ajustes, que
+  // mantém o desenho da origem por enquanto (pendência P-46). O acento e o texto
+  // saem daqui e vêm dos tokens direto.
+  readonly property LegacyColors colors: LegacyColors {}
   readonly property bool translucent: colors.translucent
 
   readonly property color sidebarDivider: colors.sidebarDivider

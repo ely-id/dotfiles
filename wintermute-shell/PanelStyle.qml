@@ -2,13 +2,7 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-  readonly property color controlFill: Theme.colors.controlFill
   readonly property color rowHover: Theme.colors.rowHover
-  readonly property color sliderTrack: Theme.colors.sliderTrack
-  readonly property color controlHover: Theme.colors.controlHover
-  readonly property color outline: Theme.colors.outline
-  readonly property color accent: Theme.colors.accent
-  readonly property color accentText: "#4F3D64"
   readonly property int width: 316
   // Pilha de cartões (ficha 05, board 13:13604; vale também para Bluetooth e Som).
   // Cartão da frente 316; carta de trás 284 em (16, 0), raio 16, conteúdo a 50% com

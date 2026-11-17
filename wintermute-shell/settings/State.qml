@@ -1,7 +1,6 @@
 pragma Singleton
 
 import QtQuick
-import "." as Settings
 import "../bluetooth" as Bluetooth
 import ".." as Shell
 import Quickshell
@@ -25,7 +24,7 @@ Singleton {
 
   Timer {
     id: sessionActionDelay
-    interval: Settings.Style.closeDuration
+    interval: Shell.Theme.settingsCloseDuration
     onTriggered: {
       const action = root.pendingSessionAction;
       root.pendingSessionAction = "";

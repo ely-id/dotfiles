@@ -18,6 +18,22 @@ def run(*args, timeout=12):
     return result.stdout
 
 
+def describe_error(error):
+    """Transformo o erro cru do brilho numa frase que diz o motivo e o que fazer."""
+    text = str(error).strip()
+    # `subprocess` levanta FileNotFoundError com o nome do programa que faltou; só o ddcutil
+    # ausente tem frase própria, o resto (brightnessctl, /sys) cai no caso geral.
+    if isinstance(error, FileNotFoundError) and error.filename == "ddcutil":
+        return "Brightness for this display needs ddcutil, which is not installed."
+    if isinstance(error, PermissionError) or re.search(r"permission denied|eacces", text, re.I):
+        return "No permission to control this display. Add your user to the i2c group."
+    first = next((line.strip() for line in text.splitlines() if line.strip()), "")
+    # O texto do próprio control.py já é a frase inteira; não repito o prefixo por cima dele.
+    if not first or first.startswith("Brightness control is unavailable for this display"):
+        return first or "Brightness is unavailable for this display"
+    return "Brightness is unavailable for this display: " + first
+
+
 def atomic_write(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as file:
@@ -79,7 +95,7 @@ def status(output, cached=""):
             result["brightness"] = device["current"] / device["max"]
             result["brightnessDevice"] = device
         except (RuntimeError, OSError, subprocess.TimeoutExpired) as error:
-            result["brightnessError"] = str(error)
+            result["brightnessError"] = describe_error(error)
     return result
 
 
@@ -108,13 +124,18 @@ def theme(name):
 
 
 def main():
+    action = ""
     try:
         action, *args = sys.argv[1:]
         commands = {"status": status, "brightness": set_brightness, "brightness-step": step_brightness,
                     "theme": theme}
         print(json.dumps(commands[action](*args)))
     except Exception as error:
-        print(json.dumps({"error": str(error)}))
+        # Só os erros de leitura e escrita do brilho ganham a frase com o motivo; o resto
+        # (tema, argumento inválido) segue com o texto que já tinha.
+        known = isinstance(error, (RuntimeError, OSError, subprocess.TimeoutExpired))
+        message = describe_error(error) if known and action in ("brightness", "brightness-step") else str(error)
+        print(json.dumps({"error": message}))
         sys.exit(1)
 
 

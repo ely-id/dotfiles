@@ -1307,6 +1307,22 @@ PanelWindow {
                     }
                   }
                 }
+                Specimen {
+                  caption: "Brilho indisponível · linha desligada com “Indisponível” e o motivo no texto de erro (dangerText); o modal cresce 25"
+                  stageWidth: 600; stageHeight: 494
+                  Demo.AppearanceBodySpecimen {
+                    brightnessAvailable: false
+                    error: "No permission to control this display. Add your user to the i2c group."
+                  }
+                }
+                Specimen {
+                  caption: "Brilho indisponível · sem o ddcutil instalado"
+                  stageWidth: 600; stageHeight: 494
+                  Demo.AppearanceBodySpecimen {
+                    brightnessAvailable: false
+                    error: "Brightness for this display needs ddcutil, which is not installed."
+                  }
+                }
               }
 
               SectionBlock {

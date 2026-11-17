@@ -26,6 +26,8 @@ Singleton {
   readonly property bool active: Settings.State.opened && Settings.State.page === "appearance"
   readonly property bool wallpapersActive: Settings.State.opened && Settings.State.page === "wallpaper"
   readonly property bool brightnessAvailable: display.brightness !== undefined && display.brightness !== null
+  // O motivo que o control.py já devolve em frase pronta (sem ddcutil, sem permissão no i2c, sem DDC).
+  readonly property string brightnessError: display.brightnessError || ""
 
   onWallpapersActiveChanged: if (wallpapersActive) loadWallpapers()
 

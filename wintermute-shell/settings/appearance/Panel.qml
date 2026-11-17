@@ -23,7 +23,10 @@ Settings.Modal {
     brightness: Appearance.State.brightness
     brightnessExpanded: Appearance.State.expandedSection === "brightness"
     displaySummary: Display.State.summary
-    error: Appearance.State.error
+    // Um erro de ação (tema, papel de parede, brilho arrastado) vale mais que o aviso permanente;
+    // sem ele, a linha de brilho desligada ganha o motivo no mesmo texto de erro.
+    error: Appearance.State.error !== "" ? Appearance.State.error
+        : Appearance.State.brightnessAvailable ? "" : Appearance.State.brightnessError
     onThemeSelected: key => Appearance.State.selectTheme(key)
     onWallpaperRequested: Settings.State.openPage("wallpaper")
     onBrightnessToggled: Appearance.State.toggleSection("brightness")

@@ -804,7 +804,9 @@ PanelWindow {
           Text {
             x: 0
             anchors.verticalCenter: parent.verticalCenter
-            text: (root.selectedPhaseTab === 3
+            text: (root.selectedPhaseTab === 4
+                ? "5 · Launcher · "
+                : root.selectedPhaseTab === 3
                 ? "4 · Ajustes · "
                 : root.selectedPhaseTab === 2
                 ? "3 · Pop-ups e painéis · "
@@ -823,6 +825,13 @@ PanelWindow {
             anchors.rightMargin: 24
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
+
+            Chip {
+              text: "F5 · Launcher"
+              iconName: "search"
+              selected: root.selectedPhaseTab === 4
+              onClicked: root.selectedPhaseTab = 4
+            }
 
             Chip {
               text: "F4 · Ajustes"
@@ -901,6 +910,36 @@ PanelWindow {
             id: contentColumn
             width: scrollArea.width
             spacing: 32
+
+            // =================================================================
+            // Aba F5 — Launcher (ficha 14)
+            // =================================================================
+            Column {
+              visible: root.selectedPhaseTab === 4
+              width: parent.width
+              spacing: 32
+
+              SectionBlock {
+                title: "Launcher (ficha 14, board 13:17120) · peça real com serviço fictício"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Digitando 640×268 · busca \"ter\" com a sugestão \"minal\" · 4 de folga antes do rodapé (P-68; o board tem 260)"
+                  stageWidth: 640; stageHeight: 268
+                  Demo.LauncherSpecimen { state: "typing"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Resultados agrupados 640×496 · quatro seções · hover em meeting-notes.md · comando perigoso em dangerText"
+                  stageWidth: 640; stageHeight: 496
+                  Demo.LauncherSpecimen { state: "grouped"; selected: 0; hovered: 2 }
+                }
+                Specimen {
+                  caption: "Sem fonte de dados (F5-T01) · só cabeçalho, com o cursor na frente do placeholder, e rodapé (640×100)"
+                  stageWidth: 640; stageHeight: 100
+                  Demo.LauncherSpecimen { state: "empty-shell" }
+                }
+              }
+            }
 
             // =================================================================
             // Aba F4 — Ajustes (ficha 13)

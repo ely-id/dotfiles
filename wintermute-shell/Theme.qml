@@ -320,6 +320,52 @@ Singleton {
   readonly property int launcherSearchHeight: 56
   readonly property int launcherFooterHeight: 44
   readonly property int launcherResultHeight: 44
+  // Tokens do launcher (ficha 14, board 13:17120; estados 13:17230 e 13:17275). Coordenadas do quadro de 640 de largura.
+  readonly property color launcherScrim: Qt.rgba(0, 0, 0, 0.20)    // véu preto a 20% sobre o desktop (ficha 19); tokens.json extras_figma.launcherScrim
+  readonly property real launcherTopRatio: 160 / 900                // topo do vidro: 160 de 900 de altura da tela (ficha 19), arredondado para pixel inteiro
+  readonly property int launcherDividerHeight: 1                    // divisores de 640×1 (cabeçalho em y 56 e rodapé)
+  readonly property int launcherSearchIconX: 18                     // ícone `search` de 20 em (18,18)
+  readonly property int launcherSearchIconY: 18
+  readonly property int launcherSearchIconSize: 20
+  readonly property int launcherFieldX: 52                          // campo de texto em (52,16), altura 24, até 20 da borda direita
+  readonly property int launcherFieldY: 16
+  readonly property int launcherFieldHeight: 24
+  readonly property int launcherFieldRightMargin: 20
+  readonly property int launcherCursorWidth: 1                      // cursor de 1×24 em accentText; 1 de folga do texto e da sugestão
+  readonly property int launcherCursorGap: 1
+  readonly property real launcherGhostOpacity: 0.7                  // sugestão fantasma em muted a 70%
+  readonly property int launcherSectionTop: 8                       // primeiro rótulo em y 64 (8 abaixo do cabeçalho)
+  readonly property int launcherSectionGap: 8                       // rótulo seguinte, 8 abaixo da última linha do grupo anterior
+  readonly property int launcherLabelX: 20                          // rótulo de seção: caixa de 400×24 em x 20
+  readonly property int launcherLabelWidth: 400
+  readonly property int launcherLabelHeight: 24
+  readonly property int launcherRowX: 8                             // linha de 624×44 em x 8, raio radiusRow
+  readonly property int launcherRowWidth: 624
+  readonly property int launcherBlockSize: 28                       // bloco 28×28 raio 8 em (8,8), ícone de 16 em (6,6)
+  readonly property int launcherBlockRadius: 8
+  readonly property int launcherBlockOffset: 8
+  readonly property int launcherBlockIconSize: 16
+  readonly property int launcherBlockIconOffset: 6
+  readonly property int launcherRowTextX: 48                        // título + detalhe em (48,12), linha de 20, 8 entre eles
+  readonly property int launcherRowTextY: 12
+  readonly property int launcherRowTextHeight: 20
+  readonly property int launcherRowTextGap: 8
+  readonly property int launcherTypeWidth: 140                      // tipo: caixa de 140×44 alinhada à direita, terminando em x 576
+  readonly property int launcherTypeRight: 576
+  readonly property int launcherEnterKeyX: 584                      // tecla ↵ em (584,12), só na selecionada
+  readonly property int launcherEnterKeyY: 12
+  readonly property int launcherFooterGap: 4                        // P-68: 4 de folga entre a última linha e o divisor do rodapé, sempre
+  readonly property int launcherFooterIconX: 16                     // ícone do modo de 16 em (16, d+14) a 80%
+  readonly property int launcherFooterIconY: 14
+  readonly property int launcherFooterIconSize: 16
+  readonly property real launcherFooterIconOpacity: 0.8
+  readonly property int launcherFooterModeX: 40                     // nome do modo: caixa de 240×44 em (40, d)
+  readonly property int launcherFooterModeWidth: 240
+  readonly property int launcherFooterActionsRight: 624             // faixa de ações de 344×20 em (280, d+12), alinhada à direita (termina em x 624)
+  readonly property int launcherFooterActionsY: 12
+  readonly property int launcherFooterActionsHeight: 20
+  readonly property int launcherFooterActionsGap: 8
+  readonly property int launcherFooterDividerHeight: 16             // divisor de 1×16 entre as duas ações
 
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.

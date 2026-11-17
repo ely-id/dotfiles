@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import "battery" as Battery
 import "calendar" as Calendar
+import "launcher" as Launcher
 import "settings" as Settings
 import "settings/appearance" as Appearance
 import "settings/system" as System
@@ -75,6 +76,23 @@ ShellRoot {
   }
 
   IpcHandler {
+    target: "launcher"
+    function toggle() { Launcher.State.toggle(); }
+    function open() { Launcher.State.open(); }
+    function close() { Launcher.State.close(); }
+  }
+
+  // O launcher e os Ajustes pedem teclado exclusivo na mesma camada, então abrir um fecha o outro.
+  Connections {
+    target: Settings.State
+    function onOpenedChanged() { if (Settings.State.opened) Launcher.State.close(); }
+  }
+  Connections {
+    target: Launcher.State
+    function onOpenedChanged() { if (Launcher.State.opened) Settings.State.close(); }
+  }
+
+  IpcHandler {
     target: "manual"
     function open() { Settings.State.open("", "manual"); }
   }
@@ -116,6 +134,7 @@ ShellRoot {
       Battery.Notification { bar: sidebar; above: toast }
       PanelDismissWindow { bar: sidebar }
       Settings.Window { menuScreen: modelData }
+      Launcher.Window { menuScreen: modelData }
       FontTestPanel {
         panelScreen: modelData
         opened: root.testPanelOpen

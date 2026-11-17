@@ -1399,6 +1399,10 @@ PanelWindow {
                   Calendar.Clock { width: 156; previewBattery: true }
                 }
                 Specimen {
+                  caption: "Relógio · 23:33, a hora mais larga (cabe na caixa de 88)"; stageWidth: 156; stageHeight: 76
+                  Demo.ClockSpecimen { time: "23:33" }
+                }
+                Specimen {
                   caption: "Relógio · hover na hora"; stageWidth: 156; stageHeight: 76
                   Calendar.Clock { width: 156; previewBattery: true; forceTimeHovered: true }
                 }

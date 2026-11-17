@@ -5,7 +5,7 @@ import "../battery" as Battery
 
 // Cartão de relógio + bateria da barra lateral (ficha 04):
 // Aberto: 156×76 (116 com aviso de bateria baixa, 56 sem bateria), raio 16.
-//   Hora Geist Serif 36 em (12,8) 88×40 sem AM/PM; chip da data 40×40 r8 em (104,8)
+//   Hora Geist Serif 34 em (12,8) 88×40 sem AM/PM; chip da data 40×40 r8 em (104,8)
 //   borderStrong; trilho da bateria 132×4 r2 em (12,60) track + carga text 80%.
 // Recolhido: 48×156 (112 sem bateria), raio 16.
 //   Hora em duas linhas Geist Mono Regular 13 (y 8 / 28), divisor em y 56,

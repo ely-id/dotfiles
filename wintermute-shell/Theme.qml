@@ -147,7 +147,9 @@ Singleton {
   // Relógio Armitage (refinado para a grade de 4; Pond era 75 / 155 / Advent Pro 39)
   readonly property int clockExpandedHeight: 76
   readonly property int clockCollapsedHeight: 156
-  readonly property int clockTimeSize: 36
+  // Era 36. Com 36, a hora mais larga (23:33, 92,6 px em Geist Serif) passava da caixa de 88
+  // e encostava no chip da data em 135 dos 1440 horários. Com 34 ela mede 87,5 e cabe.
+  readonly property int clockTimeSize: 34
   readonly property int dateChipSize: 40
   readonly property int dateChipRadius: 8
   readonly property int batteryTrackHeight: 4
@@ -341,7 +343,7 @@ Singleton {
   readonly property int fontModalTitle: 32      // Geist Serif Regular
   readonly property int fontSearch: 17          // Geist Regular (launcher)
   readonly property int fontInfoValue: 17       // Geist Serif Regular
-  readonly property int fontClock: 36           // Geist Serif Regular
+  readonly property int fontClock: 34           // Geist Serif Regular (mesmo texto do clockTimeSize)
   readonly property int fontBatteryPercent: 40  // Geist Serif Regular
   readonly property int fontMonoCaption: 11     // Geist Mono Medium
   readonly property int fontMonoNumber: 13      // Geist Mono Regular (recolhido)

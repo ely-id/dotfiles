@@ -159,7 +159,7 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
   - Com mais de seis miniaturas a grade rola dentro do modal, que continua em 608, como na origem.
   - O hover e o foco de "Choose an image" usam o fundo `pressed`, como o botão Manual. O foco pelo teclado mostra o mesmo anel da selecionada, como na origem.
   - A mensagem de erro fica onde ficava na origem, entre o título e a grade, que desce 28; a cor passa a `dangerText`.
-  - O seletor de arquivo continua sendo o `zenity` (P-60).
+  - O seletor de arquivo é o do sistema, pelo portal `org.freedesktop.portal.FileChooser` (P-60, respondida em 2026-11-17: "Realmente o portal é minha escolha."). O `zenity` sai da lista de pacotes da F10. `control.py pick` chama `OpenFile` pelo `Gio` (`python-gobject`, que a shell já usa no Bluetooth), sem dependência nova. O diálogo abre como o do `zenity` abria: título "Choose a wallpaper", filtro "Images" (`*.png *.jpg *.jpeg *.webp *.bmp *.gif *.svg *.PNG *.JPG *.JPEG`) selecionado, filtro "All files" (`*`) e, quando existe, a pasta de papéis de parede (`Pictures/Wallpapers`). Cancelar não muda nada e não mostra erro. Resposta "encerrado de outro jeito", resposta sem arquivo ou portal que falha na chamada (ausente, sem backend de `FileChooser`) viram a mensagem de erro da página: "Could not open the image picker", com o motivo depois de dois-pontos quando a chamada devolve um. O backend da sessão do Niri (`xdg-desktop-portal-gnome` ou `-gtk`) é conferido no QA ao vivo; antes disso o teste é com o portal de mentira `.agents/bancada/portal-falso.py`. Ainda não passo a janela da shell como `parent_window`.
 
 ## A CONFIRMAR
 

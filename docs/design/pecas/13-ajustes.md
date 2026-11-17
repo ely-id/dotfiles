@@ -90,7 +90,8 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
   - Rótulos: Sistema, Máquina, Placa, CPU, GPU, Memória, Disco (na shell: System, Machine, Board, CPU, GPU, Memory, Disk). A origem usava OS e Host.
   - Botão Manual em (30,436): `control` com borda `border`, raio 12. Bloco de 40×40, raio 10, em `accentSubtle` em (12,12), com o `book-open` de 20 em `accentText`; "Manual" 15 Medium `text` e "Atalhos e gestos" 13 Regular `muted` em x 64, em linhas de 20 a partir de y 12; seta `chevron-right` de 16 em `text` em (488,24). O hover não está desenhado: uso o `pressed`, como as linhas dos Ajustes.
   - Rodapé: "Wintermute Shell" em (30,536) numa caixa de 24, a versão "V0.1 · prévia" logo abaixo numa caixa de 20. Na grade, cada "+" é Geist Mono 11 Medium `muted`, centrado em (10 + 20·coluna, 7 + 20·linha), e as opacidades 1 / 0,6 / 0,3 seguem em sequência pela grade.
-  - Os logotipos e os contatos da origem (X, Instagram, site e e-mail da marca dela) não estão no Figma e saíram. Sem contatos desenhados, a grade fica parada até eu definir os contatos (P-50).
+  - Os logotipos e os contatos da origem (X, Instagram, site e e-mail da marca dela) não estão no Figma e saíram na `F4-T04`.
+- **Rodapé só com enfeites** (P-50, 2026-11-16: "Utilizar apenas enfeites nessa área do painel, como um 'footer' fazer como na referencia em anexo usando a grade de + e o arch.svg"). A referência é o rodapé da origem: marca e versão à esquerda, a grade de "+" e o logotipo "ARCH" à direita. O "ARCH" sai do símbolo `icon/information/arch` do Figma (nó `7:1799`, 151,43×42,96). Sem contatos, sem links e sem o hover da grade. A marca é o logo + "Wintermute", não "Wintermute Shell" (decisão 0013); o logo é provisório (o broto de 40×40, P-51) e a cor dele vem dos tokens. Fica para a `F4-T17`; o que a página mostra hoje é o rodapé da `F4-T04`, com "Wintermute Shell".
 - Formato dos valores, seguindo os do Figma: "CachyOS · Linux 6.17" (sistema e kernel), o nome da máquina, a placa, "Ryzen 7 · 8 cores" (modelo sem o fabricante e núcleos físicos), "Radeon · 16 GB" (a VRAM só na GPU dedicada), a memória total e "1 TB NVMe · 412 GB free" (disco em unidades decimais, livre para o usuário). Os exemplos são os do Figma, fictícios. O "DDR5" do Figma fica de fora: o fastfetch só lê o tipo da memória pelo SMBIOS, que pede root. A origem atualizava memória e disco a cada 3 s; como o Figma mostra totais, leio uma vez por abertura.
 
 ## Manual — 500×656, sem título no modal
@@ -126,4 +127,5 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
 - ~~Lista definitiva de atalhos.~~ Definida em 2026-11-15 (P-11), na seção do Manual.
 - ~~O "principal" do conector no monitor selecionado da Tela.~~ Definido em 2026-11-16 (P-48): só o nome do conector.
 - ~~A rotação da tela volta, e onde.~~ Definido em 2026-11-16 (P-49): linha "Orientation" no topo das linhas da Tela.
-- Os contatos das Informações e o que faz a grade de "+" sumir (P-50).
+- ~~Os contatos das Informações e o que faz a grade de "+" sumir.~~ Definido em 2026-11-16 (P-50): rodapé só com enfeites, sem contatos.
+- O logo definitivo da Wintermute (P-51). Até lá, o broto provisório.

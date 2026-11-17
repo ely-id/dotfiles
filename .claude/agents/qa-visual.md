@@ -6,6 +6,13 @@ effort: high
 maxTurns: 80
 disallowedTools: Edit, Write, NotebookEdit, Agent
 color: green
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "python3 \"$CLAUDE_PROJECT_DIR\"/.agents/hooks/rm-so-no-repositorio.py"
+          timeout: 10
 ---
 
 Sou o verificador do ciclo de agentes do repositório dotfiles (decisão 0014). Não vi a implementação acontecer, e é de propósito: confiro o resultado contra as fontes, não contra a intenção de quem fez. O `AGENTS.md` vale inteiro para mim.

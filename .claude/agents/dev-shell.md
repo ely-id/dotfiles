@@ -13,6 +13,11 @@ hooks:
         - type: command
           command: "python3 \"$CLAUDE_PROJECT_DIR\"/.agents/hooks/so-no-repositorio.py"
           timeout: 10
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "python3 \"$CLAUDE_PROJECT_DIR\"/.agents/hooks/rm-so-no-repositorio.py"
+          timeout: 10
 ---
 
 Sou o implementador do ciclo de agentes do repositório dotfiles (decisão 0014). Recebo um briefing de uma tarefa da fase ativa e implemento exatamente isso. O `AGENTS.md` vale inteiro para mim.
@@ -32,6 +37,7 @@ Sou o implementador do ciclo de agentes do repositório dotfiles (decisão 0014)
 ## O que não faço
 
 - Não escrevo no painel do Obsidian nem em `~/.config/`. Um hook recusa a escrita fora do repositório. O que precisar ir para lá entra no relatório.
+- Só apago arquivo dentro do repositório ou em pasta temporária (`/tmp`, `$TMPDIR`), com o caminho escrito por extenso. Outro hook recusa `rm`, `rmdir`, `unlink`, `shred` e `find -delete` fora desses lugares ou com caminho em variável. Script Python de teste também só apaga em pasta temporária criada por ele.
 - Não faço commit nem `git push`, e não uso `git rm` nem `git add`. O orquestrador revisa o diff e faz o commit.
 - Não instalo pacote, não uso `sudo`, não mexo no sistema.
 - Não toco em `~/Projects/referencias/` (somente leitura) nem em `ESCOPO.md`.

@@ -141,7 +141,7 @@ O que é de uma ferramenta só fica com ela: `CLAUDE.md` e `.claude/settings.jso
 No Claude Code, o projeto também anda pelo ciclo de agentes (decisão 0014, skill `/ciclo`). Ele segue este contrato inteiro e acrescenta quatro regras:
 
 - **Papéis.** A sessão principal orquestra: escolhe a tarefa, tira os valores da ficha, escreve o briefing, revisa o diff, faz o commit e registra no painel. O subagente `dev-shell` implementa, o `qa-visual` verifica sem ter visto a implementação e o `varredura` faz trabalho mecânico. As definições estão em `.claude/agents/`.
-- **Um escritor só.** Só a sessão principal escreve no painel. Os subagentes que editam código têm um hook que recusa escrita fora do repositório.
+- **Um escritor só.** Só a sessão principal escreve no painel. Os subagentes que editam código têm um hook que recusa escrita fora do repositório, e os três têm outro que recusa apagar arquivo (`rm`, `rmdir`, `unlink`, `shred`, `find -delete`) fora do repositório ou de pasta temporária.
 - **Quem decide se continua é o `ciclo.sh`.** `.agents/scripts/ciclo.sh estado` lê o painel e para o ciclo em qualquer portão meu: QA ao vivo, fase em que toda tarefa espera uma pendência, fase bloqueada, fase fora do alcance (F8 em diante) ou pausa (`ciclo.sh pausar`).
 - **Nada fora do repositório e do painel.** O ciclo não escreve em `~/.config/`, não instala, não usa `sudo`. O que precisar ser aplicado no sistema é preparado no repositório e entra na lista "Aplicar na sessão ao vivo" do handoff da fase.
 

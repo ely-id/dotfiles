@@ -15,11 +15,15 @@ Item {
   // Na vitrine não há foco de teclado, então o cursor pode ser pedido à força.
   property bool forceCursor: false
   property string iconName: "search"
+  // Com os chips das ferramentas em foco, ← e → andam nos chips; senão são do campo e movem o cursor do texto.
+  property bool captureHorizontal: false
 
   signal edited(string text)
   signal accepted
   signal upPressed
   signal downPressed
+  signal leftPressed
+  signal rightPressed
   signal tabPressed
   signal escapePressed
 
@@ -96,6 +100,23 @@ Item {
       onAccepted: root.accepted()
       Keys.onUpPressed: event => { root.upPressed(); event.accepted = true; }
       Keys.onDownPressed: event => { root.downPressed(); event.accepted = true; }
+      // Sem `captureHorizontal` devolvo o evento, e o TextInput move o cursor como sempre.
+      Keys.onLeftPressed: event => {
+        if (root.captureHorizontal) {
+          root.leftPressed();
+          event.accepted = true;
+        } else {
+          event.accepted = false;
+        }
+      }
+      Keys.onRightPressed: event => {
+        if (root.captureHorizontal) {
+          root.rightPressed();
+          event.accepted = true;
+        } else {
+          event.accepted = false;
+        }
+      }
       Keys.onTabPressed: event => { root.tabPressed(); event.accepted = true; }
       Keys.onEscapePressed: event => { root.escapePressed(); event.accepted = true; }
       // Ctrl+K abre o menu de ações na F5-T05; por enquanto só impeço o Qt de apagar até o fim da linha.

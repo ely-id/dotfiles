@@ -366,6 +366,23 @@ Singleton {
   readonly property int launcherFooterActionsHeight: 20
   readonly property int launcherFooterActionsGap: 8
   readonly property int launcherFooterDividerHeight: 16             // divisor de 1×16 entre as duas ações
+  // Estado vazio (nó 13:17130): a seção "Tools" com a fila de chips. Chips do componente Chip (ficha 00).
+  readonly property int launcherChipsX: 20                          // primeiro chip em x 20 (19 no código do Figma + 1 da borda), mesma coluna do rótulo
+  readonly property int launcherChipHeight: 36                      // altura do Chip da ficha 00; a fila reserva o mesmo número
+  readonly property int launcherChipsGap: 4                         // chips 4 abaixo do rótulo (rótulo 228 a 252, chips em 256)
+  readonly property int launcherChipSpacing: 8                      // 8 entre os chips
+  readonly property int launcherChipsFooterGap: 16                  // divisor do rodapé 16 abaixo dos chips (292 → 308)
+  // Estado sem resultado (nó 13:17387; bloco "vazio" 13:17394). Coordenadas no quadro do launcher.
+  readonly property int launcherNoResultCircleY: 80                 // círculo `control` de 48 (raio 24) em (296,80); x sai de centralizar nos 640
+  readonly property int launcherNoResultCircleSize: 48
+  readonly property int launcherNoResultIconSize: 20                // ícone `search-x` de 20 em (14,14) do círculo (13:17396)
+  readonly property int launcherNoResultIconOffset: 14
+  readonly property int launcherNoResultTitleY: 136                 // título (13:17397): caixa de 640×24 em y 136
+  readonly property int launcherNoResultTitleHeight: 24
+  readonly property int launcherNoResultHintY: 160                  // dica (13:17398): caixa de 640×20 em y 160, termina em 180
+  readonly property int launcherNoResultHintHeight: 20
+  readonly property int launcherNoResultTextMargin: 20              // o texto não passa de 20 de cada lado da caixa de 640
+  readonly property int launcherNoResultActionsGap: 16              // linhas de ação 16 abaixo da dica (180 → 196); sem elas o divisor do rodapé fica nessa posição, a mesma folga de 16 que o board deixa entre os chips e o rodapé
   // Cartão do cálculo (estado "Cálculo", nó 13:17343; cartão 13:17351). 624×128 em (8,88), raio radiusCard, fundo cardHover e
   // borda border de 1. Medidas dentro do cartão, borda incluída; o resultado e a expressão são caixas de 260×48.
   readonly property int launcherCalcCardHeight: 128

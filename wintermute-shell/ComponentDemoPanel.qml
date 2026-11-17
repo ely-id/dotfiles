@@ -949,9 +949,29 @@ PanelWindow {
                   Demo.LauncherSpecimen { state: "calc"; expression: "(2+3)*4,5+1,5"; separator: ","; selected: 1 }
                 }
                 Specimen {
-                  caption: "Sem fonte de dados (F5-T01) · só cabeçalho, com o cursor na frente do placeholder, e rodapé (640×100)"
-                  stageWidth: 640; stageHeight: 100
-                  Demo.LauncherSpecimen { state: "empty-shell" }
+                  caption: "Vazio 640×352 · placeholder · Recent em y 64 (linhas 88, 132, 176) · Tools em y 228 · chips de 36 em y 256 · divisor em 308"
+                  stageWidth: 640; stageHeight: 352
+                  Demo.LauncherSpecimen { state: "empty"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Vazio sem recentes 640×188 · Tools em y 64 · chips em y 92 · divisor em 144 · nada selecionado"
+                  stageWidth: 640; stageHeight: 188
+                  Demo.LauncherSpecimen { state: "empty-tools" }
+                }
+                Specimen {
+                  caption: "Vazio · chip Emoji em hover (pressed) · chip Screenshot com o foco do teclado (accentSubtle com accentRing); nenhuma linha selecionada"
+                  stageWidth: 640; stageHeight: 352
+                  Demo.LauncherSpecimen { state: "empty"; chip: 2; chipHovered: 1 }
+                }
+                Specimen {
+                  caption: "Sem resultado 640×332 · busca xyzzy · círculo de 48 em (296,80) · título e dica centrados · ações em 196 (selecionada) e 240 · divisor em 288"
+                  stageWidth: 640; stageHeight: 332
+                  Demo.LauncherSpecimen { state: "no-result" }
+                }
+                Specimen {
+                  caption: "Sem resultado sem as linhas de ação (o que o serviço de verdade oferece por enquanto, P-73) 640×240 · divisor em 196"
+                  stageWidth: 640; stageHeight: 240
+                  Demo.LauncherSpecimen { state: "no-result-bare" }
                 }
               }
             }

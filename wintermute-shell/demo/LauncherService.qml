@@ -2,15 +2,21 @@ import QtQuick
 import "../launcher/Calculator.js" as Calculator
 
 // Serviço fictício do launcher para a vitrine e a bancada (decisão 0011). Tem a mesma superfície de
-// launcher/State.qml: opened, outputName, query, ghost, sections, decimalSeparator, calculation, mode,
-// modeLabel, modeIcon, searchIcon, actions e as funções open, close, toggle, setQuery, acceptGhost, copyCommand,
-// copyText e activate. Os dados são inventados.
-// `scenario` escolhe o estado: "empty-shell" (sem seções), "typing", "grouped" ou "calc" (a busca é
-// `expression`, o cálculo ocupa o launcher). O cálculo usa a mesma biblioteca da peça de verdade.
+// launcher/State.qml: opened, outputName, query, ghost, sections, recents, tools, fallbackRows, decimalSeparator,
+// calculation, mode, modeLabel, modeIcon, searchIcon, actions e as funções open, close, toggle, setQuery,
+// acceptGhost, copyCommand, copyText, openTool e activate. Os dados são inventados.
+// `scenario` escolhe o estado:
+//   "empty"        busca vazia com três recentes e as quatro ferramentas
+//   "empty-tools"  busca vazia sem recentes (só as ferramentas)
+//   "no-result"    busca "xyzzy" que não acha nada, com as duas linhas de ação
+//   "no-result-bare" o mesmo sem as linhas de ação (o que o serviço de verdade oferece por enquanto)
+//   "typing", "grouped" ou "calc" (a busca é `expression`, o cálculo ocupa o launcher).
+// O cálculo usa a mesma biblioteca da peça de verdade. As linhas de ação seguem o texto que estiver na busca em
+// qualquer cenário, menos no "no-result-bare", para o teste de comportamento poder digitar algo que não acha nada.
 QtObject {
   id: root
 
-  property string scenario: "empty-shell"
+  property string scenario: "empty"
   // Só no cenário "calc": o que digitei na busca.
   property string expression: "128*3.5+12"
   // Fixo no ponto, para o espécime não depender do locale da máquina; o de verdade lê Qt.locale().
@@ -19,10 +25,22 @@ QtObject {
   property bool opened: true
   property string outputName: ""
   property string query: scenario === "typing" ? "ter" : scenario === "grouped" ? "no"
-      : scenario === "calc" ? expression : ""
+      : scenario === "calc" ? expression
+      : scenario === "no-result" || scenario === "no-result-bare" ? "xyzzy" : ""
   property string ghost: scenario === "typing" ? "minal" : ""
   property var sections: scenario === "typing" ? typingSections
       : scenario === "grouped" ? groupedSections : []
+  property var recents: scenario === "empty" ? recentRows : []
+  readonly property var tools: [
+    { key: "color", label: "Color picker", icon: "pipette" },
+    { key: "emoji", label: "Emoji", icon: "smile" },
+    { key: "screenshot", label: "Screenshot", icon: "scan" },
+    { key: "clipboard", label: "Clipboard", icon: "clipboard" }
+  ]
+  readonly property var fallbackRows: scenario === "no-result-bare" ? [] : [
+    { title: "Search the web", detail: "“" + query.trim() + "”", kind: "Action", icon: "globe" },
+    { title: "Search files", detail: "“" + query.trim() + "”", kind: "Action", icon: "folder" }
+  ]
 
   readonly property var calculation: Calculator.describe(query, decimalSeparator)
 
@@ -44,6 +62,15 @@ QtObject {
   property int closes: 0
   property string lastCopied: ""
   property int copies: 0
+  // A última ferramenta pedida e quantas vezes (este serviço não abre nada).
+  property string lastTool: ""
+  property int toolOpens: 0
+
+  readonly property var recentRows: [
+    { title: "Ghostty", detail: "Terminal", kind: "App", icon: "terminal" },
+    { title: "Firefox", detail: "Browser", kind: "App", icon: "globe" },
+    { title: "Files", detail: "Nautilus", kind: "App", icon: "folder" }
+  ]
 
   readonly property var typingSections: [
     {
@@ -97,6 +124,10 @@ QtObject {
   function copyText(text) {
     lastCopied = text;
     copies += 1;
+  }
+  function openTool(key) {
+    lastTool = key;
+    toolOpens += 1;
   }
   function activate(row) {
     if (row && row.copy !== undefined)

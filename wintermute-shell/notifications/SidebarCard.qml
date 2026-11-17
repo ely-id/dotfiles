@@ -86,11 +86,22 @@ Item {
         opacity: 1 - Shell.Theme.ramp(root.collapseProgress, 0, 0.31)
         visible: opacity > 0.001
 
+        // Meço o texto fora do próprio `Text`: ler `caption.implicitWidth` dentro de
+        // `caption.width` fazia o Qt avisar de laço de binding quando a primeira
+        // notificação chegava (o texto muda, o layout atualiza a largura implícita
+        // no meio da avaliação da largura). O `TextMetrics` lê a mesma fonte e o
+        // mesmo texto, mas não depende da largura de ninguém.
+        TextMetrics {
+          id: captionMetrics
+          font: caption.font
+          text: caption.text
+        }
+
         Text {
           id: caption
           x: 0
           y: 0
-          width: root.empty ? 104 : Math.max(16, Math.ceil(implicitWidth))
+          width: root.empty ? 104 : Math.max(16, Math.ceil(captionMetrics.advanceWidth))
           height: 48
           text: root.empty ? "Notificações" : String(root.effectiveCount)
           color: Shell.Theme.text

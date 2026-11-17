@@ -197,7 +197,7 @@ Singleton {
             || DesktopEntries.heuristicLookup(candidate)
             || DesktopEntries.heuristicLookup(lower);
         if (entry && entry.icon)
-          return Quickshell.iconPath(entry.icon, "application-x-executable");
+          return Shell.AppIcon.path(entry.icon, "application-x-executable");
       } catch (error) {}
     }
 

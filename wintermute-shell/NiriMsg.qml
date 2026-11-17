@@ -376,8 +376,9 @@ Singleton {
     const iconName = entry?.icon || lower;
     const info = {
       iconName: iconName,
-      iconSource: entry && !Quickshell.hasThemeIcon(iconName) && _hicolorIcon(iconName)
-          || Quickshell.iconPath(iconName, "application-x-executable")
+      iconSource: entry && !AppIcon.isFile(iconName) && !Quickshell.hasThemeIcon(iconName)
+              && _hicolorIcon(iconName)
+          || AppIcon.path(iconName, "application-x-executable")
     };
     if (entry)
       _appInfoCache[appId] = info;

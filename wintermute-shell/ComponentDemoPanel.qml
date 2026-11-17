@@ -1031,6 +1031,63 @@ PanelWindow {
                   stageWidth: 644; stageHeight: 621
                   Demo.WallpaperSpecimen { selected: "02"; extras: 4; scroll: 9999; hoverIndex: 8 }
                 }
+
+                // Cartão Customize e papéis de parede por lugar (F4-T24, P-67): sem board, composição A-05.
+                Specimen {
+                  caption: "Seletor com o botão Customize (96×32 em x 504, y 26, o Arrange da Tela) · o mesmo seletor dentro da pilha, sem o cartão, para conferir que sai igual"
+                  stageWidth: 644; stageHeight: 621
+                  Demo.WallpaperSpecimen { selected: "chiba"; stacked: true }
+                }
+                Specimen {
+                  caption: "Customize com as duas chaves desligadas · cartão de 580×228 em y 32, carta de trás de 548 a 16 de cada lado, conteúdo a 50% e desfocado, botão de fechar pendurado"
+                  stageWidth: 644; stageHeight: 273
+                  Demo.WallpaperSpecimen { selected: "chiba"; customizing: true }
+                }
+                Specimen {
+                  caption: "Follow light and dark mode ligada · Light (Chiba) e Dark (Dynamic, o céu), hover em Dark; cartão de 348"
+                  stageWidth: 644; stageHeight: 393
+                  Demo.WallpaperSpecimen {
+                    selected: "chiba"; customizing: true; followScheme: true
+                    places: ({ "light": "chiba", "dark": "dynamic" }); hoverRow: "dark"
+                  }
+                }
+                Specimen {
+                  caption: "One wallpaper per display ligada · eDP-1 sem escolha (vale o marcado, Chiba) e DP-1 com Sprawl; cartão de 348"
+                  stageWidth: 644; stageHeight: 393
+                  Demo.WallpaperSpecimen {
+                    selected: "chiba"; customizing: true; perDisplay: true
+                    places: ({ "display:DP-1": "sprawl", "display:eDP-1:dark": "freeside" })
+                  }
+                }
+                Specimen {
+                  caption: "As duas ligadas · quatro linhas, \"eDP-1 · Light\" a \"DP-1 · Dark\"; cartão de 468; hover em eDP-1 · Dark; uma acrescentada (01) em DP-1 · Light"
+                  stageWidth: 644; stageHeight: 513
+                  Demo.WallpaperSpecimen {
+                    selected: "freeside"; extras: 1; customizing: true; followScheme: true; perDisplay: true
+                    places: ({ "display:eDP-1:light": "chiba", "display:eDP-1:dark": "dynamic", "display:DP-1:light": "01" })
+                    hoverRow: "display:eDP-1:dark"
+                  }
+                }
+                Specimen {
+                  caption: "Cartão com erro · a mensagem em dangerText depois da última linha, com quebra"
+                  stageWidth: 644; stageHeight: 417
+                  Demo.WallpaperSpecimen {
+                    selected: "chiba"; customizing: true; followScheme: true; error: "Could not apply appearance settings"
+                  }
+                }
+                Specimen {
+                  caption: "A grade escolhendo para um lugar · título \"eDP-1 · Dark\", sem o botão Customize, anel e marca no Sprawl, que vale ali (o marcado na grade é o Chiba)"
+                  stageWidth: 644; stageHeight: 621
+                  Demo.WallpaperSpecimen {
+                    selected: "chiba"; followScheme: true; perDisplay: true
+                    places: ({ "display:eDP-1:dark": "sprawl" }); choosing: "display:eDP-1:dark"
+                  }
+                }
+                Specimen {
+                  caption: "A grade escolhendo para um lugar sem escolha · título \"Light\", anel e marca no que o marcado na grade vale (Dynamic)"
+                  stageWidth: 644; stageHeight: 621
+                  Demo.WallpaperSpecimen { selected: "dynamic"; followScheme: true; choosing: "light" }
+                }
               }
 
               SectionBlock {

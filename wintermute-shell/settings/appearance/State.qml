@@ -4,6 +4,7 @@ import QtCore
 import ".." as Settings
 import "../.." as Shell
 import "../../wallpaper/daylight/SkyState.js" as SkyState
+import "Places.js" as Places
 import Quickshell
 import Quickshell.Io
 
@@ -15,6 +16,17 @@ Singleton {
   property string wallpaperUrl: ""
   property var wallpapers: []
   property bool wallpaperRefreshPending: false
+  property string placeJob: ""
+  // Papéis de parede por lugar (F4-T24, P-67). As duas chaves do cartão Customize e as escolhas de cada
+  // lugar, como o wallpaper.json as guarda; a chave de um lugar é "light", "dark", "display:<conector>" ou
+  // "display:<conector>:light|dark" (ver Places.js). Lugar sem escolha usa o marcado na grade.
+  property bool followScheme: false
+  property bool perDisplay: false
+  property var places: ({})
+  // A chave do lugar para o qual a grade está escolhendo; vazia quando a grade escolhe o marcado de sempre.
+  property string choosingPlace: ""
+  // Uma escolha foi gravada no lugar (a navegação devolve o cartão Customize).
+  signal placeSaved(string key)
   property var display: ({})
   property real brightness: 1
   property real pendingBrightness: -1
@@ -36,12 +48,34 @@ Singleton {
   readonly property bool pickingWallpaper: picker.running
   readonly property bool busy: action.running || picker.running
   readonly property bool active: Settings.State.opened && Settings.State.page === "appearance"
-  readonly property bool wallpapersActive: Settings.State.opened && Settings.State.page === "wallpaper"
+  // O cartão Customize também conta: a grade fica viva atrás dele e as miniaturas das linhas vêm da lista.
+  readonly property bool wallpapersActive: Settings.State.opened
+      && (Settings.State.page === "wallpaper" || Settings.State.page === "customize")
+  // O marcado na grade, como existia antes dos lugares.
+  readonly property var grid: ({ mode: wallpaperMode, path: wallpaperPath, url: wallpaperUrl })
+  // O que a grade marca: o que vale no lugar em escolha (a escolha dele ou, sem escolha, o marcado na
+  // grade) ou, sem lugar em escolha, o marcado na grade.
+  readonly property var marked: Places.resolve(grid, places, choosingPlace)
+  readonly property string markedMode: marked.mode
+  readonly property string markedPath: marked.path
+  // O título do seletor: o nome do lugar em escolha (o mesmo texto da linha do cartão) ou vazio.
+  readonly property string choosingName: Places.nameOf(choosingPlace)
+  // Os conectores ligados, a tela embutida primeiro, e as linhas do cartão Customize: cada uma com a
+  // chave, o nome, a miniatura que vale (`dynamic`, `url`).
+  readonly property var connectors: Places.sortConnectors(screenNames())
+  readonly property var placeRows: Places.rows(followScheme, perDisplay, connectors, places, grid)
   readonly property bool brightnessAvailable: display.brightness !== undefined && display.brightness !== null
   // O motivo que o control.py já devolve em frase pronta (sem ddcutil, sem permissão no i2c, sem DDC).
   readonly property string brightnessError: display.brightnessError || ""
 
   onWallpapersActiveChanged: if (wallpapersActive) loadWallpapers()
+  // O lugar em escolha só vale com a grade à vista: zero quando o cartão volta, quando os Ajustes saem do
+  // papel de parede e quando fecham.
+  Connections {
+    target: Settings.State
+    function onPageChanged() { if (Settings.State.page !== "wallpaper") root.choosingPlace = ""; }
+    function onOpenedChanged() { if (!Settings.State.opened) root.choosingPlace = ""; }
+  }
   Component.onCompleted: readApps()
 
   onActiveChanged: {
@@ -68,6 +102,9 @@ Singleton {
         root.wallpaperMode = state.mode === "custom" ? "custom" : "dynamic";
         root.wallpaperPath = state.path || "";
         root.wallpaperUrl = state.url || "";
+        root.followScheme = state.followScheme === true;
+        root.perDisplay = state.perDisplay === true;
+        root.places = Places.cleanPlaces(state.places);
       } catch(e) { console.warn("Appearance wallpaper:", e); }
     }
   }
@@ -91,7 +128,7 @@ Singleton {
   Process {
     id: action
     stdout: StdioCollector {
-      onStreamFinished: root.receive(text, "Could not apply appearance settings")
+      onStreamFinished: root.finishPlace(root.receive(text, "Could not apply appearance settings"))
     }
     onExited: {
       if (root.wallpaperRefreshPending) root.loadWallpapers();
@@ -102,13 +139,14 @@ Singleton {
     path: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/background"
     printErrors: false
     watchChanges: true
-    onFileChanged: root.selectWallpaper(decodeURIComponent(path.replace(/^file:\/\//, "")))
+    // Quem põe o arquivo é outro programa: vale para o marcado na grade, mesmo com um lugar em escolha.
+    onFileChanged: root.applyWallpaper(["set", "custom", decodeURIComponent(path.replace(/^file:\/\//, ""))])
   }
   Process {
     id: picker
     command: ["python3", Quickshell.shellDir + "/wallpaper/control.py", "pick"]
     stdout: StdioCollector {
-      onStreamFinished: root.receive(text, "Could not open the image picker")
+      onStreamFinished: root.finishPlace(root.receive(text, "Could not open the image picker"))
     }
     onExited: if (root.wallpaperRefreshPending) root.loadWallpapers()
   }
@@ -145,10 +183,31 @@ Singleton {
   }
   Timer { id: brightnessDelay; interval: 90; onTriggered: root.flushBrightness() }
 
+  // Os nomes dos conectores ligados, na ordem em que o Quickshell os lista.
+  function screenNames() {
+    const names = [];
+    for (let index = 0; index < Quickshell.screens.length; index++) names.push(Quickshell.screens[index].name);
+    return names;
+  }
+  // O papel de parede que vale numa tela, para o `shell.qml`: se é imagem e qual `url`. Depende das duas
+  // chaves, dos lugares, do marcado na grade e do modo dos aplicativos, então a janela troca de papel de
+  // parede sozinha quando qualquer um deles muda, à mão ou pelo horário.
+  function wallpaperFor(connector) {
+    return Places.forScreen(followScheme, perDisplay, places, grid, connector, appsScheme);
+  }
+  // Devolve o resultado lido (ou null) para quem precisa saber se a gravação de um lugar deu certo.
   function receive(text, failure) {
     try {
       const result = JSON.parse(text);
-      if (result.error) error = result.error;
+      if (result.error) {
+        error = result.error;
+        // Uma chave do cartão que não gravou volta ao que o arquivo diz.
+        wallpaperFile.reload();
+      }
+      // As gravações devolvem o mesmo que o `list`; aplico já, sem esperar o arquivo ser relido.
+      if (result.places !== undefined) places = Places.cleanPlaces(result.places);
+      if (result.followScheme !== undefined) followScheme = result.followScheme === true;
+      if (result.perDisplay !== undefined) perDisplay = result.perDisplay === true;
       if (result.theme) {
         Shell.Theme.setName(result.theme);
         Shell.Theme.reload();
@@ -156,7 +215,16 @@ Singleton {
       if (result.mode) wallpaperFile.reload();
       if (result.wallpapers && JSON.stringify(result.wallpapers) !== JSON.stringify(wallpapers))
         wallpapers = result.wallpapers;
+      return result;
     } catch (exception) { error = failure; }
+    return null;
+  }
+  // `placeJob` é a chave do lugar que o comando em andamento grava. Terminou sem erro e sem cancelar:
+  // o cartão Customize volta (o seletor avisa pelo sinal).
+  function finishPlace(result) {
+    const key = placeJob;
+    placeJob = "";
+    if (key !== "" && result && !result.error && !result.cancelled) placeSaved(key);
   }
   function refresh() {
     if (query.running || brightnessWriter.running || draggingBrightness || !Settings.State.outputName) return;
@@ -251,13 +319,44 @@ Singleton {
     Shell.Theme.setName(theme);
     apply(["theme", theme]);
   }
-  function selectDynamic() { applyWallpaper(["set", "dynamic"]); }
-  function selectWallpaper(path) { applyWallpaper(["set", "custom", path]); }
+  // Com um lugar em escolha, a escolha vai para o lugar; sem, para o marcado na grade, como sempre.
+  function selectDynamic() {
+    if (choosingPlace) applyPlace(["place", choosingPlace, "dynamic"]);
+    else applyWallpaper(["set", "dynamic"]);
+  }
+  function selectWallpaper(path) {
+    if (choosingPlace) applyPlace(["place", choosingPlace, "custom", path]);
+    else applyWallpaper(["set", "custom", path]);
+  }
+  function applyPlace(args) {
+    if (action.running || picker.running) return;
+    placeJob = choosingPlace;
+    applyWallpaper(args);
+  }
+  // As duas chaves do cartão. A chave muda na hora; o comando grava e devolve o que ficou. Se a gravação
+  // falhar, o `receive` mostra o erro e o arquivo relido desfaz a mudança.
+  function setFollowScheme(on) { setOption("follow-scheme", on); }
+  function setPerDisplay(on) { setOption("per-display", on); }
+  function setOption(name, on) {
+    if (busy || on === (name === "follow-scheme" ? followScheme : perDisplay)) return;
+    if (name === "follow-scheme") followScheme = on; else perDisplay = on;
+    applyWallpaper(["option", name, on ? "true" : "false"]);
+  }
+  // Tocar numa linha do cartão: a grade passa a escolher para aquele lugar (quem navega é o seletor).
+  function beginPlace(key) { if (Places.validKey(key)) { error = ""; choosingPlace = key; } }
+  function cancelPlace() { choosingPlace = ""; }
   function loadWallpapers() {
     wallpaperRefreshPending = action.running || picker.running;
     if (!wallpaperRefreshPending) applyWallpaper(["list"]);
   }
-  function pickWallpaper() { if (!busy) { error = ""; picker.running = true; } }
+  function pickWallpaper() {
+    if (busy) return;
+    error = "";
+    placeJob = choosingPlace;
+    picker.command = ["python3", Quickshell.shellDir + "/wallpaper/control.py", "pick"]
+        .concat(choosingPlace ? [choosingPlace] : []);
+    picker.running = true;
+  }
   function setBrightness(value) {
     brightness = Math.max(0.01, Math.min(1, value));
     pendingBrightness = brightness;

@@ -11,6 +11,18 @@ import "../settings/appearance" as Appearance
 // `extras`: quantas acrescentadas numeradas o serviço fictício devolve (padrão 0).
 // `scroll`: rolagem inicial da grade em px, só para a vitrine e a bancada; um valor grande para no fim.
 // `error`: texto de erro; vazio não mostra a mensagem.
+// Os papéis de parede por lugar (F4-T24, P-67):
+// `customizing`: o cartão Customize na frente do seletor, a pilha parada (sem animar). O quadro cresce
+//   para a pilha caber: 13 acima + 32 da carta de trás + a altura do cartão (228, 348 ou 468 com 0, 2 ou 4
+//   linhas); o botão de fechar do cartão fica dentro do quadro. `scroll` não vale na pilha.
+// `stacked`: o seletor dentro da pilha, sem o cartão; sai igual ao seletor sozinho (serve para conferir).
+// `followScheme` e `perDisplay`: as duas chaves do cartão. Os monitores fictícios são o eDP-1 e o DP-1.
+// `places`: a escolha de cada lugar, por chave ("light", "dark", "display:eDP-1", "display:DP-1:dark") e
+//   com os mesmos nomes de imagem que `selected` aceita ("dynamic", "chiba", "01"...); lugar sem entrada
+//   usa o marcado na grade (`selected`).
+// `choosing`: a chave do lugar para o qual a grade está escolhendo ("" nenhum): título com o nome do
+//   lugar, sem o botão "Customize", anel e marca no que vale ali.
+// `hoverRow`: hover fixo numa linha do cartão ("follow", "per-display" ou a chave de um lugar).
 Item {
   id: root
   property string selected: "dynamic"
@@ -18,9 +30,18 @@ Item {
   property int extras: 0
   property real scroll: 0
   property string error: ""
+  property bool customizing: false
+  property bool stacked: false
+  property bool followScheme: false
+  property bool perDisplay: false
+  property var places: ({})
+  property string choosing: ""
+  property string hoverRow: ""
+
+  readonly property bool useStack: customizing || stacked
 
   implicitWidth: 644
-  implicitHeight: 621
+  implicitHeight: useStack ? 13 + (stackLoader.item ? stackLoader.item.implicitHeight : 608) : 621
 
   AppearanceService {
     id: demoService
@@ -28,19 +49,42 @@ Item {
     extras: root.extras
     wallpaperMode: root.selected === "dynamic" ? "dynamic" : "custom"
     wallpaperPath: root.selected === "dynamic" ? "" : demoService.pathOf(root.selected)
+    followScheme: root.followScheme
+    perDisplay: root.perDisplay
+    choosingPlace: root.choosing
+    places: {
+      const result = {};
+      Object.keys(root.places).forEach(key => { result[key] = demoService.entryOf(root.places[key]); });
+      return result;
+    }
   }
 
-  Appearance.WallpaperPicker {
-    id: picker
+  Loader {
+    id: pickerLoader
     y: 13
-    service: demoService
-    hoverIndex: root.hoverIndex
+    active: !root.useStack
+    sourceComponent: Appearance.WallpaperPicker {
+      service: demoService
+      hoverIndex: root.hoverIndex
+    }
+  }
+  Loader {
+    id: stackLoader
+    y: 13
+    active: root.useStack
+    sourceComponent: Appearance.WallpaperStack {
+      service: demoService
+      customizing: root.customizing
+      hoverRow: root.hoverRow
+      hoverIndex: root.hoverIndex
+    }
   }
   // Rolagem inicial, limitada ao fim da grade.
   Binding {
-    target: picker.scrollItem
+    target: pickerLoader.item ? pickerLoader.item.scrollItem : null
     property: "contentY"
-    value: Math.min(root.scroll, Math.max(0, picker.contentHeight - picker.scrollItem.height))
-    when: root.scroll > 0
+    value: pickerLoader.item
+        ? Math.min(root.scroll, Math.max(0, pickerLoader.item.contentHeight - pickerLoader.item.scrollItem.height)) : 0
+    when: root.scroll > 0 && !!pickerLoader.item
   }
 }

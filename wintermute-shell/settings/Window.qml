@@ -109,7 +109,7 @@ PanelWindow {
     anchors.centerIn: parent
     active: root.presented && (root.modalOpen || opacity > 0)
     sourceComponent: ({
-      wallpaper: wallpaperPage, information: informationPage, manual: manualPage, display: displayPage, arrange: arrangePage,
+      wallpaper: wallpaperPage, customize: wallpaperPage, information: informationPage, manual: manualPage, display: displayPage, arrange: arrangePage,
       system: systemPage, mouse: mousePage, lock: lockPage, keyboard: keyboardPage
     })[root.displayedPage] || appearancePage
     enabled: root.modalOpen
@@ -146,9 +146,12 @@ PanelWindow {
       scale: Math.min(1, (root.width - 60) / implicitWidth)
     }
   }
+  // O seletor e o cartão Customize são o mesmo componente (a pilha): o seletor continua vivo atrás do
+  // cartão, com a rolagem onde estava, e a página `customize` só põe o cartão na frente.
   Component {
     id: wallpaperPage
-    Appearance.WallpaperPicker {
+    Appearance.WallpaperStack {
+      customizing: root.displayedPage === "customize"
       availableHeight: Math.max(200, root.height - 70)
       scale: Math.min(1, (root.width - 60) / implicitWidth)
     }

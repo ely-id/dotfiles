@@ -23,6 +23,11 @@ PORTAL = "org.freedesktop.portal.Desktop"
 # Prefixo do arquivo temporário da cópia; a listagem ignora o que começa com ele.
 COPYING_PREFIX = ".copying-"
 IMAGE_PATTERNS = ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.bmp", "*.gif", "*.svg", "*.PNG", "*.JPG", "*.JPEG"]
+# Lugares com papel de parede próprio (F4-T24, P-67): "light", "dark", "display:<conector>" e
+# "display:<conector>:light" ou ":dark". O mesmo formato que settings/appearance/Places.js valida.
+PLACE_KEY = re.compile(r"^(light|dark|display:[A-Za-z0-9._+-]{1,64}(:(light|dark))?)$")
+# Os dois ajustes do cartão Customize, pelo nome que o comando `option` recebe.
+OPTIONS = {"follow-scheme": "followScheme", "per-display": "perDisplay"}
 
 
 def atomic_write(path, text):
@@ -49,14 +54,39 @@ def backgrounds_folder():
     return Path(data) / "wintermute-shell/backgrounds"
 
 
+def clean_places(raw):
+    """Devolvo só as entradas bem formadas de `places`; o resto é descartado sem derrubar o comando.
+
+    Uma entrada vale quando a chave tem o formato de PLACE_KEY e o valor é "dynamic" ou um "custom" com
+    caminho. Um arquivo antigo, sem o campo, ou com o campo no formato errado, vira {}.
+    """
+    if not isinstance(raw, dict):
+        return {}
+    places = {}
+    for key, entry in raw.items():
+        if not isinstance(key, str) or not PLACE_KEY.fullmatch(key) or not isinstance(entry, dict):
+            continue
+        if entry.get("mode") == "dynamic":
+            places[key] = {"mode": "dynamic", "path": "", "url": ""}
+        elif entry.get("mode") == "custom" and isinstance(entry.get("path"), str) and entry["path"]:
+            url = entry.get("url")
+            places[key] = {"mode": "custom", "path": entry["path"], "url": url if isinstance(url, str) else ""}
+    return places
+
+
 def wallpaper_state():
     try:
         saved = json.loads((CONFIG / "pond-interface/wallpaper.json").read_text())
     except FileNotFoundError:
         saved = {}
-    state = {"mode": "dynamic", "path": "", "url": "", "imports": [], **saved}
+    state = {"mode": "dynamic", "path": "", "url": "", "imports": [],
+             "followScheme": False, "perDisplay": False, "places": {}, **saved}
     if not isinstance(state["imports"], list) or not all(isinstance(p, str) for p in state["imports"]):
         raise ValueError("Invalid wallpaper imports")
+    # Um campo novo com o tipo errado volta ao padrão, em vez de derrubar o `list` e o `set`.
+    state["followScheme"] = state["followScheme"] is True
+    state["perDisplay"] = state["perDisplay"] is True
+    state["places"] = clean_places(state["places"])
     return state
 
 
@@ -166,6 +196,16 @@ def wallpapers():
             state.update(path=selected["path"], url=selected["url"])
         else:
             state.update(mode="dynamic", path="", url="")
+    # Um lugar cuja imagem sumiu (ou deixou de ser legível) sai de `places` e volta a valer o marcado na
+    # grade; o url dos que ficam é atualizado como o do marcado (a data de modificação entra nele).
+    for key, entry in list(state["places"].items()):
+        if entry["mode"] != "custom":
+            continue
+        kept = wallpaper_entry(entry["path"])
+        if kept:
+            entry.update(path=kept["path"], url=kept["url"])
+        else:
+            del state["places"][key]
     if json.dumps(state) != original:
         atomic_write(CONFIG / "pond-interface/wallpaper.json", json.dumps(state) + "\n")
     add_thumbnails(added + included)
@@ -234,6 +274,44 @@ def wallpaper(mode, path=""):
         state.update(mode=mode, path="", url="")
     else:
         raise ValueError("Unknown wallpaper mode")
+    atomic_write(CONFIG / "pond-interface/wallpaper.json", json.dumps(state) + "\n")
+    return wallpapers()
+
+
+def place_key(key):
+    if not isinstance(key, str) or not PLACE_KEY.fullmatch(key):
+        raise ValueError("Unknown wallpaper place")
+    return key
+
+
+def place(key, mode, path=""):
+    """Grava o papel de parede de um lugar ("dynamic" ou "custom <caminho>") e devolve o mesmo que o `list`.
+
+    A imagem entra na pasta da shell pela mesma import_wallpaper do `set custom`. A escolha do marcado na
+    grade (mode, path e url do topo do arquivo) não muda.
+    """
+    place_key(key)
+    state = wallpaper_state()
+    if mode == "custom":
+        selected = import_wallpaper(state, path)
+        entry = {"mode": mode, "path": selected["path"], "url": selected["url"]}
+    elif mode == "dynamic":
+        entry = {"mode": mode, "path": "", "url": ""}
+    else:
+        raise ValueError("Unknown wallpaper mode")
+    state["places"][key] = entry
+    atomic_write(CONFIG / "pond-interface/wallpaper.json", json.dumps(state) + "\n")
+    return wallpapers()
+
+
+def option(name, value):
+    """Liga ou desliga "Follow light and dark mode" (follow-scheme) ou "One wallpaper per display" (per-display)."""
+    if name not in OPTIONS:
+        raise ValueError("Unknown wallpaper option")
+    if value not in ("true", "false"):
+        raise ValueError("Option value must be true or false")
+    state = wallpaper_state()
+    state[OPTIONS[name]] = value == "true"
     atomic_write(CONFIG / "pond-interface/wallpaper.json", json.dumps(state) + "\n")
     return wallpapers()
 
@@ -314,19 +392,24 @@ def portal_pick_file(title, filters, folder, failure):
     return path
 
 
-def pick_wallpaper():
+def pick_wallpaper(key=None):
+    # A chave é conferida antes de abrir o diálogo: chave errada não deve fazer eu escolher uma imagem à toa.
+    if key is not None:
+        place_key(key)
     folder = wallpaper_folder()
     chosen = portal_pick_file("Choose a wallpaper", [("Images", IMAGE_PATTERNS), ("All files", ["*"])],
                               folder if folder.is_dir() else None, "Could not open the image picker")
     if chosen is None:
         return {"cancelled": True}
+    if key is not None:
+        return place(key, "custom", chosen)
     return wallpaper("custom", chosen)
 
 
 def main():
     try:
         action, *args = sys.argv[1:]
-        commands = {"list": wallpapers, "set": wallpaper, "pick": pick_wallpaper}
+        commands = {"list": wallpapers, "set": wallpaper, "pick": pick_wallpaper, "place": place, "option": option}
         print(json.dumps(commands[action](*args)))
     except Exception as error:
         print(json.dumps({"error": str(error)}))

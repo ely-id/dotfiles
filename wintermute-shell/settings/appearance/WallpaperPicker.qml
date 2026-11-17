@@ -12,6 +12,11 @@ import "../.." as Shell
 // dentro do modal, que continua com 608. A área rolante começa em y 80 e a grade em y 4 dentro dela, para
 // o anel de seleção (4 px para fora) não ser cortado. As setas e o `reveal` valem com qualquer número.
 // Com erro, a mensagem aparece em y 58 e empurra a grade 28 para baixo, como na origem.
+// O botão "Customize" (F4-T24, P-67; sem board, composição A-05) é o "Arrange" da página Tela: ActionButton
+// pequeno de 96×32, alinhado à direita com a grade (x 504 = 624 − 24 − 96) e centrado na caixa do título
+// (y 26 = 20 + (44 − 32) / 2). Abre o cartão Customize na frente do seletor. Quando a grade escolhe para
+// um lugar o título passa a ser o nome dele (o mesmo texto da linha do cartão), anel e marca mostram o que
+// vale ali, tocar numa miniatura grava no lugar, e o botão some. Fechar ou Escape voltam ao cartão.
 // Lê o estado por `service` (decisão 0011).
 Settings.Modal {
   id: root
@@ -20,17 +25,34 @@ Settings.Modal {
   property var service: Appearance.State
   // Só para a vitrine: fixa o hover numa miniatura (índice na grade; -1 para nenhuma).
   property int hoverIndex: -1
+  // A pilha (WallpaperStack.qml) é quem desenha o vidro, o contorno e o botão de fechar do seletor.
+  property bool embedded: false
+  // O seletor é a carta de trás do cartão Customize: sem o botão "Customize".
+  property bool behind: false
 
-  title: "Wallpaper"
-  closeLabel: "Back to Appearance"
+  title: service.choosingName || "Wallpaper"
+  closeLabel: service.choosingPlace ? "Back to Customize" : "Back to Appearance"
+  showGlass: !embedded
+  showOutline: !embedded
+  closeVisible: !embedded
   implicitWidth: Shell.Theme.settingsWallpaperWidth
   implicitHeight: Math.min(Shell.Theme.settingsWallpaperHeight, availableHeight)
   bodyTop: Shell.Theme.settingsWallpaperListTop + (service.error ? Shell.Theme.settingsWallpaperErrorShift : 0)
   roundedContent: true
   contentHeight: grid.y + grid.height + Shell.Theme.settingsWallpaperBottomPadding
-  onBackRequested: Settings.State.back()
-  Keys.onEscapePressed: Settings.State.back()
+  onBackRequested: goBack()
+  Keys.onEscapePressed: goBack()
 
+  // Escolhendo para um lugar, voltar devolve o cartão Customize sem mudar nada.
+  function goBack() {
+    if (service.choosingPlace) {
+      service.cancelPlace();
+      Settings.State.openPage("customize");
+    } else {
+      Settings.State.back();
+    }
+  }
+  function openCustomize() { Settings.State.openPage("customize"); }
   function focusTile(index) {
     const tile = tiles.itemAt(index);
     if (tile) tile.forceActiveFocus(Qt.TabFocusReason);
@@ -66,9 +88,9 @@ Settings.Modal {
         number: modelData.number || 0
         source: modelData.thumbnail || modelData.url || ""
         forceHovered: index === root.hoverIndex
-        selected: dynamic ? root.service.wallpaperMode === "dynamic"
-            : !adding && root.service.wallpaperMode === "custom"
-                && root.service.wallpaperPath === modelData.path
+        selected: dynamic ? root.service.markedMode === "dynamic"
+            : !adding && root.service.markedMode === "custom"
+                && root.service.markedPath === modelData.path
         onClicked: {
           if (adding) root.service.pickWallpaper();
           else if (dynamic) root.service.selectDynamic();
@@ -82,15 +104,34 @@ Settings.Modal {
       }
     }
   }
-  overlay: Text {
-    x: Shell.Theme.settingsWallpaperErrorX; y: Shell.Theme.settingsWallpaperErrorY
-    width: parent.width - 2 * Shell.Theme.settingsWallpaperErrorX
-    visible: !!root.service.error
-    text: root.service.error
-    elide: Text.ElideRight
-    color: Shell.Theme.dangerText
-    font.family: Shell.Theme.fontFamily
-    font.pixelSize: Shell.Theme.fontBody
-    font.letterSpacing: 0
-  }
+  overlay: [
+    Text {
+      x: Shell.Theme.settingsWallpaperErrorX; y: Shell.Theme.settingsWallpaperErrorY
+      width: parent.width - 2 * Shell.Theme.settingsWallpaperErrorX
+      visible: !!root.service.error
+      text: root.service.error
+      elide: Text.ElideRight
+      color: Shell.Theme.dangerText
+      font.family: Shell.Theme.fontFamily
+      font.pixelSize: Shell.Theme.fontBody
+      font.letterSpacing: 0
+    },
+    Shell.ActionButton {
+      objectName: "customizeWallpapers"
+      // O de sempre da página Tela (settings/display/Panel.qml), com o mesmo foco e teclado.
+      x: root.width - Shell.Theme.settingsWallpaperGridInset - width
+      y: 20 + (44 - height) / 2 // centrado na caixa do título (y 20, altura 44, do Modal)
+      width: Shell.Theme.settingsDisplayArrangeWidth
+      small: true
+      text: "Customize"
+      visible: !root.service.choosingPlace && !root.behind
+      activeFocusOnTab: visible && enabled
+      Accessible.role: Accessible.Button
+      Accessible.name: "Customize wallpapers"
+      Accessible.onPressAction: root.openCustomize()
+      Keys.onReturnPressed: root.openCustomize()
+      Keys.onSpacePressed: root.openCustomize()
+      onClicked: root.openCustomize()
+    }
+  ]
 }

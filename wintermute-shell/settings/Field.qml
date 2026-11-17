@@ -15,6 +15,9 @@ Rectangle {
   property bool checked: false
   property bool navigation: false
   property int step: 0
+  // O x do título. O padrão é o de sempre (20, ou 54 com `step`); a linha de lugar do papel de parede
+  // (F4-T24) o põe depois da miniatura.
+  property real titleX: step > 0 ? 54 : 20
   // Opcional para fixar o estado na demonstração: "" | "rest" | "hover"
   property string visualState: ""
   signal clicked
@@ -63,7 +66,7 @@ Rectangle {
 
   Text {
     id: label
-    x: root.step > 0 ? 54 : 20
+    x: root.titleX
     anchors.verticalCenter: parent.verticalCenter
     text: root.title
     color: Shell.Theme.text

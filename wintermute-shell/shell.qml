@@ -93,11 +93,14 @@ ShellRoot {
     model: Quickshell.screens
     delegate: Scope {
       required property var modelData
+      // O papel de parede que vale nesta tela e no modo atual dos aplicativos (F4-T24): com as chaves do
+      // cartão Customize desligadas, o marcado na grade, como sempre.
+      readonly property var placed: Appearance.State.wallpaperFor(modelData.name)
       Wallpaper.Window {
         screen: modelData
-        custom: Appearance.State.wallpaperMode === "custom"
+        custom: placed.custom
         dimmed: Theme.translucent
-        imageSource: Appearance.State.wallpaperUrl
+        imageSource: placed.url
       }
       Sidebar {
         id: sidebar

@@ -18,6 +18,10 @@ Rectangle {
   property real availableHeight: 900
   property bool roundedContent: false
   property bool showOutline: true
+  // Para a pilha do papel de parede (F4-T24): quando o cartão é a carta de trás, quem desenha o vidro, o
+  // contorno e o botão de fechar é a pilha, porque o conteúdo é cortado, apagado e desfocado e o vidro não.
+  property bool showGlass: true
+  property bool closeVisible: true
   property Gradient fill: null
   property real closeButtonY: -13
   signal backRequested
@@ -34,7 +38,7 @@ Rectangle {
   }
   onScaleChanged: blurRegion.changed()
 
-  Shell.GradientFill { fill: root.fill }
+  Shell.GradientFill { visible: root.showGlass; fill: root.fill }
   // Stop dialog clicks from reaching the outside-dismiss area.
   MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }
   // Título Serif 32 em (30,20), caixa (w − 80)×44 (fichas 11 e 13).
@@ -86,6 +90,7 @@ Rectangle {
   Item { id: overlays; anchors.fill: parent; z: 6 }
   Shell.PanelCloseButton {
     objectName: "settingsModalClose"
+    visible: root.closeVisible
     x: parent.width - 20; y: root.closeButtonY; z: 5
     Accessible.role: Accessible.Button
     Accessible.name: root.closeLabel

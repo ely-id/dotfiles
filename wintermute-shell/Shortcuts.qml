@@ -55,11 +55,18 @@ Scope {
     property string outputName
     stdout: StdioCollector {
       onStreamFinished: {
+        // Falha de qualquer tipo (erro do control.py, saída que não é JSON, saída vazia) vai para o log
+        // e também para o OSD, que mostra o alerta (P-62).
         try {
           const result = JSON.parse(text);
-          if (result.error) console.warn("Brightness shortcut:", result.error);
-          else Appearance.State.receiveBrightness(brightness.outputName, result.brightness);
-        } catch (error) { console.warn("Brightness shortcut:", error); }
+          if (result.error) {
+            console.warn("Brightness shortcut:", result.error);
+            Appearance.State.receiveBrightnessFailure(brightness.outputName, String(result.error));
+          } else Appearance.State.receiveBrightness(brightness.outputName, result.brightness);
+        } catch (error) {
+          console.warn("Brightness shortcut:", error);
+          Appearance.State.receiveBrightnessFailure(brightness.outputName, String(error));
+        }
       }
     }
     onExited: Qt.callLater(root.flushBrightness)

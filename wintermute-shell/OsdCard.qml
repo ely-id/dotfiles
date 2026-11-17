@@ -8,6 +8,8 @@ Card {
   id: root
   property string iconName: "sun"
   property real value: 0
+  // O padrão é o percentual; o OSD de brilho que falhou (P-62) troca por um texto de alerta.
+  property string accessibleName: Math.round(Theme.clamp01(value) * 100) + "%"
   readonly property int litDots: value <= 0 ? 0 : Math.max(1, Math.round(Theme.clamp01(value) * 10))
 
   width: Theme.sidebarCardExpandedWidth
@@ -15,7 +17,7 @@ Card {
   radius: Theme.radiusCard
   hoverEnabled: false
   Accessible.role: Accessible.ProgressBar
-  Accessible.name: Math.round(Theme.clamp01(value) * 100) + "%"
+  Accessible.name: accessibleName
 
   Image {
     x: 12; y: 10

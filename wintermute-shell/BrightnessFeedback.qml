@@ -5,12 +5,16 @@ import "audio" as Audio
 import "settings/appearance" as Appearance
 
 // OSD de brilho (ficha 10): 156×36, visível Theme.osdHoldDuration (1200 ms) depois do último evento.
+// Quando a tecla de brilho falha (sem ddcutil, sem permissão no i2c, monitor sem DDC), o mesmo cartão
+// aparece com `circle-alert` no lugar do `sun` e nenhum ponto aceso, como o volume no mudo (P-62).
+// O motivo fica na página Aparência.
 Item {
   id: root
   required property var screen
   required property real collapseProgress
   required property real expandedBottomMargin
   property real value: 0
+  property bool failed: false
   readonly property bool collapsed: collapseProgress >= 0.56
   width: Theme.sidebarCardExpandedWidth
   height: 38 // The sidebar's 6px spacing completes the 8px gap below the card.
@@ -20,7 +24,14 @@ Item {
     target: Appearance.State
     function onKeyboardBrightnessChanged(outputName, value) {
       if (outputName !== root.screen.name) return;
+      root.failed = false;
       root.value = value;
+      feedback.active = true;
+      dismissTimer.restart();
+    }
+    function onKeyboardBrightnessFailed(outputName, reason) {
+      if (outputName !== root.screen.name) return;
+      root.failed = true;
       feedback.active = true;
       dismissTimer.restart();
     }
@@ -57,10 +68,11 @@ Item {
       }
       OsdCard {
         id: indicator
-        iconName: "sun"
+        iconName: root.failed ? "circle-alert" : "sun"
         x: root.collapsed ? 67 : 0
         y: root.collapsed ? 67 : 0
-        value: root.value
+        value: root.failed ? 0 : root.value
+        accessibleName: root.failed ? "Brightness unavailable" : Math.round(Theme.clamp01(root.value) * 100) + "%"
       }
     }
   }

@@ -32,6 +32,7 @@ Item {
   Connections {
     target: Appearance.State
     function onKeyboardBrightnessChanged(outputName, value) { feedback.active = false; }
+    function onKeyboardBrightnessFailed(outputName, reason) { feedback.active = false; }
   }
   Timer { id: dismissTimer; interval: Theme.osdHoldDuration; onTriggered: feedback.active = false }
 

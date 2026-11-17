@@ -21,6 +21,9 @@ Singleton {
   property bool draggingBrightness: false
   property string error: ""
   signal keyboardBrightnessChanged(string outputName, real value)
+  // A tecla de brilho falhou (P-62): o OSD mostra o alerta. O motivo que a página Aparência exibe continua
+  // vindo da leitura do estado, então este sinal não mexe em `error` nem em `display`.
+  signal keyboardBrightnessFailed(string outputName, string reason)
   readonly property bool pickingWallpaper: picker.running
   readonly property bool busy: action.running || picker.running
   readonly property bool active: Settings.State.opened && Settings.State.page === "appearance"
@@ -140,6 +143,9 @@ Singleton {
     if (output === display.output && !draggingBrightness && pendingBrightness < 0 && !brightnessWriter.running)
       brightness = value;
     keyboardBrightnessChanged(output, value);
+  }
+  function receiveBrightnessFailure(output, reason) {
+    keyboardBrightnessFailed(output, reason);
   }
   function toggleSection(section) { expandedSection = expandedSection === section ? "" : section; }
   function apply(args, script = "settings/appearance/control.py") {

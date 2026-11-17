@@ -1280,6 +1280,11 @@ PanelWindow {
                   OsdCard { iconName: "volume-x"; value: 0 }
                 }
                 Specimen {
+                  caption: "Brilho indisponível · alerta e 0 pontos (P-62)"
+                  stageWidth: 156; stageHeight: 36
+                  OsdCard { iconName: "circle-alert"; value: 0 }
+                }
+                Specimen {
                   caption: "Teclado 156×76 · layout atual com rádio marcado"
                   stageWidth: 156; stageHeight: 76
                   KeyboardLayoutCard { layouts: ["Português (BR)", "English (US)"]; activeIndex: 0 }

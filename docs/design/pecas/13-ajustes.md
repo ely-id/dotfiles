@@ -109,7 +109,7 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
   - Super+L: tela de bloqueio.
   - Capturas: Super+Shift+1, 2 e 3, como anotei no arquivo (hoje Ctrl+Shift+1, 2 e 3).
   - A área de transferência ainda não tem atalho; entra na lista quando a F6 definir.
-- Os textos da lista ficam em inglês (decisão 0012). Posso trocar os binds depois, então eles ficam num único arquivo (`F4-T07`).
+- Os textos da lista ficam em inglês (decisão 0012). Posso trocar os binds depois, então eles ficam num único arquivo (`F4-T07`). Desde a `F4-T07` (2026-11-17, decisão 0015) esse arquivo é o `wintermute-shell/settings/manual/shortcuts.json`: cada atalho tem a tecla do Niri, a descrição e a ação; o Manual deriva dele as teclas que mostra e o `keybinds.py`, ao lado, gera o bloco `binds { }` do Niri.
 - Abre sozinho na primeira vez (`shell.qml:55-65`). Botão “Entendi” primário 440×40.
 - Conferido no Figma em 2026-11-17 (`F4-T05`, board `13:16155`, modal `13:16158`), o que esta ficha não dizia:
   - Seletor segmentado de 168×40 em (166,24), com "Teclado" e "Touchpad" (na shell: Keyboard e Touchpad). Ele fica no modal, fora do tutorial; na origem ficava dentro. Só troca o tutorial: a lista é a mesma nas duas abas.

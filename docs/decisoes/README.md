@@ -18,6 +18,7 @@ Cada arquivo registra uma decisão: o contexto em que ela foi tomada, o que esco
 | [0012](0012-interface-em-ingles.md) | A interface da shell fala inglês | Aceita |
 | [0013](0013-marca-logo-e-wintermute.md) | Na interface, a marca é o logo com a palavra "Wintermute" | Aceita |
 | [0014](0014-ciclo-de-agentes.md) | Ciclo de agentes: o Fable orquestra, o Sonnet implementa e verifica, um script decide quando parar | Aceita |
+| [0015](0015-um-arquivo-so-para-os-atalhos.md) | Um arquivo só para os atalhos: o Manual e as binds do Niri saem da mesma lista | Aceita |
 
 ## Modelo
 

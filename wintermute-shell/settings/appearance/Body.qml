@@ -1,12 +1,14 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import "." as Appearance
+import ".." as Settings
 import "../.." as Shell
 
 // Conteúdo da página Aparência (ficha 11), em coordenadas do modal de 580: rótulo "Variação" 13 muted
-// em (30,64), três discos de 120×116 em y 88 (x 70 / 230 / 390) e as três linhas de 52 com 8 de espaço,
-// em x 30 a partir de y 260. Não lê estado nenhum: quem usa liga as propriedades e os sinais, e a
-// vitrine liga valores fictícios.
+// em (30,64), três discos de 120×116 em y 88 (x 70 / 230 / 390) e as cinco linhas de 52 com 8 de espaço,
+// em x 30 a partir de y 260: "Wallpaper" em 260, as duas chaves dos aplicativos em 320 e 380 (composição
+// A-05, sem board), "Screen brightness" em 440 e "Display" em 500; com elas o modal tem 576. Não lê
+// estado nenhum: quem usa liga as propriedades e os sinais, e a vitrine liga valores fictícios.
 Item {
   id: root
   width: 580
@@ -14,6 +16,8 @@ Item {
 
   property string selectedTheme: Shell.Theme.name
   property string wallpaperSummary: "Dynamic"
+  property bool appsDark: false
+  property bool appsAutomatic: false
   property bool brightnessAvailable: true
   property real brightness: 0.8
   property bool brightnessExpanded: false
@@ -24,6 +28,8 @@ Item {
 
   signal themeSelected(string key)
   signal wallpaperRequested
+  signal appsDarkToggled(bool dark)
+  signal appsAutomaticToggled(bool automatic)
   signal brightnessToggled
   signal brightnessMoved(real value)
   signal brightnessDragStarted
@@ -63,6 +69,20 @@ Item {
       summary: root.wallpaperSummary
       navigation: true
       onToggled: root.wallpaperRequested()
+    }
+    Settings.Field {
+      objectName: "appsDarkField"
+      toggle: true
+      title: "Dark mode for apps"
+      checked: root.appsDark
+      onToggled: checked => root.appsDarkToggled(checked)
+    }
+    Settings.Field {
+      objectName: "appsAutomaticField"
+      toggle: true
+      title: "Switch with day and night"
+      checked: root.appsAutomatic
+      onToggled: checked => root.appsAutomaticToggled(checked)
     }
     Accordion {
       objectName: "brightnessSection"

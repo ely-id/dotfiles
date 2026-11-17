@@ -1297,12 +1297,12 @@ PanelWindow {
               }
 
               SectionBlock {
-                title: "Aparência (ficha 11, board 13:14610) · modal 580×456 com as três variações"
+                title: "Aparência (ficha 11, board 13:14610) · modal 580×576 com as três variações"
                 itemGap: 40
 
                 Specimen {
                   caption: "Escolher um disco troca o acento (e grava em theme.json, como no cabeçalho)"
-                  stageWidth: 600; stageHeight: 469
+                  stageWidth: 600; stageHeight: 589
                   Settings.Modal {
                     x: 0; y: 13
                     title: "Appearance"
@@ -1311,6 +1311,8 @@ PanelWindow {
                     Appearance.Body {
                       id: appearanceBody
                       brightnessAvailable: true
+                      onAppsDarkToggled: dark => appsDark = dark
+                      onAppsAutomaticToggled: automatic => appsAutomatic = automatic
                       onThemeSelected: key => Appearance.State.selectTheme(key)
                       onBrightnessToggled: brightnessExpanded = !brightnessExpanded
                       onBrightnessMoved: value => brightness = Math.max(0, Math.min(1, value))
@@ -1319,7 +1321,7 @@ PanelWindow {
                 }
                 Specimen {
                   caption: "Brilho indisponível · linha desligada com “Indisponível” e o motivo no texto de erro (dangerText); o modal cresce 25"
-                  stageWidth: 600; stageHeight: 494
+                  stageWidth: 600; stageHeight: 614
                   Demo.AppearanceBodySpecimen {
                     brightnessAvailable: false
                     error: "No permission to control this display. Add your user to the i2c group."
@@ -1327,7 +1329,7 @@ PanelWindow {
                 }
                 Specimen {
                   caption: "Brilho indisponível · sem o ddcutil instalado"
-                  stageWidth: 600; stageHeight: 494
+                  stageWidth: 600; stageHeight: 614
                   Demo.AppearanceBodySpecimen {
                     brightnessAvailable: false
                     error: "Brightness for this display needs ddcutil, which is not installed."

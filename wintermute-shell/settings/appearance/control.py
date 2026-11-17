@@ -123,12 +123,80 @@ def theme(name):
     return {"theme": name}
 
 
+# O modo claro ou escuro dos aplicativos chega a eles pelo portal org.freedesktop.portal.Settings
+# (org.freedesktop.appearance, color-scheme). Os backends do portal que o Niri usa leem isso do GSettings,
+# então a shell só grava essa chave.
+GSETTINGS_SCHEMA = "org.gnome.desktop.interface"
+GSETTINGS_KEY = "color-scheme"
+APP_SCHEMES = {"dark": "prefer-dark", "light": "prefer-light"}
+
+
+def gsettings(*args):
+    """Chamo o gsettings pelo run() e devolvo só a primeira linha do motivo quando falha."""
+    try:
+        return run("gsettings", *args)
+    except FileNotFoundError:
+        raise RuntimeError("gsettings is not installed") from None
+    except subprocess.TimeoutExpired:
+        raise RuntimeError("gsettings timed out") from None
+    except RuntimeError as error:
+        first = next((line.strip() for line in str(error).splitlines() if line.strip()), "")
+        raise RuntimeError(first or "gsettings failed") from None
+
+
+def read_automatic():
+    """Leio a troca por horário do apps.json; arquivo ausente ou torto vale desligada."""
+    try:
+        data = json.loads((CONFIG / "wintermute-shell/apps.json").read_text())
+    except (OSError, ValueError):
+        return False
+    return isinstance(data, dict) and data.get("automatic") is True
+
+
+def apps_status():
+    try:
+        value = gsettings("get", GSETTINGS_SCHEMA, GSETTINGS_KEY).strip().strip("'")
+    except RuntimeError as error:
+        raise RuntimeError(f"Could not read the app color mode: {error}") from None
+    # Só `prefer-dark` é escuro; `default` (sem preferência) e `prefer-light` contam como claro.
+    return {"scheme": "dark" if value == "prefer-dark" else "light", "automatic": read_automatic()}
+
+
+def apps_scheme(scheme):
+    if scheme not in APP_SCHEMES:
+        raise ValueError("Unknown app color mode")
+    try:
+        gsettings("set", GSETTINGS_SCHEMA, GSETTINGS_KEY, APP_SCHEMES[scheme])
+    except RuntimeError as error:
+        raise RuntimeError(f"Could not change the app color mode: {error}") from None
+    return {"scheme": scheme}
+
+
+def apps_automatic(value):
+    if value not in ("true", "false"):
+        raise ValueError("Unknown automatic switch value")
+    path = CONFIG / "wintermute-shell/apps.json"
+    try:
+        data = json.loads(path.read_text())
+    except (OSError, ValueError):
+        data = {}
+    if not isinstance(data, dict):
+        data = {}
+    data["automatic"] = value == "true"
+    try:
+        atomic_write(path, json.dumps(data) + "\n")
+    except OSError as error:
+        raise RuntimeError(f"Could not change the app color mode: {error.strerror or error}") from None
+    return {"automatic": data["automatic"]}
+
+
 def main():
     action = ""
     try:
         action, *args = sys.argv[1:]
         commands = {"status": status, "brightness": set_brightness, "brightness-step": step_brightness,
-                    "theme": theme}
+                    "theme": theme, "apps-status": apps_status, "apps-scheme": apps_scheme,
+                    "apps-automatic": apps_automatic}
         print(json.dumps(commands[action](*args)))
     except Exception as error:
         # Só os erros de leitura e escrita do brilho ganham a frase com o motivo; o resto

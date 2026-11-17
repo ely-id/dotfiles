@@ -5,8 +5,8 @@ import ".." as Settings
 import "../display" as Display
 import "../.." as Shell
 
-// Página Aparência (ficha 11): modal de 580×456. O desenho está em Body.qml; aqui só entram o estado
-// real (tema, papel de parede, brilho e tela) e a navegação.
+// Página Aparência (ficha 11): modal de 580×576. O desenho está em Body.qml; aqui só entram o estado
+// real (tema, modo dos aplicativos, papel de parede, brilho e tela) e a navegação.
 Settings.Modal {
   id: root
   title: "Appearance"
@@ -19,6 +19,8 @@ Settings.Modal {
     id: body
     selectedTheme: Shell.Theme.name
     wallpaperSummary: Appearance.State.wallpaperMode === "dynamic" ? "Dynamic" : "Custom"
+    appsDark: Appearance.State.appsScheme === "dark"
+    appsAutomatic: Appearance.State.appsAutomatic
     brightnessAvailable: Appearance.State.brightnessAvailable
     brightness: Appearance.State.brightness
     brightnessExpanded: Appearance.State.expandedSection === "brightness"
@@ -29,6 +31,8 @@ Settings.Modal {
         : Appearance.State.brightnessAvailable ? "" : Appearance.State.brightnessError
     onThemeSelected: key => Appearance.State.selectTheme(key)
     onWallpaperRequested: Settings.State.openPage("wallpaper")
+    onAppsDarkToggled: dark => Appearance.State.setAppsDark(dark)
+    onAppsAutomaticToggled: automatic => Appearance.State.setAppsAutomatic(automatic)
     onBrightnessToggled: Appearance.State.toggleSection("brightness")
     onBrightnessMoved: value => Appearance.State.setBrightness(value)
     onBrightnessDragStarted: Appearance.State.draggingBrightness = true

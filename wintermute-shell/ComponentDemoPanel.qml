@@ -15,6 +15,7 @@ import "settings/appearance" as Appearance
 import "settings/system" as System
 import "settings/display" as Display
 import "settings/information" as Information
+import "settings/manual" as Manual
 
 // Painel de demonstração visual da F1, da F2 e da F3 (fichas 00 a 05, boards 13:11217, 13:11463, 13:12277, 13:11395 e 13:13604).
 // Abre com: qs -p ~/Projects/dotfiles/wintermute-shell ipc call demo toggle
@@ -1003,6 +1004,27 @@ PanelWindow {
                   caption: "Hover no botão Manual · fundo pressed, como as linhas dos Ajustes"
                   stageWidth: 600; stageHeight: 633
                   Information.Panel { y: 13; service: demoInformation; manualHovered: true }
+                }
+              }
+
+              SectionBlock {
+                title: "Manual (ficha 13, board 13:16155) · página real, tutorial parado"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Manual 500×656 · aba Touchpad como no Figma: touchpad 200×128, 3 dedos e 4 setas em accentText, lista em linhas de 44"
+                  stageWidth: 520; stageHeight: 669
+                  Manual.Panel { y: 13; mode: "touchpad"; animated: false }
+                }
+                Specimen {
+                  caption: "Aba Keyboard (P-53) · mini teclado 209×86 e mouse 40×56 da origem em (84,69), Super contornada em accentText"
+                  stageWidth: 520; stageHeight: 669
+                  Manual.Panel { y: 13; mode: "keyboard"; animated: false }
+                }
+                Specimen {
+                  caption: "Lista rolada (P-52) · a área das seis linhas rola e o botão Got it fica fixo"
+                  stageWidth: 520; stageHeight: 669
+                  Manual.Panel { y: 13; mode: "keyboard"; animated: false; firstRow: 27 }
                 }
               }
             }

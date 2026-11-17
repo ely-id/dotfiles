@@ -15,11 +15,19 @@ Item {
   property real reveal: 1
   readonly property int itemCount: items.length
   readonly property bool listMode: itemCount >= 2
+  // Altura da lista que o ListView mediu por último. Zero só até a primeira medida existir.
+  // Antes eu só aceitava a medida quando `measuredItemCount === itemCount`. Só que, quando o número de
+  // itens muda, o ListView atualiza o `contentHeight` antes de o `itemCount` ser reavaliado, então por
+  // um passo a medida nova não "batia" com a contagem e a altura caía na estimativa `itens × rowHeight`
+  // (88, bem acima das linhas reais) e depois descia para a medida: o painel crescia e encolhia a cada
+  // item removido, e o `CenterWindow` ainda recentrava o `panelTop` junto. Agora a estimativa só vale
+  // enquanto nunca houve medida; depois disso a medida anterior fica de pé até a nova chegar, e o painel
+  // vai da altura antiga direto para a nova. Sem itens a lista não ocupa nada, então esse caso não olha a
+  // medida. A mesma troca corrige o "limpar tudo": a medida só era guardada com a contagem batendo, então
+  // a primeira notificação depois de limpar deixava o painel preso em 88 (a estimativa) em vez dos 72 medidos.
   property real measuredListHeight: 0
-  property int measuredItemCount: -1
-  readonly property real effectiveListHeight:
-      measuredItemCount === itemCount && measuredListHeight > 0
-      ? measuredListHeight : itemCount * Notifications.Style.rowHeight
+  readonly property real effectiveListHeight: itemCount === 0 ? 0
+      : measuredListHeight > 0 ? measuredListHeight : itemCount * Notifications.Style.rowHeight
   readonly property real panelHeight: listMode
       ? Math.min(Notifications.Style.panelHeaderHeight + effectiveListHeight
                  + Notifications.Style.panelBottomPadding,
@@ -119,10 +127,7 @@ Item {
       model: root.items
       interactive: contentHeight > height
       onContentHeightChanged: {
-        if (contentHeight > 0 || root.itemCount === 0) {
-          root.measuredListHeight = contentHeight;
-          root.measuredItemCount = root.itemCount;
-        }
+        if (contentHeight > 0) root.measuredListHeight = contentHeight;
       }
 
       delegate: Notifications.Card {
@@ -134,7 +139,14 @@ Item {
         width: root.width
         height: implicitHeight
         notification: modelData
-        showDivider: root.listMode && index < root.itemCount - 1
+        // Uso `count` do próprio ListView, sem olhar `listMode` nem `itemCount`: os dois derivam de
+        // `items` e ainda estão com o valor velho na hora em que a linha nasce. Com o `itemCount` velho,
+        // a última linha nascia com divisor e o perdia logo depois; com o `listMode` velho (1 para 2,
+        // 0 para 3), a linha nascia sem divisor e ganhava 1 px depois. Nos dois casos a animação de
+        // altura do cartão (180 ms) fazia o painel encolher ou crescer 1 px (243,88 para 243; 226 para
+        // 227) depois de já ter assentado, e o `panelTop` recentrava junto. `index < count - 1` já
+        // exige 2 itens ou mais, então o `listMode` não faz falta.
+        showDivider: index < notificationList.count - 1
         panelRow: root.listMode
         onActivated: root.service.activate(modelData)
         onDismissed: root.service.remove(modelData)

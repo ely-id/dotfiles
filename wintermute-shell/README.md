@@ -36,8 +36,20 @@ Com a shell aberta, aciono ações pelo IPC do Quickshell (`qs -p ~/Projects/dot
 - **Tema e tokens (`Theme.qml`):** única fonte de verdade em código para cores, tipografia, raios, sombras, medidas e durações. Espelha `../docs/design/tokens/tokens.json`.
 - **Variação ativa (`~/.config/wintermute-shell/theme.json`):** guarda a escolha entre `"chiba"`, `"freeside"` e `"sprawl"`. Pode ser trocada pelos três discos da página **Aparência** nos Ajustes ou gravando `{"theme": "chiba"}` no arquivo; o `FileView` de `Theme.qml` observa o arquivo e aplica a mudança na hora.
 - **Atalhos e IPC (`Shortcuts.qml` e `shell.qml`):** definem os receptores IPC que os atalhos do Niri chamam.
-- **Lista de atalhos do Manual (`settings/manual/shortcuts.json`):** um atalho por linha, com `keys` (as teclas, na ordem) e `label` (o que ele faz, em inglês). A ordem do arquivo é a ordem da lista. O arquivo só descreve os atalhos; quem os define é a configuração do Niri.
+- **Atalhos (`settings/manual/shortcuts.json`):** a única lista de atalhos. Cada um tem a tecla do Niri (`bind`), a descrição em inglês (`label`) e a ação. O Manual tira dela as teclas que mostra e o `keybinds.py` gera as binds do Niri. Como editar e gerar está em "Atalhos do Niri", logo abaixo.
 - **Primeira execução (`~/.local/state/wintermute-shell/manual-shown`):** o Manual abre sozinho na primeira vez que a shell roda e cria esse arquivo. Apagar o arquivo faz o Manual abrir de novo na próxima vez.
+
+## Atalhos do Niri
+
+Edito os atalhos só no `settings/manual/shortcuts.json`, nunca no `keybinds.kdl`. Cada item é uma seção (`{ "section": "Windows" }`, que vira comentário no KDL) ou um atalho: `bind` (a tecla como o Niri escreve, ex. `Mod+Shift+A`), `label` e uma ação, que é `niri` (ação do Niri), `spawn` (um programa), `sh` (um comando de shell) ou `ipc` (uma chamada ao IPC desta shell). `options` leva propriedades do Niri (`cooldown-ms=150`), `"manual": false` esconde o atalho do Manual, `"overlay": true` põe o `label` como título da bind no overlay do Niri (só os que abrem uma peça da shell e os que eu já tinha com título; os outros ficam com a descrição do Niri; não vale em linha com `binds` nem junto com `"manual": false`) e `"waits": "F5"` marca o atalho cuja ação só existe numa fase futura (sai comentado). Uma linha do Manual que junta várias binds (a roda, Super+1 a 9) usa `keys` e `binds`.
+
+```bash
+wintermute-shell/settings/manual/keybinds.py check      # confere a lista
+wintermute-shell/settings/manual/keybinds.py generate   # escreve o bloco binds { } na saída padrão
+wintermute-shell/settings/manual/keybinds.py generate --output ~/.config/niri/cfg/keybinds.kdl --apply
+```
+
+`--shell CAMINHO` troca a pasta da shell nos comandos de IPC; sem ela uso a pasta onde o script mora, com o começo igual a `$HOME` escrito como `~`. Escrever dentro de `~/.config` pede `--apply`, que guarda antes uma cópia `keybinds.kdl.bak-AAAAMMDD-HHMMSS` ao lado e só aplica se o `niri validate` aceitar o arquivo.
 
 ## Mapa das pastas
 

@@ -6,7 +6,8 @@ import "." as Audio
 import ".."
 
 // Painel de som (ficha 07, 316 × (116 + 40 por dispositivo); com 3 dispositivos, 236).
-// Abas "Saída" / "Entrada" em Serif 20: (20,16) 64×32 e (92,16) 96×32. Slider 276 em (20,56),
+// Abas "Output" / "Input" em Serif 20: (20,16) 79×32 e (107,16) 96×32 (o Figma desenha "Saída" em
+// 64×32 e "Entrada" em (92,16); a conta está no modelo das abas). Slider 276 em (20,56),
 // divisor em y 100 e linhas 300×40 a partir de y 108.
 Item {
   id: root
@@ -32,9 +33,13 @@ Item {
     anchors.fill: parent
 
     Repeater {
+      // "Output" tem 67 px de tinta em Serif 20 e "Saída" tinha 52: são 15 px a mais, e a caixa de
+      // 64 não comportava o texto (P-63, "alarga"). Somo os 15 à caixa de "Output" (64 + 15 = 79) e
+      // empurro "Input" junto (92 + 15 = 107), para voltarem os 20 px de folga entre a tinta e a
+      // caixa seguinte. Os valores são fixos, sem medir o texto em tempo de execução.
       model: [
-        {tab: "output", label: "Output", x: 20, width: 64},
-        {tab: "input", label: "Input", x: 92, width: 96}
+        {tab: "output", label: "Output", x: 20, width: 79},
+        {tab: "input", label: "Input", x: 107, width: 96}
       ]
       delegate: MouseArea {
         id: tabButton

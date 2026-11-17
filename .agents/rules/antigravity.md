@@ -15,3 +15,4 @@ O contrato do repositório está no `AGENTS.md` e vale integralmente. Esta regra
 - **Commits.** Vale a regra do `AGENTS.md`: sem rodapé de coautoria e sem menção a ferramenta de IA, mesmo que a ferramenta sugira um. O autor é o do meu `git config`.
 - **Memória.** O Knowledge e qualquer memória automática do Antigravity não são o registro do projeto. O que precisa sobreviver entre sessões vai para o painel.
 - **Uma ferramenta por vez.** Não abro sessão no Antigravity enquanto houver sessão aberta no Claude Code, e o contrário. O painel não tem controle de versão.
+- **Ciclo de agentes.** O `/ciclo` e os subagentes são só do Claude Code (decisão 0014). No Antigravity, as fases andam em sessões comuns, com o mesmo protocolo. Antes de abrir uma sessão aqui, `.agents/scripts/ciclo.sh estado` precisa não estar `travado`: se estiver, o ciclo está rodando no Claude Code.

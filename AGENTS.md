@@ -69,6 +69,7 @@ A sessão só está encerrada quando o painel descreve o estado real. Se o conte
 - Estados possíveis: `planejada`, `em andamento`, `aguardando QA`, `go`, `no-go`, `bloqueada`.
 - Uma fase termina em `aguardando QA`, nunca em `go`. O veredito é meu: eu entro na sessão do Niri, sigo o roteiro do handoff e digo Go ou NoGo. O agente registra o veredito com a data e as minhas palavras, e nunca marca `go` por conta própria.
 - NoGo abre uma subfase com os ajustes apontados. A fase seguinte só começa depois do Go.
+- **Exceção das fases de construção da shell (ajuste A-03).** Na F4, na F5 e na F6, a fase seguinte pode começar com a anterior em `aguardando QA`. O QA ao vivo das três acontece junto, numa sessão do Niri no fim da F6, que eu conduzo com `/qa-fase ao-vivo`. A F7 só começa depois do Go das três, e da F7 em diante vale de novo o portão por fase. NoGo no QA conjunto abre subfases, que são feitas antes da F7.
 - A sessão do Niri roda em paralelo à do GNOME. Nenhuma fase migra esta máquina para fora do GNOME.
 
 ## Escopo
@@ -81,7 +82,8 @@ A sessão só está encerrada quando o painel descreve o estado real. Se o conte
 
 - **Nunca inventar valor.** Cor, medida, raio, tempo e tipografia saem de `docs/design/tokens/` e das fichas em `docs/design/pecas/`. Se faltar, perguntar e registrar em `PENDENCIAS.md`.
 - Itens marcados como *A CONFIRMAR* nas fichas estão consolidados em `PENDENCIAS.md`. Não se chuta: pergunta-se.
-- O aceite visual de uma peça é o print dela ao lado da referência (PNG local ou board do Figma), com as medidas da ficha conferidas.
+- O aceite visual de uma peça é o print dela ao lado da referência (PNG local ou board do Figma), com as medidas da ficha conferidas. Os prints fora do Niri saem de `.agents/scripts/bancada.sh`, nas três variações.
+- Cor e família de fonte escritas direto numa peça são valor inventado. `.agents/scripts/lint-proveniencia.sh` confere as linhas alteradas e precisa passar antes de cada commit de código da shell.
 - A shell é sempre escura. As três variações (Chiba, Freeside, Sprawl) mudam só o acento.
 - Dados de exemplo são fictícios. Nenhum segredo, dado real da máquina ou caminho pessoal entra no código ou nos prints.
 
@@ -132,3 +134,15 @@ Trabalho neste repositório com o Claude Code e com o Antigravity, uma ferrament
 - `.agents/SKILLS.md`: quando usar cada skill, e o que existe em cada ferramenta.
 
 O que é de uma ferramenta só fica com ela: `CLAUDE.md` e `.claude/settings.json` para o Claude Code; `.agents/rules/antigravity.md` e `.agents/hooks.json` para o Antigravity.
+
+## Ciclo de agentes
+
+No Claude Code, o projeto também anda pelo ciclo de agentes (decisão 0014, skill `/ciclo`). Ele segue este contrato inteiro e acrescenta quatro regras:
+
+- **Papéis.** A sessão principal orquestra: escolhe a tarefa, tira os valores da ficha, escreve o briefing, revisa o diff, faz o commit e registra no painel. O subagente `dev-shell` implementa, o `qa-visual` verifica sem ter visto a implementação e o `varredura` faz trabalho mecânico. As definições estão em `.claude/agents/`.
+- **Um escritor só.** Só a sessão principal escreve no painel. Os subagentes que editam código têm um hook que recusa escrita fora do repositório.
+- **Quem decide se continua é o `ciclo.sh`.** `.agents/scripts/ciclo.sh estado` lê o painel e para o ciclo em qualquer portão meu: QA ao vivo, fase em que toda tarefa espera uma pendência, fase bloqueada, fase fora do alcance (F8 em diante) ou pausa (`ciclo.sh pausar`).
+- **Nada fora do repositório e do painel.** O ciclo não escreve em `~/.config/`, não instala, não usa `sudo`. O que precisar ser aplicado no sistema é preparado no repositório e entra na lista "Aplicar na sessão ao vivo" do handoff da fase.
+
+O ciclo nunca roda ao mesmo tempo que uma sessão minha no Antigravity ou no Claude Code. A trava do `ciclo.sh` existe para isso.
+

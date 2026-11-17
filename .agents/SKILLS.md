@@ -11,7 +11,27 @@ Moram em `.agents/skills/`, que o Antigravity lê. O Claude Code lê uma cópia 
 | `/retomar` | No começo de toda sessão | Lê o painel, a fase ativa, o último relatório e o git, e resume onde parei e o próximo passo |
 | `/encerrar-sessao` | Antes de terminar toda sessão | Escreve o relatório, atualiza a fase e o painel, registra pendências e ajustes, faz o commit |
 | `/qa-fase preparar` | Quando o trabalho de uma fase termina | Confere os critérios de aceite e escreve o handoff com o roteiro de teste |
+| `/qa-fase ao-vivo` | Quando eu abro a sessão do Niri para avaliar | Aplica comigo o que ficou para a sessão ao vivo, segue o roteiro passo a passo e registra o veredito de cada fase |
 | `/qa-fase go` ou `/qa-fase no-go` | Depois que eu avalio a fase no Niri | Registra o meu veredito e abre a subfase em caso de NoGo |
+| `/ciclo` | Quando o projeto pode andar sozinho até o próximo portão meu | Orquestra os subagentes tarefa atrás de tarefa, registra cada uma e para no portão que o `ciclo.sh` apontar. Só no Claude Code (decisão 0014) |
+
+### Subagentes do ciclo (só no Claude Code)
+
+Definidos em `.claude/agents/`. Quem os chama é a sessão principal do `/ciclo`; não uso direto.
+
+| Subagente | Modelo | Papel |
+|---|---|---|
+| `dev-shell` | Sonnet, effort high | Implementa uma tarefa a partir do briefing, roda o lint e a bancada, não faz commit |
+| `qa-visual` | Sonnet, effort high | Verifica sem ter visto a implementação, com a bancada, o lint e as referências. Não edita nada |
+| `varredura` | Haiku, effort medium | Trabalho mecânico: textos, logs, buscas em muitos arquivos |
+
+### Scripts do ciclo
+
+| Script | O que faz |
+|---|---|
+| `.agents/scripts/ciclo.sh` | Portão do ciclo (`estado`), trava, pausa e o modo pelo terminal (`rodar`) |
+| `.agents/scripts/bancada.sh` | Prints de uma peça nas três variações, fora do Niri |
+| `.agents/scripts/lint-proveniencia.sh` | Cor e fonte literais nas linhas alteradas |
 
 ## Por momento do trabalho
 
@@ -23,7 +43,7 @@ No Claude Code, as skills externas vêm dos plugins. No Antigravity, as que são
 | Dúvida sobre API do Quickshell, do Niri ou do Qt/QML | Context7 (`resolve-library-id` e `query-docs`) | Plugin Context7 | Consultar a documentação atual em vez de responder de memória |
 | Algo não funciona e a causa não é óbvia | `mattpocock-skills:diagnosing-bugs` ou `engineering:debug` | `diagnosing-bugs` ou `debug` | Reproduzir, isolar, diagnosticar e só então corrigir |
 | Antes de começar uma fase grande (F2, F5, F6) | `mattpocock-skills:grilling` | `grilling` | Testar o plano da fase contra perguntas duras antes de escrever código |
-| Antes de `/qa-fase preparar` | `/code-review` | Só no Claude Code | Revisar o diff da fase atrás de erros de correção |
+| Antes de `/qa-fase preparar` | `/code-review` | Só no Claude Code | Revisar o diff da fase atrás de erros de correção. No `/ciclo`, a sessão principal roda antes do handoff |
 | Depois da revisão, se o código ficou pesado | `/simplify` | Só no Claude Code | Só qualidade: reaproveitamento e simplificação |
 | Decisão técnica com consequência duradoura | `engineering:architecture` | `architecture` | Ajuda a estruturar o registro em `docs/decisoes/` |
 | Escrever handoff, contrato ou instrução para outro agente | `mattpocock-skills:writing-for-agents` | `writing-for-agents` | O handoff precisa funcionar para quem não viu a conversa |

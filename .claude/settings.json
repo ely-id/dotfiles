@@ -7,6 +7,32 @@
     "additionalDirectories": [
       "~/Documents/Journal/projeto-dotfiles"
     ],
+    "allow": [
+      "Bash(.agents/scripts/ciclo.sh *)",
+      "Bash(.agents/scripts/bancada.sh *)",
+      "Bash(.agents/scripts/lint-proveniencia.sh*)",
+      "Bash(.agents/scripts/sincronizar-skills.sh)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(qs -p *)"
+    ],
+    "ask": [
+      "Bash(sudo *)",
+      "Bash(pkexec *)",
+      "Bash(pacman *)",
+      "Bash(paru *)",
+      "Bash(yay *)",
+      "Bash(git push*)",
+      "Bash(rfkill *)",
+      "Bash(usermod *)",
+      "Bash(gpasswd *)",
+      "Bash(systemctl *)",
+      "Edit(~/.config/**)"
+    ],
     "deny": [
       "Edit(~/Documents/Journal/projeto-dotfiles/ESCOPO.md)",
       "Edit(~/Projects/referencias/**)"

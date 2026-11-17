@@ -5,10 +5,12 @@ import ".." as Settings
 import "../.." as Shell
 
 // Seletor de papel de parede (ficha 13; Figma 13:16208): modal de 624×608 com a grade de miniaturas de
-// 276×156 em duas colunas (x 24 e 324) e três linhas (y 84, 256 e 428). Ordem: "Choose an image",
-// Dynamic, as três incluídas e depois as acrescentadas; com as cinco fixas o sexto lugar fica vazio (P-59).
-// Passando de seis miniaturas a grade rola dentro do modal, que continua com 608. A área rolante começa
-// em y 80 e a grade em y 4 dentro dela, para o anel de seleção (4 px para fora) não ser cortado.
+// 276×156 em duas colunas (x 24 e 324), com linhas a cada 172 a partir de y 84 (o board desenha três).
+// Ordem: "Choose an image", Dynamic, as três nativas (com nome) e depois as acrescentadas, numeradas de 01
+// em diante na ordem em que entram (P-59). A grade não tem tamanho travado: cresce para baixo, e o espaço
+// depois da última fica vazio, para as imagens novas entrarem nele. Passando de seis miniaturas ela rola
+// dentro do modal, que continua com 608. A área rolante começa em y 80 e a grade em y 4 dentro dela, para
+// o anel de seleção (4 px para fora) não ser cortado. As setas e o `reveal` valem com qualquer número.
 // Com erro, a mensagem aparece em y 58 e empurra a grade 28 para baixo, como na origem.
 // Lê o estado por `service` (decisão 0011).
 Settings.Modal {
@@ -61,6 +63,7 @@ Settings.Modal {
         dynamic: !!modelData.dynamic
         title: modelData.title || ""
         subtitle: modelData.subtitle || ""
+        number: modelData.number || 0
         source: modelData.thumbnail || modelData.url || ""
         forceHovered: index === root.hoverIndex
         selected: dynamic ? root.service.wallpaperMode === "dynamic"

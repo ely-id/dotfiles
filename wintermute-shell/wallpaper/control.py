@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Manage wallpaper discovery and saved selection through a JSON command interface."""
 from concurrent.futures import ThreadPoolExecutor
+import filecmp
 import hashlib
 import json
 import os
 from pathlib import Path
 import random
 import re
+import shutil
 import sys
 import tempfile
 
@@ -18,6 +20,8 @@ THUMBNAILS = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "p
 THUMBNAIL_WIDTH = 800
 INCLUDED_WALLPAPERS = Path(__file__).resolve().parent / "included"
 PORTAL = "org.freedesktop.portal.Desktop"
+# Prefixo do arquivo temporário da cópia; a listagem ignora o que começa com ele.
+COPYING_PREFIX = ".copying-"
 IMAGE_PATTERNS = ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.bmp", "*.gif", "*.svg", "*.PNG", "*.JPG", "*.JPEG"]
 
 
@@ -35,7 +39,14 @@ def atomic_write(path, text):
 
 
 def wallpaper_folder():
+    # Só a pasta em que o diálogo do portal abre; a lista de papéis de parede não lê mais daqui (P-66).
     return Path(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.PicturesLocation)) / "Wallpapers"
+
+
+def backgrounds_folder():
+    """A pasta da shell onde moram as imagens que eu acrescento (P-59). Só é criada na primeira cópia."""
+    data = os.environ.get("XDG_DATA_HOME") or Path.home() / ".local/share"
+    return Path(data) / "wintermute-shell/backgrounds"
 
 
 def wallpaper_state():
@@ -99,26 +110,56 @@ def add_thumbnails(entries):
         stale.unlink(missing_ok=True)
 
 
+def included_entries():
+    catalog_path = INCLUDED_WALLPAPERS.parent / "catalog.json"
+    catalog = json.loads(catalog_path.read_text()) if catalog_path.exists() else []
+    return [entry for item in catalog
+            if (entry := wallpaper_entry(INCLUDED_WALLPAPERS / item["file"], item["title"], item["author"]))]
+
+
+def file_time(path):
+    try:
+        return os.stat(path).st_mtime_ns
+    except OSError:
+        return 0
+
+
+def background_entries(state):
+    """As imagens legíveis da pasta da shell, na ordem de entrada.
+
+    A ordem é a de state["imports"]. Uma imagem que está na pasta e não na lista (posta lá à mão) entra
+    no fim, por data de modificação e depois por nome. O que a lista cita e não existe mais, ou aponta
+    para fora da pasta, não entra.
+    """
+    folder = backgrounds_folder().resolve()
+    found = {}
+    try:
+        children = list(folder.iterdir()) if folder.is_dir() else []
+    except OSError:
+        children = []
+    for child in children:
+        if child.name.startswith(COPYING_PREFIX):
+            continue
+        # O título e a autoria vazios: a acrescentada leva só o número (P-59).
+        entry = wallpaper_entry(child, "", "")
+        # O wallpaper_entry resolve links; um link que sai da pasta não é uma imagem da pasta.
+        if entry and Path(entry["path"]).parent == folder:
+            found[entry["path"]] = entry
+    ordered = [path for path in dict.fromkeys(state["imports"]) if path in found]
+    rest = sorted((path for path in found if path not in ordered),
+                  key=lambda path: (file_time(path), Path(path).name.casefold()))
+    return [found[path] for path in ordered + rest]
+
+
 def wallpapers():
     state = wallpaper_state()
     original = json.dumps(state)
-    catalog_path = INCLUDED_WALLPAPERS.parent / "catalog.json"
-    catalog = json.loads(catalog_path.read_text()) if catalog_path.exists() else []
-    included = [entry for item in catalog
-                if (entry := wallpaper_entry(INCLUDED_WALLPAPERS / item["file"], item["title"], item["author"]))]
-    included_paths = {entry["path"] for entry in included}
-    discovered = {}
-    for path in sorted(wallpaper_folder().glob("*"), key=lambda p: p.name.casefold()):
-        if (entry := wallpaper_entry(path)) and entry["path"] not in included_paths:
-            discovered[entry["path"]] = entry
-    known = included_paths | discovered.keys()
-    imported = {}
-    # Preserve the previously selected image when upgrading from a single-path setting.
-    paths = state["imports"] + ([state["path"]] if state["mode"] == "custom" and state["path"] else [])
-    for path in paths:
-        if (entry := wallpaper_entry(path)) and entry["path"] not in known:
-            imported[entry["path"]] = entry
-    state["imports"] = list(imported)
+    included = included_entries()
+    added = background_entries(state)
+    # O número é a posição na ordem de entrada, sem buraco (P-65): se uma imagem some, as seguintes descem.
+    for number, entry in enumerate(added, 1):
+        entry["number"] = number
+    state["imports"] = [entry["path"] for entry in added]
     if state["mode"] == "custom":
         selected = wallpaper_entry(state["path"])
         if selected:
@@ -127,21 +168,68 @@ def wallpapers():
             state.update(mode="dynamic", path="", url="")
     if json.dumps(state) != original:
         atomic_write(CONFIG / "pond-interface/wallpaper.json", json.dumps(state) + "\n")
-    added = list(imported.values()) + list(discovered.values())
     add_thumbnails(added + included)
     dynamic = {"dynamic": True, "title": "Dynamic"}
     return dict(state, wallpapers=[dynamic] + included + added)
 
 
+def import_wallpaper(state, path):
+    """Devolvo a entrada da imagem que vira o papel de parede personalizado, copiando-a para a pasta da shell.
+
+    Papel de parede personalizado mora sempre na pasta da shell (P-59). Uma incluída e uma imagem que já
+    está na pasta só são selecionadas. Se a pasta já tem um arquivo com o mesmo conteúdo, uso esse. Se tem
+    outro arquivo com o mesmo nome, a cópia ganha -2, -3, ... antes da extensão. A cópia entra no fim de
+    state["imports"].
+    """
+    source = wallpaper_entry(path)
+    if not source:
+        raise ValueError("Choose a readable image file")
+    image = Path(source["path"])
+    if source["path"] in {entry["path"] for entry in included_entries()}:
+        return source
+    folder = backgrounds_folder()
+    resolved = folder.resolve()
+    if image.parent == resolved:
+        return source
+    try:
+        if folder.is_dir():
+            size = image.stat().st_size
+            for child in sorted(resolved.iterdir()):
+                if (not child.name.startswith(COPYING_PREFIX) and child.is_file() and not child.is_symlink()
+                        and child.stat().st_size == size and filecmp.cmp(child, image, shallow=False)
+                        and (existing := wallpaper_entry(child, "", ""))):
+                    return existing
+        folder.mkdir(parents=True, exist_ok=True)
+        resolved = folder.resolve()
+        target = resolved / image.name
+        copy = 2
+        while target.exists() or target.is_symlink():
+            target = resolved / f"{image.stem}-{copy}{image.suffix}"
+            copy += 1
+        # Copio para um temporário na mesma pasta e troco de nome, para a listagem nunca ver meia imagem.
+        descriptor, temporary = tempfile.mkstemp(dir=resolved, prefix=COPYING_PREFIX)
+        try:
+            with os.fdopen(descriptor, "wb") as output, open(image, "rb") as origin:
+                shutil.copyfileobj(origin, output)
+            os.chmod(temporary, 0o644)
+            os.replace(temporary, target)
+        finally:
+            Path(temporary).unlink(missing_ok=True)
+    except OSError as error:
+        reason = (error.strerror or str(error)).splitlines()
+        raise ValueError("Could not save the image: " + (reason[0] if reason else "unknown error")) from None
+    copied = wallpaper_entry(target, "", "")
+    if not copied:
+        raise ValueError("Choose a readable image file")
+    state["imports"].append(copied["path"])
+    return copied
+
+
 def wallpaper(mode, path=""):
     state = wallpaper_state()
     if mode == "custom":
-        selected = wallpaper_entry(path)
-        if not selected:
-            raise ValueError("Choose a readable image file")
+        selected = import_wallpaper(state, path)
         state.update(mode=mode, path=selected["path"], url=selected["url"])
-        if selected["path"] not in state["imports"]:
-            state["imports"].insert(0, selected["path"])
     elif mode == "dynamic":
         state.update(mode=mode, path="", url="")
     else:

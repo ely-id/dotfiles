@@ -1026,6 +1026,11 @@ PanelWindow {
                   stageWidth: 644; stageHeight: 621
                   Demo.WallpaperSpecimen { selected: "sprawl"; error: "Could not open the image picker" }
                 }
+                Specimen {
+                  caption: "Quatro acrescentadas (P-59) · rolado até o fim, a 02 escolhida e hover na 04: número em Geist Mono 13 em (16,120), sem autor; o lugar depois da última fica vazio"
+                  stageWidth: 644; stageHeight: 621
+                  Demo.WallpaperSpecimen { selected: "02"; extras: 4; scroll: 9999; hoverIndex: 8 }
+                }
               }
 
               SectionBlock {

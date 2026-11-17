@@ -6,9 +6,12 @@ import "../../wallpaper/daylight" as Daylight
 import "../.." as Shell
 
 // Miniatura do seletor de papel de parede (ficha 13; Figma 13:16208): 276×156, raio 12, conteúdo
-// recortado e borda `border` de 1 por cima da imagem. Há três formas: a imagem (com título e autor
-// sobre um degradê preto no hover ou no foco), o Dinâmico (o céu da Daylight, com "Dynamic" sempre
-// visível) e "Choose an image" (contorno tracejado em borderStrong sobre cardHover).
+// recortado e borda `border` de 1 por cima da imagem. Há quatro formas: a imagem nativa (com título e
+// autor sobre um degradê preto no hover ou no foco), o Dinâmico (o céu da Daylight, com "Dynamic" sempre
+// visível), "Choose an image" (contorno tracejado em borderStrong sobre cardHover) e a imagem
+// acrescentada, que leva só o número (`number` > 0, P-59): no hover ou no foco o mesmo degradê e o
+// número em Geist Mono, na posição do título único do "Dynamic". Essa quarta não tem board; é composição
+// (ajuste A-05) com a miniatura que já existe.
 // A selecionada ganha o anel accent de 1 a 4 px da miniatura e a marca de 24 em accent no canto.
 // O foco pelo teclado desenha o mesmo anel, como na origem; o Figma não desenha foco.
 // Escolha minha: o Figma não desenha hover em "Choose an image". Uso o fundo `pressed`, como no botão
@@ -21,6 +24,9 @@ Item {
   property string title
   property string subtitle
   property url source
+  // Posição da imagem acrescentada na ordem de entrada (1, 2, ...); 0 quando a miniatura não é uma.
+  property int number: 0
+  readonly property string numberLabel: number < 10 ? "0" + number : String(number)
   // Só para a vitrine: fixa o hover na miniatura.
   property bool forceHovered: false
   readonly property bool highlighted: forceHovered || hover.hovered || activeFocus
@@ -29,7 +35,7 @@ Item {
   implicitHeight: Shell.Theme.settingsWallpaperTileHeight
   activeFocusOnTab: true
   Accessible.role: adding ? Accessible.Button : Accessible.RadioButton
-  Accessible.name: [title, subtitle].filter(Boolean).join(", ")
+  Accessible.name: number > 0 ? "Wallpaper " + numberLabel : [title, subtitle].filter(Boolean).join(", ")
   Accessible.checked: selected
   Accessible.onPressAction: clicked()
   Keys.onReturnPressed: clicked()
@@ -99,7 +105,7 @@ Item {
       font.letterSpacing: 0
     }
 
-    // Imagem: degradê preto de 276×80 na base e, por cima, título e autor.
+    // Imagem: degradê preto de 276×80 na base e, por cima, título e autor (ou só o número, na acrescentada).
     Item {
       anchors.fill: parent
       visible: !root.adding && !root.dynamic && root.highlighted
@@ -112,6 +118,7 @@ Item {
         }
       }
       Text {
+        visible: root.number === 0
         x: Shell.Theme.settingsWallpaperTextX; y: Shell.Theme.settingsWallpaperTitleY
         width: Shell.Theme.settingsWallpaperTextWidth; height: Shell.Theme.settingsWallpaperTitleHeight
         verticalAlignment: Text.AlignVCenter
@@ -124,6 +131,7 @@ Item {
         font.letterSpacing: 0
       }
       Text {
+        visible: root.number === 0
         x: Shell.Theme.settingsWallpaperTextX; y: Shell.Theme.settingsWallpaperAuthorY
         width: Shell.Theme.settingsWallpaperTextWidth; height: Shell.Theme.settingsWallpaperAuthorHeight
         verticalAlignment: Text.AlignVCenter
@@ -133,6 +141,20 @@ Item {
         font.family: Shell.Theme.fontFamily
         font.weight: Font.Medium
         font.pixelSize: Shell.Theme.fontCaption
+        font.letterSpacing: 0
+      }
+      // Acrescentada: uma linha só, onde o "Dynamic" põe o título (A-05), em Geist Mono 13 Regular.
+      Text {
+        visible: root.number > 0
+        x: Shell.Theme.settingsWallpaperTextX; y: Shell.Theme.settingsWallpaperDynamicTitleY
+        width: Shell.Theme.settingsWallpaperDynamicTitleWidth; height: Shell.Theme.settingsWallpaperTitleHeight
+        verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
+        text: root.numberLabel
+        color: Shell.Theme.text
+        font.family: Shell.Theme.monoFontFamily
+        font.weight: Font.Normal
+        font.pixelSize: Shell.Theme.fontMonoNumber
         font.letterSpacing: 0
       }
     }

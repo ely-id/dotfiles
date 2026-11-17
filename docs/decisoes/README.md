@@ -17,6 +17,7 @@ Cada arquivo registra uma decisão: o contexto em que ela foi tomada, o que esco
 | [0011](0011-pecas-leem-service-e-vitrine-com-dados-ficticios.md) | As peças leem o estado por `service`, e a vitrine usa a peça real com dados fictícios | Aceita |
 | [0012](0012-interface-em-ingles.md) | A interface da shell fala inglês | Aceita |
 | [0013](0013-marca-logo-e-wintermute.md) | Na interface, a marca é o logo com a palavra "Wintermute" | Aceita |
+| [0014](0014-ciclo-de-agentes.md) | Ciclo de agentes: o Fable orquestra, o Sonnet implementa e verifica, um script decide quando parar | Aceita |
 
 ## Modelo
 

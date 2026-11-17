@@ -68,6 +68,15 @@ Li os seis estados pelo `get_design_context`: vazio `13:17130`, aberto pelo "+" 
 - **Rodapé:** ícone `calculator`, "Calculator" e uma ação só, "Copy ↵". O "Colar Ctrl ↵" do board ficou de fora: escrever na janela que estava em foco pede uma ferramenta que a shell não traz (P-71).
 - **Tokens:** `fontLauncherExpression` (28) e `fontLauncherResult` (40), em Geist Serif, e os `launcherCalc*` do `Theme.qml`, com o nó do Figma no comentário.
 
+## Vazio e sem resultado: como funcionam (`F5-T04`, proposta da P-72)
+
+- **Qual estado aparece:** uma expressão vira cálculo; com a busca vazia (ou só com espaços), o vazio; com texto que o serviço não acha em seção nenhuma, o sem resultado; no resto, a lista.
+- **Vazio:** "Recent" com as linhas que o serviço entrega (sem recentes, a seção não aparece) e "Tools" com os quatro chips. O rótulo "Tools" segue a regra dos rótulos (8 abaixo da última linha, ou em y 64 sem recentes); os chips ficam 4 abaixo dele e o divisor do rodapé 16 abaixo dos chips. Com três recentes dá os 352 do board; sem recentes, 188 (chips em y 92, divisor em 144).
+- **Chips pelo teclado** (P-72, que não trava): ↓ depois da última linha de "Recent", ou direto quando não há recentes, entra no primeiro chip; ← e → andam entre os chips e param nas pontas; ↑ volta para a linha de onde entrei; Enter abre a ferramenta. O chip com o foco usa o estado selecionado do componente Chip (`accentSubtle` com `accentRing`), e enquanto ele tem o foco nenhuma linha fica selecionada. Com texto na busca, ← e → são do campo de texto. Digitar tira o foco do chip.
+- **O que os chips abrem:** nada ainda. O seletor de cor é a `F5-T08`, o emoji a `F5-T09`, e a captura e a área de transferência são da F6. Até lá o clique só fica registrado no log, e o launcher continua aberto.
+- **Sem resultado:** o círculo, o título com a busca entre aspas curvas (cortado com reticências numa caixa de 600, 20 de cada lado) e a dica. As duas linhas de ação vêm do serviço, 16 abaixo da dica, sem rótulo, com 4 de folga até o rodapé (332, como no board). **O serviço de verdade ainda não as oferece**, porque o que elas fazem é a P-73: nesse caso o divisor do rodapé fica 16 abaixo da dica, em 196, e o launcher tem 240. A conta é a mesma folga de 16 que o board deixa entre os chips e o rodapé.
+- Enquanto a `F5-T02` não trouxer a fonte de resultados, o launcher de verdade mostra só "Tools" com a busca vazia e "Nothing found" para qualquer texto que não seja cálculo.
+
 ## Textos em inglês (decisão 0012)
 
 A ficha e o board estão em português; a shell mostra o equivalente em inglês. Escolhi assim:

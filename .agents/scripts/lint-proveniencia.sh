@@ -37,6 +37,13 @@ base="${1:-HEAD}"
 
 fora='^wintermute-shell/(Theme\.qml|LegacyColors\.qml|ComponentDemoPanel\.qml|FontTestPanel\.qml|demo/)'
 
+# Texto de interface com letra acentuada (À a ÿ). Com a locale em UTF-8 o bash recusa a faixa [À-ÿ]
+# no [[ =~ ]] ("Invalid range end"), e a checagem ficava desligada sem reprovar nada. O grep com
+# expressão do Perl entende a faixa pelos números das letras, em qualquer locale UTF-8.
+tem_acento() {
+  grep -qP '(text|title|label|placeholder)[A-Za-z]*:\s*".*[\x{C0}-\x{FF}]' <<< "$1"
+}
+
 linhas_novas() {
   # Saída: arquivo<TAB>linha<TAB>conteúdo, só das linhas acrescentadas.
   git diff --unified=0 --no-color "$base" -- 'wintermute-shell/*.qml' \
@@ -75,7 +82,7 @@ while IFS=$'\t' read -r arquivo linha conteudo; do
   elif [[ "$codigo" =~ Qt\.(darker|lighter)\( ]]; then
     echo "AVISO $arquivo:$linha  cor derivada de token: ${conteudo#"${conteudo%%[![:space:]]*}"}"
     avisos=$(( avisos + 1 ))
-  elif [[ "$codigo" =~ (text|title|label|placeholder)[A-Za-z]*:[[:space:]]*\".*[À-ÿ] ]]; then
+  elif tem_acento "$codigo"; then
     echo "AVISO $arquivo:$linha  texto com acento na interface: ${conteudo#"${conteudo%%[![:space:]]*}"}"
     avisos=$(( avisos + 1 ))
   fi

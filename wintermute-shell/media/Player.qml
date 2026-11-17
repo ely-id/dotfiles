@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Shapes
 import Quickshell.Widgets
 import "." as Media
@@ -181,6 +182,8 @@ Shell.Card {
       opacity: 0.7
       smooth: true
       antialiasing: true
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
     }
 
     Image {

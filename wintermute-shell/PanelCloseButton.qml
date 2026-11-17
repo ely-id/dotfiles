@@ -46,10 +46,10 @@ Item {
       fillMode: Image.PreserveAspectFit
       smooth: true
       antialiasing: true
-      layer.enabled: root.hovered
+      layer.enabled: true
       layer.effect: MultiEffect {
         colorization: 1
-        colorizationColor: Theme.textOnAccent
+        colorizationColor: root.hovered ? Theme.textOnAccent : Theme.text
       }
     }
   }

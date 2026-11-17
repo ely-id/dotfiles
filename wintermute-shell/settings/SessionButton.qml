@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import ".." as Shell
 
@@ -121,6 +122,8 @@ Item {
       sourceSize: Qt.size(40, 40)
       fillMode: Image.PreserveAspectFit
       smooth: true
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
     }
   }
 

@@ -154,6 +154,8 @@ Shell.PanelBackground {
           source: Qt.resolvedUrl("../icons/" + profile.modelData.icon + ".svg")
           sourceSize: Qt.size(32, 32)
           fillMode: Image.PreserveAspectFit
+          layer.enabled: true
+          layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
         }
       }
 

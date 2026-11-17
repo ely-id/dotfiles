@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "." as Installs
 import ".." as Shell
 
@@ -16,6 +17,13 @@ Shell.Card {
   readonly property int rowHeight: Shell.Theme.sidebarCardCollapsedWidth - 2 * contentPadding
   readonly property var activeModel: customModel !== null ? customModel : Installs.State.jobs
   readonly property int count: customModel !== null ? customModel.length : Installs.State.jobs.count
+
+  // Ícone vazio ou só o nome (sem "/" nem ":") é um ícone de icons/; qualquer outra coisa é o caminho do
+  // ícone do aplicativo que está sendo instalado. As duas funções usam a mesma regra.
+  function isShellIcon(iconValue) {
+    const str = String(iconValue || "");
+    return str === "" || (str.indexOf("/") === -1 && str.indexOf(":") === -1);
+  }
 
   function resolveIcon(iconValue) {
     if (!iconValue)
@@ -87,6 +95,9 @@ Shell.Card {
           fillMode: Image.PreserveAspectFit
           smooth: true
           antialiasing: true
+          // O ícone de aplicativo mantém as próprias cores; só o de icons/ é colorizado (P-64).
+          layer.enabled: root.isShellIcon(row.icon)
+          layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
         }
 
         Text {

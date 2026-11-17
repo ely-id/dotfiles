@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell.Widgets
 import "." as Notifications
 import ".." as Shell
@@ -85,6 +86,11 @@ Item {
     source: root.service.iconSource(root.notification || ({}))
     asynchronous: true
     smooth: true
+    // A notificação da própria shell traz um ícone de icons/ pelo `iconName` e esse é colorizado (P-64);
+    // o ícone do aplicativo que enviou a notificação mantém as próprias cores. A State.iconSource decide
+    // pelo mesmo campo.
+    layer.enabled: !!(root.notification && root.notification.iconName)
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
   }
 
   Text {

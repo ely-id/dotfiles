@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import ".."
 
 // Linha de rede (ficha 05): ListRow 300×44 r12 com o sinal em (12,12), cadeado em (272,14)
@@ -27,6 +28,8 @@ ListRow {
       source: Qt.resolvedUrl("../icons/cable.svg")
       sourceSize: Qt.size(40, 40)
       fillMode: Image.PreserveAspectFit
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
     }
   } }
 

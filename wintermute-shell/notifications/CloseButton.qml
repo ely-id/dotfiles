@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "." as Notifications
 import ".." as Shell
 
@@ -35,6 +36,8 @@ Rectangle {
     fillMode: Image.PreserveAspectFit
     smooth: true
     antialiasing: true
+    layer.enabled: true
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
   }
 
   MouseArea {

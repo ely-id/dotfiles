@@ -5,7 +5,8 @@ import ".."
 Item {
   id: root
   property int bars: 3
-  // Cor opcional (por exemplo accentText nos detalhes); transparente mantém o branco do SVG.
+  // Cor opcional (por exemplo accentText nos detalhes); transparente usa `text`. O SVG é branco puro e a
+  // cor vem sempre da colorização (P-64).
   property color tint: "transparent"
   implicitWidth: 20
   implicitHeight: 20
@@ -23,10 +24,10 @@ Item {
     fillMode: Image.PreserveAspectFit
     smooth: true
     antialiasing: true
-    layer.enabled: root.tint.a > 0
+    layer.enabled: true
     layer.effect: MultiEffect {
       colorization: 1
-      colorizationColor: root.tint
+      colorizationColor: root.tint.a > 0 ? root.tint : Theme.text
     }
   }
 }

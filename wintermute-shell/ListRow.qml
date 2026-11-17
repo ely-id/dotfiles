@@ -29,6 +29,11 @@ Item {
   // Opcional para fixar o estado na demonstração: "" | "rest" | "hover" | "pressed" | "selected"
   property string visualState: ""
 
+  // Os ícones de icons/ são desenhados em branco puro e a cor vem da colorização (P-64). Só eles são
+  // colorizados: uma imagem de outra origem passada por `iconSource` sairia chapada numa cor só.
+  readonly property bool isShellIcon: iconName !== ""
+      || iconSource.toString().startsWith(Qt.resolvedUrl("icons/").toString())
+
   readonly property bool isSelectedState: visualState === "selected" || (visualState === "" && selected)
   readonly property bool isPressedState: visualState === "pressed" || (visualState === "" && pointer.pressed && interactive)
   readonly property bool isHoverState: visualState === "hover" || (visualState === "" && hover.hovered && interactive)
@@ -79,6 +84,8 @@ Item {
     smooth: true
     antialiasing: true
     opacity: root.contentOpacity
+    layer.enabled: root.isShellIcon
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
   }
 
   Text {

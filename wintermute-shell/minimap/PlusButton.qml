@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Shapes
 import ".." as Shell
 
@@ -68,6 +69,8 @@ Item {
     sourceSize: Qt.size(32, 32)
     smooth: true
     antialiasing: true
+    layer.enabled: true
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
   }
 
   MouseArea {

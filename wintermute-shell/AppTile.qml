@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 
 // Bloco de aplicativo Armitage (ficha 00):
 // 28 px (raio 8, ícone 16 em 6,6) ou 48 px (raio 14, ícone 20 em 14,14).
@@ -13,6 +14,11 @@ Rectangle {
   property bool focused: false
   // Opcional para fixar o estado na demonstração: "" | "rest" | "focus"
   property string visualState: ""
+
+  // Os ícones de icons/ são desenhados em branco puro e a cor vem da colorização (P-64). Só eles são
+  // colorizados: o ícone de um aplicativo passado por `iconSource` sairia chapado numa cor só.
+  readonly property bool isShellIcon: iconName !== ""
+      || iconSource.toString().startsWith(Qt.resolvedUrl("icons/").toString())
 
   readonly property bool isFocusState: visualState === "focus" || (visualState === "" && focused)
   readonly property int iconSize: tileSize >= 48 ? 20 : 16
@@ -35,5 +41,7 @@ Rectangle {
     fillMode: Image.PreserveAspectFit
     smooth: true
     antialiasing: true
+    layer.enabled: root.isShellIcon
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
   }
 }

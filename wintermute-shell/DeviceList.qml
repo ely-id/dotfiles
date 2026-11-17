@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 
 // Cabeçalho, linhas rolantes, estado vazio e rodapé de uma lista de dispositivos (fichas 05 e 06).
@@ -35,6 +36,10 @@ Item {
       source: root.titleIcon
       sourceSize: Qt.size(40, 40)
       fillMode: Image.PreserveAspectFit
+      // Os ícones de icons/ são desenhados em branco puro e a cor vem da colorização (P-64); `titleIcon`
+      // aceita qualquer URL, então só colorizo o que vem da pasta de ícones da shell.
+      layer.enabled: root.titleIcon.toString().startsWith(Qt.resolvedUrl("icons/").toString())
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
     }
     Text {
       x: root.titleIcon.toString() !== "" ? 48 : 20

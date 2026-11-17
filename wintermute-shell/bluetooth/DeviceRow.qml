@@ -22,6 +22,8 @@ Bluetooth.Row {
     width: 20; height: 20
     source: Qt.resolvedUrl("../icons/" + (root.device.icon || "bluetooth") + ".svg")
     sourceSize: Qt.size(40, 40)
+    layer.enabled: true
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
   } }
   trailing: Component { Item {
     Text {
@@ -46,6 +48,8 @@ Bluetooth.Row {
         opacity: infoPointer.containsMouse ? 1 : 0.6
         source: Qt.resolvedUrl("../icons/info.svg")
         sourceSize: Qt.size(32, 32)
+        layer.enabled: true
+        layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
       }
       MouseArea {
         id: infoPointer

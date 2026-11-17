@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 
 // Cartão do OSD de brilho e volume (ficha 10): 156×36, raio 16. Ícone Lucide de 16 em (12,10) e 10
 // pontos 6×6 a cada 10 px, a partir de x 42, y 15. Acesos em `text`, apagados em `dot`.
@@ -26,6 +27,8 @@ Card {
     sourceSize: Qt.size(32, 32)
     fillMode: Image.PreserveAspectFit
     smooth: true
+    layer.enabled: true
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
   }
 
   Repeater {

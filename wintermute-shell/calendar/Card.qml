@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import "Dates.js" as Dates
 import ".." as Shell
@@ -182,6 +183,8 @@ Shell.PanelBackground {
       source: Qt.resolvedUrl("../icons/" + nav.iconName + ".svg")
       sourceSize: Qt.size(32, 32)
       fillMode: Image.PreserveAspectFit
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
     }
     HoverHandler { id: navHover; cursorShape: Qt.PointingHandCursor }
     TapHandler { onTapped: nav.clicked() }

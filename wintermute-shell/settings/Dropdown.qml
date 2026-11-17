@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Effects
 import ".." as Shell
 import QtQuick.Controls
 FocusScope {
@@ -60,6 +61,8 @@ FocusScope {
           width: 16; height: 16; sourceSize: Qt.size(32, 32)
           rotation: option.modelData.iconRotation || 0
           source: option.modelData.icon ? Qt.resolvedUrl("../icons/" + option.modelData.icon + ".svg") : ""
+          layer.enabled: true
+          layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
         }
         Text {
           x: leading.visible ? 36 : 12
@@ -75,6 +78,8 @@ FocusScope {
           width: 16; height: 16; sourceSize: Qt.size(32, 32)
           rotation: option.modelData.submenu ? -90 : 0
           source: Qt.resolvedUrl(option.modelData.submenu ? "../icons/chevron-down.svg" : "../icons/check.svg")
+          layer.enabled: true
+          layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
         }
         Rectangle {
           visible: !!option.modelData.separator

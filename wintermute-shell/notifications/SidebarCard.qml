@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell.Widgets
 import "." as Notifications
 import ".." as Shell
@@ -62,6 +63,8 @@ Item {
         fillMode: Image.PreserveAspectFit
         smooth: true
         antialiasing: true
+        layer.enabled: true
+        layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
       }
 
       // Ponto não lido 6×6 accent em (28,14) quando recolhido e com notificações
@@ -142,6 +145,8 @@ Item {
                 smooth: true
                 antialiasing: true
                 opacity: index === 0 ? 1.0 : 0.4
+                layer.enabled: true
+                layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
               }
             }
           }

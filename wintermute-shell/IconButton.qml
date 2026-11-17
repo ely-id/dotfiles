@@ -34,6 +34,11 @@ Item {
 
   property real glyphOpacity: isDisabledState ? 0.4 : (hovered || isSelectedState || isPressedState ? 1.0 : restingOpacity)
   readonly property color effectiveIconColor: isSelectedState ? Theme.textOnAccent : iconColor
+  // Os ícones de icons/ são desenhados em branco puro e a cor vem sempre da colorização (P-64), então só
+  // eles são colorizados: uma imagem de outra origem sairia chapada numa cor só. Decido pela pasta da
+  // própria shell, porque `iconSource` aceita qualquer URL.
+  readonly property bool isShellIcon: iconName !== ""
+      || iconSource.toString().startsWith(Qt.resolvedUrl("icons/").toString())
 
   signal clicked
 
@@ -77,7 +82,7 @@ Item {
     smooth: true
     antialiasing: true
     opacity: root.glyphOpacity
-    layer.enabled: root.isSelectedState || !Qt.colorEqual(root.effectiveIconColor, Theme.text)
+    layer.enabled: root.isShellIcon
     layer.effect: MultiEffect {
       colorization: 1
       colorizationColor: root.effectiveIconColor

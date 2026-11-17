@@ -167,6 +167,8 @@ PanelWindow {
       sourceSize: Qt.size(32, 32)
       smooth: true
       antialiasing: true
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
     }
   }
 
@@ -212,10 +214,10 @@ PanelWindow {
       sourceSize: Qt.size(32, 32)
       smooth: true
       antialiasing: true
-      layer.enabled: !plusSample.hoveredState
+      layer.enabled: true
       layer.effect: MultiEffect {
         colorization: 1
-        colorizationColor: Theme.muted
+        colorizationColor: plusSample.hoveredState ? Theme.text : Theme.muted
       }
     }
   }

@@ -190,6 +190,8 @@ Settings.Modal {
       source: Qt.resolvedUrl("../../icons/chevron-right.svg")
       sourceSize: Qt.size(32, 32)
       smooth: true
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
     }
 
     HoverHandler { id: manualHover; cursorShape: Qt.PointingHandCursor }

@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 
 // Chip Armitage (ficha 00):
 // Altura 36, padding 12/14, espaço 8, raio 10, ícone 16 + rótulo 13 Medium.
@@ -13,6 +14,11 @@ Rectangle {
   property bool interactive: true
   // Opcional para fixar o estado na demonstração: "" | "rest" | "hover" | "selected"
   property string visualState: ""
+
+  // Os ícones de icons/ são desenhados em branco puro e a cor vem da colorização (P-64). Só eles são
+  // colorizados: um ícone de aplicativo passado por `iconSource` sairia chapado numa cor só.
+  readonly property bool isShellIcon: iconName !== ""
+      || iconSource.toString().startsWith(Qt.resolvedUrl("icons/").toString())
 
   readonly property bool isSelectedState: visualState === "selected" || (visualState === "" && selected)
   readonly property bool isHoverState: visualState === "hover" || (visualState === "" && chipHover.hovered && interactive)
@@ -46,6 +52,8 @@ Rectangle {
     fillMode: Image.PreserveAspectFit
     smooth: true
     antialiasing: true
+    layer.enabled: root.isShellIcon
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
   }
 
   Text {

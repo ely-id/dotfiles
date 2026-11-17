@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "../.." as Shell
 
 // Linha de ajuste da Aparência (ficha 11): 520×52, raio 12, fundo `control` (hover `pressed`), título 15
@@ -52,6 +53,8 @@ Rectangle {
     objectName: "settingsRowChevron"
     visible: root.enabled
     rotation: root.expanded ? 180 : 0
+    layer.enabled: true
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
     Behavior on rotation { NumberAnimation { duration: 220; easing.type: Easing.InOutCubic } }
   }
   MouseArea {

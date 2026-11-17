@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell.Widgets
 import ".." as Shell
 
@@ -69,6 +70,10 @@ Item {
     fillMode: Image.PreserveAspectFit
     smooth: true
     antialiasing: true
+    // Este Image só mostra o ícone de icons/ (`lucideIcon`); o ícone do aplicativo vai no IconImage abaixo,
+    // que nunca é colorizado.
+    layer.enabled: true
+    layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
   }
 
   IconImage {

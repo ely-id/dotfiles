@@ -202,6 +202,8 @@ Card {
       sourceSize: Qt.size(32, 32)
       smooth: true
       antialiasing: true
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
     }
 
     Text {
@@ -236,6 +238,8 @@ Card {
       sourceSize: Qt.size(32, 32)
       smooth: true
       antialiasing: true
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
     }
 
     Text {
@@ -336,6 +340,8 @@ Card {
           opacity: action.glyphOpacity * (index === 0 ? 1 - flipProgress : flipProgress)
           smooth: true
           antialiasing: true
+          layer.enabled: true
+          layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
         }
       }
     }

@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
@@ -144,6 +145,12 @@ Item {
             source: button.modelData.icon
             asynchronous: true
             opacity: Shell.Theme.settingsTrayIconOpacity
+            // O ícone de um item real da bandeja é o do aplicativo e nunca é colorizado. A vitrine passa
+            // ícones de icons/ no lugar deles (demo/SettingsHomeSpecimen.qml), e esses são desenhados em
+            // branco puro (P-64), então só eles ganham a cor `text`. Um ícone de aplicativo nunca mora na
+            // pasta de ícones da shell.
+            layer.enabled: String(source).startsWith(Qt.resolvedUrl("../icons/").toString())
+            layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
           }
 
           MouseArea {

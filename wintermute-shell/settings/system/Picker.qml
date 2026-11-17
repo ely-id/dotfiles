@@ -76,6 +76,8 @@ Settings.Modal {
       sourceSize: Qt.size(32, 32)
       fillMode: Image.PreserveAspectFit
       smooth: true
+      layer.enabled: true
+      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.text }
     }
 
     Text {

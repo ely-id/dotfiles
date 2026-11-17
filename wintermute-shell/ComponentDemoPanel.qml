@@ -559,7 +559,7 @@ PanelWindow {
         Minimap.WindowIcon {
           x: 10; y: 60
           interactive: false
-          windowData: ({ lucideIcon: "message-square", isFocused: false })
+          windowData: ({ lucideIcon: "hash", isFocused: false })
         }
         Rectangle {
           visible: orgSpec.stateNumber !== 4
@@ -589,7 +589,7 @@ PanelWindow {
             x: -48; width: 192; height: 40
             Minimap.WindowIcon { x: 0; y: 0; interactive: false; windowData: ({ lucideIcon: "terminal" }) }
             Minimap.WindowIcon { x: 48; y: 0; interactive: false; windowData: ({ lucideIcon: "globe" }) }
-            Minimap.WindowIcon { x: 96; y: 0; interactive: false; windowData: ({ lucideIcon: "message-square" }) }
+            Minimap.WindowIcon { x: 96; y: 0; interactive: false; windowData: ({ lucideIcon: "hash" }) }
             Minimap.WindowIcon { x: 144; y: 0; interactive: false; windowData: ({ lucideIcon: "mail", isFocused: true }) }
           }
         }
@@ -632,7 +632,7 @@ PanelWindow {
         Rectangle { x: 76; y: 28; width: 4; height: 4; radius: 2; color: Theme.dot }
         Rectangle { x: 124; y: 28; width: 4; height: 4; radius: 2; color: Theme.dot }
 
-        Minimap.WindowIcon { x: 10; y: 60; interactive: false; windowData: ({ lucideIcon: "message-square" }) }
+        Minimap.WindowIcon { x: 10; y: 60; interactive: false; windowData: ({ lucideIcon: "hash" }) }
         // Alvo de soltar 40×40 r20 em (58,60)
         Rectangle {
           x: 58; y: 60; width: 40; height: 40; radius: 20
@@ -661,7 +661,7 @@ PanelWindow {
         anchors.fill: parent
 
         // Linha 2 deslocada para o topo (y 10)
-        Minimap.WindowIcon { x: 10; y: 10; interactive: false; windowData: ({ lucideIcon: "message-square" }) }
+        Minimap.WindowIcon { x: 10; y: 10; interactive: false; windowData: ({ lucideIcon: "hash" }) }
         Rectangle { x: 76; y: 28; width: 4; height: 4; radius: 2; color: Theme.dot }
         Rectangle { x: 124; y: 28; width: 4; height: 4; radius: 2; color: Theme.dot }
 
@@ -845,7 +845,7 @@ PanelWindow {
 
             Chip {
               text: "F1 · Base"
-              iconName: "sliders-horizontal"
+              iconName: "settings"
               selected: root.selectedPhaseTab === 1
               onClicked: root.selectedPhaseTab = 1
             }
@@ -1464,7 +1464,7 @@ PanelWindow {
                   Notifications.SidebarCard {
                     width: 156
                     previewCount: 3
-                    previewIcons: ["message-square", "mail", "terminal"]
+                    previewIcons: ["hash", "mail", "terminal"]
                   }
                 }
                 Specimen {
@@ -1482,7 +1482,7 @@ PanelWindow {
                     width: 156
                     customModel: [
                       { jobId: "1", name: "Firefox", status: "installing", progress: 0.65, icon: "globe" },
-                      { jobId: "2", name: "Blender", status: "installed", progress: 1.0, icon: "box" }
+                      { jobId: "2", name: "Blender", status: "installed", progress: 1.0, icon: "app-window" }
                     ]
                   }
                 }
@@ -1493,7 +1493,7 @@ PanelWindow {
                     collapseProgress: 1
                     customModel: [
                       { jobId: "1", name: "Firefox", status: "installing", progress: 0.65, icon: "globe" },
-                      { jobId: "2", name: "Blender", status: "installed", progress: 1.0, icon: "box" }
+                      { jobId: "2", name: "Blender", status: "installed", progress: 1.0, icon: "app-window" }
                     ]
                   }
                 }

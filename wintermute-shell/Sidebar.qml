@@ -172,7 +172,7 @@ PanelWindow {
       width: root.cardWidth
       collapseProgress: root.collapseProgress
       previewCount: root.demoCards ? 3 : -1
-      previewIcons: root.demoCards ? ["message-square", "mail", "terminal"] : []
+      previewIcons: root.demoCards ? ["hash", "mail", "terminal"] : []
       onPanelRequested: { root.dismissPanels(); Notifications.State.togglePanel(root.screen.name); }
     }
 
@@ -182,7 +182,7 @@ PanelWindow {
       collapseProgress: root.collapseProgress
       customModel: root.demoCards ? [
         { jobId: "demo-1", name: "Firefox", status: "installing", progress: 0.65, icon: "globe" },
-        { jobId: "demo-2", name: "Blender", status: "installed", progress: 1.0, icon: "box" }
+        { jobId: "demo-2", name: "Blender", status: "installed", progress: 1.0, icon: "app-window" }
       ] : null
     }
     KeyboardFeedback {

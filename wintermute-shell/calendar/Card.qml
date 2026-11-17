@@ -18,16 +18,21 @@ Shell.PanelBackground {
   readonly property var days: Dates.monthDays(displayedMonth)
   readonly property int weekRow: isCurrentMonth
       ? Dates.currentWeekRow(days, today) : -1
-  readonly property var locale: Qt.locale("pt_BR")
+  // Sigo o idioma do sistema: nome do mês, iniciais da semana e texto do leitor de tela saem do
+  // locale, sem montar a frase à mão. O que não é do locale é a ordem da grade, que fica na segunda.
+  readonly property var locale: Qt.locale()
   readonly property string monthName: locale.standaloneMonthName(
       displayedMonth.getMonth(), Locale.LongFormat)
   readonly property string monthTitle: monthName.charAt(0).toUpperCase() + monthName.slice(1)
-      + " de " + displayedMonth.getFullYear()
+      + " " + displayedMonth.getFullYear()
+  // dayName conta do domingo (0); a grade começa na segunda, por isso o (i + 1) % 7.
+  readonly property var weekdayInitials: [0, 1, 2, 3, 4, 5, 6].map(
+      i => locale.dayName((i + 1) % 7, Locale.NarrowFormat))
 
   implicitWidth: 264
   implicitHeight: 296
   Accessible.role: Accessible.Pane
-  Accessible.name: "Calendário, " + monthTitle
+  Accessible.name: "Calendar, " + monthTitle
 
   function showMonth(month) {
     browsedMonth = Dates.monthStart(month);
@@ -60,24 +65,24 @@ Shell.PanelBackground {
   NavigationButton {
     x: 176; y: 16
     iconName: "rotate-ccw"
-    accessibleName: "Voltar para hoje"
+    accessibleName: "Back to today"
     onClicked: root.goToday()
   }
   NavigationButton {
     x: 204; y: 16
     iconName: "chevron-up"
-    accessibleName: "Mês anterior"
+    accessibleName: "Previous month"
     onClicked: root.moveMonth(-1)
   }
   NavigationButton {
     x: 232; y: 16
     iconName: "chevron-down"
-    accessibleName: "Próximo mês"
+    accessibleName: "Next month"
     onClicked: root.moveMonth(1)
   }
 
   Repeater {
-    model: ["S", "T", "Q", "Q", "S", "S", "D"]
+    model: root.weekdayInitials
     delegate: Text {
       required property int index
       required property string modelData
@@ -124,8 +129,9 @@ Shell.PanelBackground {
           : dayHover.hovered ? Shell.Theme.pressed : "transparent"
       antialiasing: true
       Accessible.role: Accessible.StaticText
-      Accessible.name: root.locale.toString(modelData, "dddd, d 'de' MMMM 'de' yyyy")
-          + (isToday ? ", hoje" : "")
+      // toString(data, LongFormat) traria hora e fuso; o formato longo só da data vem de dateFormat.
+      Accessible.name: root.locale.toString(modelData, root.locale.dateFormat(Locale.LongFormat))
+          + (isToday ? ", today" : "")
 
       Behavior on color {
         ColorAnimation { duration: Shell.Theme.hoverDuration; easing.type: Easing.OutCubic }

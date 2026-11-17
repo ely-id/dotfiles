@@ -19,4 +19,4 @@
 ## Comportamento a herdar
 
 - Semana começa na segunda (já era a intenção; o Figma confirma).
-- Locale pt-BR para nomes e abreviações.
+- ~~Locale pt-BR para nomes e abreviações.~~ Desde a `F4-T16` (2026-11-17, decisão 0012) o calendário segue o locale do sistema (`Qt.locale()`): o título é o nome do mês com a primeira letra em maiúscula, um espaço e o ano ("November 2026"; em português, "Novembro 2026", sem o "de"), as iniciais do cabeçalho saem do locale (M T W T F S S; em português, S T Q Q S S D) e o leitor de tela lê a data por extenso do locale. A semana continua começando na segunda, e a grade não muda. O relógio da barra não segue o locale: o dia do chip ("fri") e o do recolhido ("FR") ficam em inglês, porque a abreviação de duas letras é desenho.

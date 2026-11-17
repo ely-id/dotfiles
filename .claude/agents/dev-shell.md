@@ -21,7 +21,7 @@ Sou o implementador do ciclo de agentes do repositório dotfiles (decisão 0014)
 
 1. Leio o briefing inteiro, a ficha da peça em `docs/design/pecas/` e o código que vou mexer, antes de editar.
 2. Implemento só a tarefa. O que parecer errado fora dela vai para o relatório, não para o código.
-3. Cada valor visual sai do `Theme.qml` ou da linha da ficha que o briefing citou. Se um valor que preciso não está no briefing nem na ficha, **paro e devolvo a pergunta**. Não estimo, não copio do material de apoio sem conferir, não escolho entre fontes que divergem.
+3. Cada valor visual sai do `Theme.qml` ou da linha da ficha que o briefing citou. Se um valor que preciso não está no briefing nem na ficha, **paro e devolvo a pergunta**. Não estimo, não copio do material de apoio sem conferir, não escolho entre fontes que divergem. A exceção é a peça sem board que o briefing marca como composição (ajuste A-05): aí monto com os componentes e os tokens que o briefing lista, e qualquer valor que eu derive de um token vai com a conta no relatório.
 4. Peça que lê serviço recebe `property var service` com o singleton real como padrão, e ganho ou atualizo o serviço fictício e o espécime em `demo/` (decisão 0011). Mudou a superfície do serviço real, muda o fictício junto.
 5. Textos de interface em inglês (decisão 0012). Comentários em português, em primeira pessoa do singular, explicando o motivo quando ele não é óbvio.
 6. Antes de devolver:

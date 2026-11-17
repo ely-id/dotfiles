@@ -81,6 +81,7 @@ A sessão só está encerrada quando o painel descreve o estado real. Se o conte
 ## Regras de design
 
 - **Nunca inventar valor.** Cor, medida, raio, tempo e tipografia saem de `docs/design/tokens/` e das fichas em `docs/design/pecas/`. Se faltar, perguntar e registrar em `PENDENCIAS.md`.
+- **Peça sem desenho no Figma (ajuste A-05).** Quando uma peça ou um estado de que a shell precisa não tem board, ele é composto com os componentes, os tokens e os padrões que a shell já usa (linhas, chaves, menus, pilha de cartões, grade de 4 px), na mesma direção visual e de interação do resto. Isso não é inventar valor: nenhuma cor, fonte ou medida sem origem, e um valor novo só quando sai de uma conta sobre tokens, com a conta escrita na ficha. A composição fica registrada na ficha da peça e é aprovada por mim no QA ao vivo, pelo print. Divergência entre fontes e decisão de comportamento ou de conteúdo continuam virando pendência.
 - Itens marcados como *A CONFIRMAR* nas fichas estão consolidados em `PENDENCIAS.md`. Não se chuta: pergunta-se.
 - O aceite visual de uma peça é o print dela ao lado da referência (PNG local ou board do Figma), com as medidas da ficha conferidas. Os prints fora do Niri saem de `.agents/scripts/bancada.sh`, nas três variações.
 - Cor e família de fonte escritas direto numa peça são valor inventado. `.agents/scripts/lint-proveniencia.sh` confere as linhas alteradas e precisa passar antes de cada commit de código da shell.

@@ -19,7 +19,7 @@ O identificador da tarefa, os critérios de "pronto quando" e a lista de espéci
 1. Leio a tarefa na nota da fase (painel do Obsidian, somente leitura), a ficha da peça em `docs/design/pecas/`, o `Theme.qml` e o `git diff` da tarefa.
 2. Rodo `.agents/scripts/lint-proveniencia.sh`. Erro do lint reprova.
 3. Rodo `.agents/scripts/bancada.sh` em cada espécime, nas três variações. Falta de print ou erro de QML reprova.
-4. Olho cada print com a ferramenta de leitura de imagem e comparo com a referência:
+4. Olho cada print com a ferramenta de leitura de imagem e comparo com a referência. Peça sem board (ajuste A-05) não tem referência própria: comparo com as peças da shell que usam os mesmos componentes e confiro que nenhum valor fica sem origem. As referências são:
    - PNG local em `~/Projects/referencias/dotfiles-estudo/pacote-entrega-original/referencias/armitage/` (como resolver o caminho: `docs/design/README.md`);
    - ou o board do Figma pelo node-id, quando a ferramenta do Figma estiver disponível;
    - ou os prints aprovados de tarefas anteriores, em `handoffs/FN-prints/` do painel, para consistência.

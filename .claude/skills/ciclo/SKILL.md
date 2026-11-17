@@ -22,7 +22,7 @@ O painel fica em `${DOTFILES_PAINEL:-~/Documents/Journal/projeto-dotfiles}`. Tod
 - **Quem decide se o ciclo continua é o `ciclo.sh`**, não a minha impressão de que acabou. Rodo `.agents/scripts/ciclo.sh estado --dentro` antes de cada tarefa e paro em qualquer resultado diferente de `continuar`.
 - **Nenhuma fase recebe `go` do ciclo.** O veredito é meu, na sessão do Niri (`/qa-fase ao-vivo`).
 - **Nada fora do repositório e do painel.** O ciclo não instala pacote, não usa `sudo`, não faz `git push` e não escreve em `~/.config/`. O que precisar mudar ali (binds do Niri, por exemplo, pela P-35) é preparado no repositório e entra na lista "Aplicar na sessão ao vivo" do handoff da fase.
-- **Nunca inventar valor.** Se a ficha, os tokens, o Figma e a origem não dão um valor, abro uma pendência em `PENDENCIAS.md` e marco a tarefa na nota da fase com `(bloqueada: P-NN)` no fim da linha. Esse texto é o que o `ciclo.sh` lê. Depois sigo para a próxima tarefa que não depende da resposta.
+- **Nunca inventar valor.** Se a ficha, os tokens, o Figma e a origem não dão um valor, abro uma pendência em `PENDENCIAS.md` e marco a tarefa na nota da fase com `(bloqueada: P-NN)` no fim da linha. Esse texto é o que o `ciclo.sh` lê. Depois sigo para a próxima tarefa que não depende da resposta. **Falta de board não é falta de valor:** peça ou estado sem desenho no Figma é composto pela regra "Peça sem desenho no Figma" do `AGENTS.md` (ajuste A-05), e o briefing diz isso ao `dev-shell`, com os componentes e os tokens a usar.
 
 ## Abrir
 

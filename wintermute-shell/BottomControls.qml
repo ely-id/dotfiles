@@ -11,7 +11,8 @@ import "wifi" as Wifi
 // Recolhido (48×168, r16): 4 botões 40×40 em x 4, y 4/44/84/124, ícone 16 em (12,12).
 // Hover que cresce para 80 (aberto):
 //   Wi-Fi: download (12,10) + texto 11 muted (32,8) + divisor (80,10) + upload (88,10) + texto 11 muted (108,8).
-//   Som: slider compacto 132×8 r4 em (12,14), preenchimento accent, alça 16 knob em y 10.
+//   Som: slider compacto 96×8 r4 em (12,14), preenchimento accent, alça 16 knob em y 10, e o percentual
+//   em Geist Mono 11 Medium muted, alinhado à direita numa caixa 28×20 em (116,8), com 8 de folga (P-42, P-61).
 Card {
   id: root
   property real collapseProgress: 0
@@ -22,6 +23,7 @@ Card {
   property string previewDownloadRate: "12 MB/s"
   property string previewUploadRate: "1,2 MB/s"
   property real previewVolume: 0.61
+  property bool previewMuted: false
 
   signal collapseClicked
   readonly property real widthProgress: Theme.collapseWidth(collapseProgress)
@@ -58,6 +60,7 @@ Card {
       && (Wifi.State.wifiConnected || Wifi.State.wiredConnected)
   readonly property bool soundHovered: soundButtonHovered
       || compactSoundSlider.hovered
+      || soundValueHover.hovered
   readonly property bool wifiPresentationRequested: wifiHovered || wifiOpen
   readonly property bool wifiMetricsVisible: previewReveal === "" && wifiMetrics.visible
   onWifiMetricsVisibleChanged: Wifi.State.setRateConsumer(root, wifiMetricsVisible)
@@ -99,23 +102,57 @@ Card {
     }
   }
 
-  // Slider compacto no hover do Som: trilho 132×8 r4 em (12,14), alça 16×16 em y 10
+  // Slider compacto no hover do Som: trilho 96×8 r4 em (12,14), alça 16×16 em y 10.
+  // O percentual (28×20 em (116,8)) é desenhado logo abaixo, não dentro do slider.
   Slider {
     id: compactSoundSlider
     z: 2
     x: 12
     y: 0
-    width: 132
+    width: 96
     height: 36
     compact: true
     externalValue: root.previewReveal === "sound" ? root.previewVolume : Audio.State.outputVolume
-    muted: root.previewReveal === "sound" ? false : Audio.State.outputMuted
+    muted: root.previewReveal === "sound" ? root.previewMuted : Audio.State.outputMuted
     trackColor: Theme.track
     interactive: root.previewReveal === "sound" || root.soundSliderRequested
     hoverEnabled: root.soundSliderContentVisible
     visible: opacity > 0.001
     opacity: root.soundSliderContentVisible && root.collapseProgress <= 0.001 ? 1 : 0
     onMoved: if (root.previewReveal === "") Audio.State.setOutputVolume(compactSoundSlider.value)
+  }
+
+  // Percentual do slider compacto (P-42: Geist Mono; P-61: 11 Medium muted, à direita, "0%" no mudo).
+  // Usa o visualValue do slider para acompanhar a prévia e o arraste junto com a alça.
+  Text {
+    id: soundValueLabel
+    x: 116
+    y: 8
+    width: 28
+    height: 20
+    text: (compactSoundSlider.muted ? 0 : Math.round(compactSoundSlider.visualValue * 100)) + "%"
+    color: Theme.muted
+    font.family: Theme.monoFontFamily
+    font.weight: Font.Medium
+    font.pixelSize: Theme.fontMonoCaption
+    font.letterSpacing: 0
+    horizontalAlignment: Text.AlignRight
+    verticalAlignment: Text.AlignVCenter
+    opacity: compactSoundSlider.opacity
+    visible: opacity > 0.001
+  }
+
+  // Faixa x 108 a 144 (folga + número): não é interativa, mas conta como hover do Som.
+  // Sem ela, o ponteiro sobre o número tiraria o hover do slider e o cartão recolheria.
+  Item {
+    x: 108
+    y: 0
+    width: 36
+    height: 36
+    HoverHandler {
+      id: soundValueHover
+      enabled: root.soundSliderContentVisible
+    }
   }
 
   Behavior on height {

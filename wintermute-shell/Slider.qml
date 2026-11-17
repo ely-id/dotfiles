@@ -10,7 +10,8 @@ import QtQuick.Templates as T
 //   Hover: anel accentRing 4 px outside e bolha 28×22 raio 6 em y -28 com Geist Mono 11 textOnAccent.
 //   Mudo: trilho com borda borderStrong, preenchimento 2 px em muted, ícone volume-x 16 na alça.
 // Modo compacto (compact: true, hover no Som em BottomControls, ficha 03):
-//   Caixa 132×36; trilho 132×8 em y 14, raio 4, fundo track; preenchimento accent; alça 16×16 em y 10, knob.
+//   Caixa 96×36; trilho 96×8 em y 14, raio 4, fundo track; preenchimento accent; alça 16×16 em y 10, knob.
+//   O percentual fica fora do slider, desenhado por quem usa (o BottomControls).
 T.Slider {
   id: root
 
@@ -50,7 +51,7 @@ T.Slider {
   readonly property real handleSize: compact ? 16 : (isDraggingState ? 20 : 26)
   readonly property real handleTop: compact ? 10 : (isDraggingState ? 6 : 3)
 
-  implicitWidth: compact ? 132 : Theme.panelFieldWidth
+  implicitWidth: compact ? 96 : Theme.panelFieldWidth
   implicitHeight: compact ? 36 : 32
   clip: false
 

@@ -1525,7 +1525,16 @@ PanelWindow {
                   BottomControls {
                     previewReveal: "sound"
                     previewHoverSlot: 1
-                    previewVolume: 0.61
+                    previewVolume: 0.6
+                  }
+                }
+                Specimen {
+                  caption: "Hover Som · mudo (156×80)"; stageWidth: 156; stageHeight: 80
+                  BottomControls {
+                    previewReveal: "sound"
+                    previewHoverSlot: 1
+                    previewVolume: 0.6
+                    previewMuted: true
                   }
                 }
                 Specimen {

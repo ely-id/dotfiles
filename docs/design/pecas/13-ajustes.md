@@ -175,6 +175,32 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
   - **P-65:** o número é a posição na ordem de entrada, sem buraco. Se uma imagem some da pasta, as seguintes descem um número. Não há botão de remover.
   - **P-66:** as acrescentadas são só as imagens da pasta da shell. A varredura de `~/Pictures/Wallpapers` deixa de alimentar a lista, porque pela P-59 as acrescentadas moram na pasta da shell e têm ordem de entrada. A pasta continua sendo a em que o diálogo do portal abre.
 
+### Cartão "Customize": papel de parede por modo e por monitor (`F4-T24`, ajuste A-05, P-67 respondida em 2026-11-17)
+
+- Minha resposta à P-67: "Aprovado", a proposta inteira. Um botão "Customize" no seletor abre um cartão que empilha na frente dele, como as páginas do Wi-Fi; no cartão, duas chaves independentes e uma linha por lugar; tocar numa linha volta à grade, que escolhe para aquele lugar; "Dynamic" vale em qualquer lugar; lugar sem escolha usa o marcado na grade; monitor desligado some da lista e a escolha fica guardada; quando o modo dos aplicativos troca (`F4-T23`), à mão ou pelo horário, cada tela passa ao papel de parede do modo novo.
+- **Nada disto tem board.** É composição pela regra A-05: só componentes e tokens que a shell já usa, e cada medida nova sai de uma conta sobre tokens, escrita aqui. A aprovação é minha, pelo print, no QA ao vivo.
+- **Botão "Customize"** no seletor: o secundário pequeno do "Arrange" da Tela (`control` com borda `border`, raio 8, 13 Medium `text`), 96×32 (`settingsDisplayArrangeWidth`). Posição no modal de 624: x 504 = 624 − 24 (`settingsWallpaperGridInset`) − 96, alinhado à direita com a grade; y 26 = 20 + (44 − 32) / 2, centrado na caixa do título (y 20, altura 44). Some quando a grade escolhe para um lugar e quando o seletor é a carta de trás.
+- **Pilha** (tokens do `PanelStyle.qml`, os da ficha 05):
+  - Cartão da frente: modal de 580 (`settingsModalWidth`), raio 32, 32 abaixo do topo do conjunto (`frontInsetStacked`).
+  - Carta de trás: o seletor na escala original, cortado em 548 = 580 − 2 × 16 (`backOffsetX`), a 16 de cada lado da frente e 32 acima dela, com a base rente à da frente; raio 32, o mesmo vidro e o mesmo contorno; conteúdo a 50% (`backContentOpacity`) com blur 8 (`backContentBlur`), inclusive no trecho acima da frente. O conteúdo fica à esquerda e o que passa de 548 é cortado, como no `CardLayer`. Sem botão de fechar e sem clique.
+  - O botão de fechar pendurado é o do cartão da frente, em (largura − 20, −13), e volta ao seletor.
+  - Transição: 350 ms (`pageDuration`) na curva `[0.19, 1, 0.22, 1]`; a frente entra de escala 0,92 a 1 com a opacidade de 0 a 1 e sai com a escala `max(0, 1 − 2 × progresso)`; a carta de trás interpola largura (624 a 548), posição, opacidade do conteúdo e blur; a altura do conjunto interpola junto.
+  - O seletor e o cartão são um componente só (`WallpaperStack.qml`), carregado nas páginas `wallpaper` e `customize`, para o seletor continuar vivo atrás do cartão com a rolagem onde estava.
+- **Cartão**: título "Customize" em Serif 32 em (30,20). Linhas de 520×52 em x 30, a primeira em y 84, passo 60 (`settingsBodyInset`, `settingsBodyTop`, `settingsRowPitch`):
+  - y 84: chave "Follow light and dark mode".
+  - y 144: chave "One wallpaper per display".
+  - y 204 em diante: uma linha por lugar.
+  - Base de 32 (`settingsBottomPadding`). Altura: 84 + 60 × (2 + n) − 8 + 32, ou seja 228 sem linhas, 348 com duas e 468 com quatro. Passando da altura disponível, o corpo rola.
+  - O erro aparece depois da última linha, em `dangerText`, com quebra, como nas outras páginas de linhas.
+- **Linha de lugar**: a linha com seta dos Ajustes (`chevron-right` de 16 em (484,18) em `muted`; hover `pressed`), sem valor à direita, com:
+  - Miniatura de 64×36 em (8,8). Altura 36 = 52 − 2 × 8, com a mesma folga em cima, embaixo e à esquerda; largura 64 = 36 × 16 / 9, a proporção das imagens de 1920×1080. Raio 8 (`settingsDisplayTileRadius`, o do monitor em miniatura da Tela), conteúdo recortado e borda `border` de 1 por cima, como na miniatura da grade. Mostra o que vale no lugar: a escolha dele ou, sem escolha, o marcado na grade; "Dynamic" mostra o céu, sem texto.
+  - Nome em x 84 = 8 + 64 + 12 (12 é a folga entre o bloco e o texto do botão Manual), Geist 15 Regular `text`.
+- **Quais linhas aparecem**: com as duas chaves desligadas, nenhuma; só a do modo, "Light" e "Dark"; só a dos monitores, uma por monitor ligado, pelo nome do conector (`eDP-1`, `HDMI-A-1`, como na P-48); as duas, "eDP-1 · Light" e "eDP-1 · Dark" para cada monitor, com o mesmo " · " do "1 · Built-in" da Tela. A tela embutida vem primeiro (`eDP-`, `LVDS-`, `DSI-`, `DPI-`) e depois os outros pelo nome; Light antes de Dark.
+- **Grade escolhendo para um lugar**: o título do seletor passa a ser o nome do lugar (o texto da linha), o botão "Customize" some, e o anel e a marca mostram o que vale ali. Tocar numa miniatura grava no lugar e o cartão volta; "Choose an image" abre o portal, copia a imagem para a pasta da shell e a põe no lugar; cancelar o portal não muda nada. Fechar ou Escape voltam ao cartão sem mudar nada.
+- **Como fica guardado**: o `wallpaper.json` ganha `followScheme`, `perDisplay` e `places`, um dicionário de chave de lugar para `{mode, path, url}`. As chaves são `light`, `dark`, `display:<conector>` e `display:<conector>:light` ou `:dark`. O `mode`, o `path` e o `url` de sempre continuam sendo o marcado na grade. Lugar sem entrada usa o marcado na grade e não herda de outro lugar. As escolhas ficam guardadas quando desligo uma chave e quando o monitor não está ligado. Um lugar cuja imagem sumiu sai de `places`. O `control.py` ganhou `place`, `option` e `pick <chave>`.
+- **Na área de trabalho**: cada tela recebe o papel de parede que vale para o conector dela e para o modo atual dos aplicativos (`appsScheme` da `F4-T23`), então a troca de modo troca o papel de parede sozinha. Com as duas chaves desligadas é o de antes: um papel de parede para todas as telas.
+- Escolhas minhas na `F4-T24`, que aprovo ou corrijo no QA ao vivo: o título do cartão é "Customize", o do botão que o abre; o título da grade em escolha é o nome do lugar; a linha não mostra o nome do papel de parede, só a miniatura; não há botão para limpar a escolha de um lugar (para voltar ao marcado na grade, escolho de novo a mesma imagem).
+
 ## A CONFIRMAR
 
 - ~~Ícone do perfil Desempenho na home: `zap` aqui vs `rocket` no pop-up da bateria (ficha 08).~~ Definido em 2026-11-15 (P-07): `zap` nos dois lugares.

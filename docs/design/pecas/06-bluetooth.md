@@ -28,3 +28,4 @@ Pilha igual à ficha 05 (316 / 284 / fechar pendurado).
 ## Desligado — 156
 
 - Mesmo cabeçalho com a chave off + texto centrado `muted`: “O Bluetooth está desligado.” Sem rodapé; o texto fica com o centro em y 104.
+- **Rádio bloqueado pelo `rfkill`** (`F4-T13`, 2026-11-17). É o mesmo desenho do desligado, com a frase "Bluetooth is blocked. Turn it on to unblock it." no lugar. Ligar a chave roda `rfkill unblock bluetooth` e só então liga o adaptador; a chave fica ocupada do começo ao fim. Se o comando falha, a mensagem de erro (em `dangerText`, onde as mensagens do Bluetooth já aparecem) diz o motivo: "Could not unblock Bluetooth: …". Se o comando passa e o adaptador continua bloqueado depois de 3 s, que é o caso de bloqueio de hardware: "Bluetooth is still blocked. Check the hardware switch or airplane mode.". Os 3 s são espera de processo, não medida de desenho.

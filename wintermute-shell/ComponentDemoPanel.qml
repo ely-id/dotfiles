@@ -1008,6 +1008,27 @@ PanelWindow {
               }
 
               SectionBlock {
+                title: "Papel de parede (ficha 13, board 13:16208) · seletor real com imagens minhas"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Wallpaper 624×608 · Dynamic escolhido, hover no Chiba (título em (16,108), autor em muted), sexto lugar vazio (P-59)"
+                  stageWidth: 644; stageHeight: 621
+                  Demo.WallpaperSpecimen { selected: "dynamic"; hoverIndex: 2 }
+                }
+                Specimen {
+                  caption: "Imagem escolhida (anel accent a 4 px e marca de 24) · hover em Choose an image, fundo pressed"
+                  stageWidth: 644; stageHeight: 621
+                  Demo.WallpaperSpecimen { selected: "freeside"; hoverIndex: 0 }
+                }
+                Specimen {
+                  caption: "Com erro · a mensagem em dangerText em y 58 e a grade desce 28"
+                  stageWidth: 644; stageHeight: 621
+                  Demo.WallpaperSpecimen { selected: "sprawl"; error: "Could not open the image picker" }
+                }
+              }
+
+              SectionBlock {
                 title: "Manual (ficha 13, board 13:16155) · página real, tutorial parado"
                 itemGap: 40
 

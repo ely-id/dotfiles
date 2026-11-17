@@ -280,6 +280,39 @@ Singleton {
   readonly property int settingsManualLabelWidth: 230     // descrição 13 Medium muted, alinhada à direita
   readonly property int settingsManualButtonTop: 604      // "Got it" de 440×40, raio 10
   readonly property int settingsManualButtonHeight: 40
+  // Papel de parede (ficha 13; Figma 13:16208): modal de 624×608, grade de miniaturas 276×156 em duas colunas.
+  readonly property int settingsWallpaperWidth: 624
+  readonly property int settingsWallpaperHeight: 608
+  readonly property int settingsWallpaperListTop: 80        // a área rolante começa 4 acima da primeira linha, para o anel não ser cortado
+  readonly property int settingsWallpaperGridTop: 4         // primeira linha em y 84
+  readonly property int settingsWallpaperGridInset: 24      // colunas em x 24 e 324
+  readonly property int settingsWallpaperColumnGap: 24
+  readonly property int settingsWallpaperRowGap: 16         // linhas em y 84, 256 e 428
+  readonly property int settingsWallpaperBottomPadding: 24  // 584 → 608
+  readonly property int settingsWallpaperTileWidth: 276
+  readonly property int settingsWallpaperTileHeight: 156    // raio radiusRow, borda border de 1 por cima da imagem
+  readonly property int settingsWallpaperRingGap: 4         // anel accent de 1 a 4 da miniatura, raio 16
+  readonly property int settingsWallpaperRingRadius: 16
+  readonly property int settingsWallpaperMarkSize: 24       // círculo accent em (240,12), check 16 em (4,4) em textOnAccent
+  readonly property int settingsWallpaperMarkX: 240
+  readonly property int settingsWallpaperMarkY: 12
+  readonly property int settingsWallpaperGradientHeight: 80 // degradê preto de 276×80 em y 76, de 0 a 80% na base (hover)
+  readonly property real settingsWallpaperGradientOpacity: 0.8
+  readonly property int settingsWallpaperTextX: 16          // título em y 108 (caixa 244×20) e autor em y 128 (caixa 244×14)
+  readonly property int settingsWallpaperTitleY: 108
+  readonly property int settingsWallpaperAuthorY: 128
+  readonly property int settingsWallpaperTextWidth: 244
+  readonly property int settingsWallpaperTitleHeight: 20
+  readonly property int settingsWallpaperAuthorHeight: 14
+  readonly property int settingsWallpaperDynamicTitleY: 120 // "Dynamic" sempre visível, caixa 200×20
+  readonly property int settingsWallpaperDynamicTitleWidth: 200
+  readonly property int settingsWallpaperAddIconX: 128      // "Choose an image": ícone 20 em (128,52), texto em caixa 276×24 em y 80
+  readonly property int settingsWallpaperAddIconY: 52
+  readonly property int settingsWallpaperAddLabelY: 80
+  readonly property int settingsWallpaperAddLabelHeight: 24
+  readonly property int settingsWallpaperErrorX: 30         // mensagem em y 58; a grade desce 28
+  readonly property int settingsWallpaperErrorY: 58
+  readonly property int settingsWallpaperErrorShift: 28
   readonly property int launcherWidth: 640
   readonly property int launcherSearchHeight: 56
   readonly property int launcherFooterHeight: 44

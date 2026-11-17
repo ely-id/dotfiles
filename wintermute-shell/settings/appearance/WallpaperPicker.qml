@@ -4,17 +4,28 @@ import "." as Appearance
 import ".." as Settings
 import "../.." as Shell
 
+// Seletor de papel de parede (ficha 13; Figma 13:16208): modal de 624×608 com a grade de miniaturas de
+// 276×156 em duas colunas (x 24 e 324) e três linhas (y 84, 256 e 428). Ordem: "Choose an image",
+// Dynamic, as três incluídas e depois as acrescentadas; com as cinco fixas o sexto lugar fica vazio (P-59).
+// Passando de seis miniaturas a grade rola dentro do modal, que continua com 608. A área rolante começa
+// em y 80 e a grade em y 4 dentro dela, para o anel de seleção (4 px para fora) não ser cortado.
+// Com erro, a mensagem aparece em y 58 e empurra a grade 28 para baixo, como na origem.
+// Lê o estado por `service` (decisão 0011).
 Settings.Modal {
   id: root
   objectName: "wallpaperPicker"
+
+  property var service: Appearance.State
+  // Só para a vitrine: fixa o hover numa miniatura (índice na grade; -1 para nenhuma).
+  property int hoverIndex: -1
+
   title: "Wallpaper"
-  closeLabel: "Back to appearance"
-  closeButtonY: -20
-  implicitWidth: 624
-  implicitHeight: Math.min(616, availableHeight)
-  bodyTop: Appearance.State.error ? 106 : 78
+  closeLabel: "Back to Appearance"
+  implicitWidth: Shell.Theme.settingsWallpaperWidth
+  implicitHeight: Math.min(Shell.Theme.settingsWallpaperHeight, availableHeight)
+  bodyTop: Shell.Theme.settingsWallpaperListTop + (service.error ? Shell.Theme.settingsWallpaperErrorShift : 0)
   roundedContent: true
-  contentHeight: grid.height + 34
+  contentHeight: grid.y + grid.height + Shell.Theme.settingsWallpaperBottomPadding
   onBackRequested: Settings.State.back()
   Keys.onEscapePressed: Settings.State.back()
 
@@ -22,22 +33,26 @@ Settings.Modal {
     const tile = tiles.itemAt(index);
     if (tile) tile.forceActiveFocus(Qt.TabFocusReason);
   }
+  // Mantém a miniatura focada à vista, com o anel de 4 px incluído.
   function reveal(tile) {
-    const top = tile.y;
-    const bottom = top + tile.height + 8;
-    if (top < scrollItem.contentY) scrollItem.contentY = top;
+    const ring = Shell.Theme.settingsWallpaperRingGap;
+    const top = grid.y + tile.y - ring;
+    const bottom = grid.y + tile.y + tile.height + ring;
+    if (top < scrollItem.contentY) scrollItem.contentY = Math.max(0, top);
     else if (bottom > scrollItem.contentY + scrollItem.height)
       scrollItem.contentY = Math.min(contentHeight - scrollItem.height, bottom - scrollItem.height);
   }
 
   Grid {
     id: grid
-    x: 30; y: 4
-    columns: 2; spacing: 12
-    enabled: !Appearance.State.busy
+    x: Shell.Theme.settingsWallpaperGridInset; y: Shell.Theme.settingsWallpaperGridTop
+    columns: 2
+    columnSpacing: Shell.Theme.settingsWallpaperColumnGap
+    rowSpacing: Shell.Theme.settingsWallpaperRowGap
+    enabled: !root.service.busy
     Repeater {
       id: tiles
-      model: [{adding: true, title: "Choose an image"}].concat(Appearance.State.wallpapers)
+      model: [{adding: true, title: "Choose an image"}].concat(root.service.wallpapers)
       delegate: WallpaperTile {
         required property var modelData
         required property int index
@@ -47,13 +62,14 @@ Settings.Modal {
         title: modelData.title || ""
         subtitle: modelData.subtitle || ""
         source: modelData.thumbnail || modelData.url || ""
-        selected: dynamic ? Appearance.State.wallpaperMode === "dynamic"
-            : !adding && Appearance.State.wallpaperMode === "custom"
-                && Appearance.State.wallpaperPath === modelData.path
+        forceHovered: index === root.hoverIndex
+        selected: dynamic ? root.service.wallpaperMode === "dynamic"
+            : !adding && root.service.wallpaperMode === "custom"
+                && root.service.wallpaperPath === modelData.path
         onClicked: {
-          if (adding) Appearance.State.pickWallpaper();
-          else if (dynamic) Appearance.State.selectDynamic();
-          else Appearance.State.selectWallpaper(modelData.path);
+          if (adding) root.service.pickWallpaper();
+          else if (dynamic) root.service.selectDynamic();
+          else root.service.selectWallpaper(modelData.path);
         }
         onActiveFocusChanged: if (activeFocus) root.reveal(this)
         Keys.onLeftPressed: root.focusTile(index - 1)
@@ -64,10 +80,14 @@ Settings.Modal {
     }
   }
   overlay: Text {
-    x: 30; y: 58; width: parent.width - 60
-    visible: !!Appearance.State.error
-    text: Appearance.State.error
+    x: Shell.Theme.settingsWallpaperErrorX; y: Shell.Theme.settingsWallpaperErrorY
+    width: parent.width - 2 * Shell.Theme.settingsWallpaperErrorX
+    visible: !!root.service.error
+    text: root.service.error
     elide: Text.ElideRight
-    font.family: Shell.Theme.fontFamily; font.pixelSize: 13; color: "#ffb4ab"
+    color: Shell.Theme.dangerText
+    font.family: Shell.Theme.fontFamily
+    font.pixelSize: Shell.Theme.fontBody
+    font.letterSpacing: 0
   }
 }

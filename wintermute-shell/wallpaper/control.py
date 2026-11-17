@@ -126,8 +126,8 @@ def wallpapers():
         atomic_write(CONFIG / "pond-interface/wallpaper.json", json.dumps(state) + "\n")
     added = list(imported.values()) + list(discovered.values())
     add_thumbnails(added + included)
-    dynamic = {"dynamic": True, "title": "Daylight (dynamic)", "subtitle": "Changes through the day"}
-    return dict(state, wallpapers=added + [dynamic] + included)
+    dynamic = {"dynamic": True, "title": "Dynamic"}
+    return dict(state, wallpapers=[dynamic] + included + added)
 
 
 def wallpaper(mode, path=""):

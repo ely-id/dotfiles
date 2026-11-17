@@ -35,6 +35,10 @@ Nenhuma fase avança sozinha. Quando o trabalho de uma fase termina, ela fica ag
 
 O critério de aceite visual é sempre o mesmo: o print da peça ao lado da referência, com as medidas da ficha conferidas.
 
+### QA ao vivo em lote nas fases de construção da shell
+
+Na F4, na F5 e na F6 não avalio fase por fase (ajuste A-03). Cada uma termina em `aguardando QA`, com handoff e prints da bancada, e a seguinte começa. No fim da F6 entro na sessão do Niri, abro o Claude Code lá e digito `/qa-fase ao-vivo`: o agente aplica comigo o que ficou para a sessão ao vivo, me guia pelo roteiro das três fases um passo por vez e registra um veredito por fase. NoGo vira subfase, feita antes da F7. Da F7 em diante, volta o portão por fase.
+
 ## O painel
 
 O acompanhamento vive em um vault do Obsidian, fora deste repositório, e funciona como um quadro de projeto:
@@ -68,3 +72,43 @@ Antes da primeira sessão no Antigravity numa máquina:
 5. Peço para acrescentar uma linha ao `ESCOPO.md` e confiro que a escrita é recusada pelo hook.
 
 Trocar de ferramenta é seguro em qualquer fronteira de sessão: o que uma sessão deixa no painel é o que a próxima lê, venha de onde vier.
+
+## Ciclo de agentes
+
+Para o projeto andar sem eu abrir sessão por sessão, uso o ciclo de agentes ([decisões/0014](decisoes/0014-ciclo-de-agentes.md)). Ele só existe no Claude Code, porque depende de subagentes com modelo próprio.
+
+| Papel | Quem |
+|---|---|
+| Orquestrar, planejar, revisar, commitar, registrar | A sessão principal, no Fable com effort high |
+| Implementar | Subagente `dev-shell` (Sonnet) |
+| Verificar, sem ter visto a implementação | Subagente `qa-visual` (Sonnet) |
+| Trabalho mecânico | Subagente `varredura` (Haiku) |
+
+### Como rodo pelo app de desktop
+
+1. Abro uma sessão nova do Claude Code em `~/Projects/dotfiles`, escolho o Fable como modelo, o effort em high e o modo de permissão que aceita edições.
+2. Digito `/ciclo`. A sessão trabalha tarefa atrás de tarefa, fecha um relatório a cada bloco e para sozinha no próximo portão meu.
+3. Se eu quiser uma garantia de que ela não para antes da hora, uso o `/goal` no lugar: `/goal Seguir a skill ciclo até que a saída mais recente de .agents/scripts/ciclo.sh estado --dentro mostre um RESULTADO diferente de continuar`. O avaliador do `/goal` só lê a conversa, e a saída do `ciclo.sh` fica nela.
+4. Quando ela para, a última linha diz o que eu faço: responder uma pendência e digitar `/ciclo` de novo, ou entrar no Niri para o QA ao vivo.
+
+Para parar no meio: `.agents/scripts/ciclo.sh pausar` num terminal. A sessão para antes da próxima tarefa. `ciclo.sh liberar` desfaz.
+
+### Os portões
+
+`.agents/scripts/ciclo.sh estado` lê o painel e diz se o ciclo continua. Ele para quando:
+
+- chegou a hora do QA ao vivo (as fases do lote acabaram, ou uma fase fora do lote ficou em `aguardando QA`);
+- toda tarefa aberta da fase ativa está marcada `(bloqueada: P-NN)`, esperando uma resposta minha;
+- a fase ativa está `bloqueada`, ou fora do alcance do ciclo (F8 em diante, que mexem no sistema e nos meus arquivos pessoais);
+- outra sessão está rodando o ciclo, ou eu o pausei.
+
+Tarefa sem valor na ficha não trava o ciclo: o orquestrador abre a pendência, marca a tarefa e segue para a próxima que não depende dela.
+
+### Pelo terminal
+
+Se o comando `claude` estiver no PATH, `.agents/scripts/ciclo.sh rodar` chama `claude -p /ciclo` em sequência, cada sessão com contexto novo, com limite de sessões, de turnos e de gasto (`CICLO_MAX_SESSOES`, `CICLO_MAX_TURNOS`, `CICLO_ORCAMENTO`), e avisa pelo `notify-send` quando para.
+
+### Bancada e lint
+
+- `.agents/scripts/bancada.sh <espécime> [props] [nome]` copia a shell para fora do repositório, troca os singletons do Bluetooth e das notificações pelos serviços fictícios e grava o print da peça nas três variações, numa janela comum. O desfoque do compositor não aparece; isso fica para o QA ao vivo.
+- `.agents/scripts/lint-proveniencia.sh [commit]` reprova cor e família de fonte escritas direto nas linhas alteradas da shell.

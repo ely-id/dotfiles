@@ -7,14 +7,16 @@ dotfiles/
 ├── AGENTS.md               Contrato de trabalho para agentes de código
 ├── CLAUDE.md               Complemento do contrato para o Claude Code
 ├── .agents/                Ferramental de agente comum ao Claude Code e ao Antigravity
-│   ├── skills/             Skills do projeto (/retomar, /encerrar-sessao, /qa-fase), a fonte
-│   ├── hooks/              Aviso de início de sessão e os adaptadores do Antigravity
-│   ├── scripts/            Sincronização das skills e cópia das skills externas
+│   ├── skills/             Skills do projeto (/retomar, /encerrar-sessao, /qa-fase, /ciclo), a fonte
+│   ├── hooks/              Aviso de início de sessão, adaptadores do Antigravity e o hook dos subagentes
+│   ├── scripts/            Ciclo, bancada, lint, sincronização das skills e skills externas
+│   ├── bancada/            shell.qml de teste que a bancada põe numa cópia da shell
 │   ├── rules/              Regra específica do Antigravity
 │   ├── hooks.json          Hooks do Antigravity
 │   └── SKILLS.md           Quando usar cada skill, nas duas ferramentas
 ├── .claude/                Configuração do Claude Code para este projeto
-│   ├── settings.json       Hook de início de sessão, bloqueios e atribuição desligada
+│   ├── settings.json       Hook de início de sessão, permissões e atribuição desligada
+│   ├── agents/             Subagentes do ciclo: dev-shell, qa-visual e varredura
 │   └── skills/             Cópia de .agents/skills/, refeita pelo script de sincronização
 ├── docs/
 │   ├── estrutura.md        Este arquivo

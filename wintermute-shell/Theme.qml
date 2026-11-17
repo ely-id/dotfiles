@@ -96,7 +96,7 @@ Singleton {
   //    danger / success / attention / warning para preenchimentos.
 
   // ---- vidro (igual nas 3; o brilho da base usa o acento atual) ----
-  readonly property real glassBlur: 50                  // definido em P-03 (2026-11-14); no niri vira background-effect blur
+  readonly property real glassBlur: 40                  // P-03 começou em 50; voltei para os 40 do Figma em 2026-11-17 (S13). No niri vira background-effect blur
   readonly property color glassTop: Qt.rgba(13 / 255, 14 / 255, 17 / 255, 0.94)   // #0D0E11 @ 94%
   readonly property color glassMid: Qt.rgba(22 / 255, 23 / 255, 26 / 255, 0.92)   // #16171A @ 92%, pos 0.55
   readonly property color glassBottom: Qt.rgba(42 / 255, 44 / 255, 49 / 255, 0.92) // #2A2C31 @ 92%

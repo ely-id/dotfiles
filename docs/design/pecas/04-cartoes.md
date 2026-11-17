@@ -9,7 +9,7 @@
 
 Aberto: cartão **156×76** (Pond era 75; alinhado à grade).
 
-- Hora em Geist Serif 36, caixa 88×40 em (12,8), formato `h:mm` (exemplo 14:32). Sem AM/PM no desenho Armitage (a Pond tinha AM/PM em 11 px).
+- Hora em Geist Serif **34**, caixa 88×40 em (12,8), formato `h:mm` (exemplo 14:32). Era 36: com 36 a hora mais larga, `23:33`, media 92,6 px, passava da caixa de 88 e encostava no chip da data em 135 dos 1440 horários. Com 34 ela mede 87,5 e sobram de 5 a 6 px de tinta até o chip (`F4-T11`, 2026-11-17; no QA da F3 eu disse que "não precisa diminuir muito o tamanho da fonte do relógio"). Com 33 a folga seria de 7 px. Sem AM/PM no desenho Armitage (a Pond tinha AM/PM em 11 px).
 - Chip da data 40×40 em (104,8), raio **8** (Pond era 6 e y 9), borda `borderStrong`, sem fundo. “sex” 11 `muted` no topo; “13” 13 `text` embaixo, ambos centrados.
 - Trilho da bateria 132×**4** (Pond era 2) em (12,60), raio 2, fundo `track`. Carga = largura × % na cor `text` a 80% (nas prévias; carregando / baixo usam `success` / `danger` — herdar a lógica da Pond, com as cores Armitage).
 - Hover na hora: retângulo 148×50 em (4,4), raio 8, fundo `hover`. Clicar abre o calendário (ficha 09).

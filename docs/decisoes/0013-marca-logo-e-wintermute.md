@@ -27,3 +27,9 @@ O rodapé das Informações tem só enfeites: a marca (logo + "Wintermute") com 
 - O broto provisório tem o mesmo desenho dos indicadores de terminal da origem (`assets/terminal-loaders/sprout-*`, 40×40, no roxo dela), embora o arquivo não seja idêntico a nenhum do clone de estudo. Serve como provisório, mas não pode chegar à publicação: a F11 confere que ele foi trocado (P-51 e `F11-T02`).
 - As fases que desenham telas com a marca (F7, bloqueio e login; F9, Plymouth) seguem esta regra, a menos que o board da fase já decida outra coisa; nesse caso, registro a divergência em `PENDENCIAS.md`.
 - O painel de teste de fontes (`FontTestPanel.qml`) mostra "Wintermute Shell" como legenda de conferência. Não é interface e fica como está.
+
+## Atualização de 2026-11-17 (P-58)
+
+Ao ver a proposta de composição do rodapé, respondi: "Acho que eu tiraria a grade e manteria apenas Broto | Wintermute | logo ARCH". A grade de "+" saiu do rodapé das Informações; ficaram o broto, "Wintermute" com a versão e o "ARCH". A regra desta decisão não muda: a marca continua sendo logo + "Wintermute", com o logo num arquivo só (`wintermute-shell/assets/brand/logo.svg`).
+
+A cor do logo é o token `brandMark` (#DADCDE), a média de `text` e `muted`, porque pedi um meio termo entre branco e cinza e não havia token entre os dois. O arquivo é desenhado em branco e recebe a cor na peça. A composição final, com as medidas e as contas, está na ficha `13-ajustes`.

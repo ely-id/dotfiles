@@ -8,6 +8,11 @@ Item {
   id: root
   property string page: "drawer"
   property bool bluetoothEnabled: true
+  // Rádio bloqueado pelo rfkill: o adaptador fica desligado e a frase parada pede para ligar.
+  property bool bluetoothBlocked: false
+  // Mensagem de erro do desbloqueio, como o State.qml a deixa em errorText. O painel zera o errorText
+  // ao abrir, então escrevo depois da abertura em vez de ligar a propriedade.
+  property string errorMessage: ""
   property bool searching: false
   implicitWidth: PanelStyle.stackWidth
   implicitHeight: 400
@@ -15,6 +20,7 @@ Item {
   BluetoothService {
     id: demoService
     enabled: root.bluetoothEnabled
+    blocked: root.bluetoothBlocked
     discovering: root.searching
     prompt: root.page === "pair" ? ({ kind: "confirm", code: "482913", path: "/demo/n3" })
                                  : ({ kind: "" })
@@ -27,6 +33,8 @@ Item {
     Component.onCompleted: {
       open();
       Qt.callLater(() => {
+        if (root.errorMessage !== "")
+          demoService.errorText = root.errorMessage;
         if (root.page === "nearby")
           stack.openNearby();
         else if (root.page === "details")

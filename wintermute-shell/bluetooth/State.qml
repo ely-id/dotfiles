@@ -25,7 +25,8 @@ Singleton {
   property bool discoveryPending: false
   property bool discoveryOwned: false
   readonly property bool scanningRequested: discoveryConsumers.length > 0
-  readonly property bool powerBusy: Object.keys(pending).some(key => pending[key].action === "power")
+  // A chave fica ocupada do desbloqueio do rfkill até o `power` voltar, sem instante livre no meio.
+  readonly property bool powerBusy: unblock.busy || Object.keys(pending).some(key => pending[key].action === "power")
   readonly property var devices: {
     const values = adapter ? adapter.devices.values : [];
     return values.map(device => {
@@ -73,7 +74,11 @@ Singleton {
     if (device && !isBusy(device.path)) send("forget", device.path);
   }
   function setEnabled(value) {
-    if (adapter && !powerBusy) send("power", adapter.dbusPath, {enabled: value});
+    if (!adapter || powerBusy) return;
+    // Com o rádio bloqueado o BlueZ recusa o `power`. Para ligar, desbloqueio primeiro e só mando o
+    // `power` quando o Unblock avisar que o adaptador saiu do bloqueio.
+    if (value && blocked) { errorText = ""; unblock.run(); return; }
+    send("power", adapter.dbusPath, {enabled: value});
   }
   function answer(accept, value) {
     if (transportReady) actions.write(JSON.stringify({action: "answer", promptId: prompt.id,
@@ -128,6 +133,16 @@ Singleton {
           : "Não foi possível conectar. Confira se o dispositivo está ligado e por perto e tente de novo.";
     }
     actionFinished(job.path, job.action, message.success);
+  }
+
+  Unblock {
+    id: unblock
+    blocked: root.blocked
+    onFinished: (success, error) => {
+      if (!success) { root.errorText = error; return; }
+      // O finished chega antes de a chave ser liberada, então o send não deixa lacuna na chave ocupada.
+      if (root.adapter) root.send("power", root.adapter.dbusPath, {enabled: true});
+    }
   }
 
   Process {

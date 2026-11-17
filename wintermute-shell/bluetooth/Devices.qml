@@ -14,7 +14,7 @@ Shell.DeviceList {
   devices: service.enabled ? service.pairedDevices : []
   deviceKey: "path"
   emptyText: !service.available ? "Nenhum adaptador Bluetooth encontrado."
-      : service.blocked ? "O Bluetooth está bloqueado. Desligue o modo avião para ativar."
+      : service.blocked ? "Bluetooth is blocked. Turn it on to unblock it."
       : !service.enabled ? "O Bluetooth está desligado."
       : "Nenhum dispositivo pareado. Procure dispositivos próximos para parear."
   message: service.errorText

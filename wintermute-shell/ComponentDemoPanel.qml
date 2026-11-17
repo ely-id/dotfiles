@@ -1155,6 +1155,21 @@ PanelWindow {
                   Demo.BluetoothSpecimen { page: "drawer"; bluetoothEnabled: false; height: 178 }
                 }
                 Specimen {
+                  caption: "Rádio bloqueado 316×156 · a chave desbloqueia ao ligar"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 178
+                  Demo.BluetoothSpecimen {
+                    page: "drawer"; bluetoothEnabled: false; bluetoothBlocked: true; height: 178
+                  }
+                }
+                Specimen {
+                  caption: "Rádio bloqueado · erro ao desbloquear (rfkill indisponível)"
+                  stageWidth: PanelStyle.stackWidth; stageHeight: 222
+                  Demo.BluetoothSpecimen {
+                    page: "drawer"; bluetoothEnabled: false; bluetoothBlocked: true; height: 222
+                    errorMessage: "Could not unblock Bluetooth: rfkill is not installed"
+                  }
+                }
+                Specimen {
                   caption: "Detalhes · mesmo layout do Wi-Fi"
                   stageWidth: PanelStyle.stackWidth; stageHeight: 380
                   Demo.BluetoothSpecimen { page: "details"; height: 380 }

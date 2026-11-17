@@ -136,6 +136,20 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
 - Hover: título e autor sobre degradê preto 0→80% na base.
 - Tile “Escolher imagem” com traço tracejado `[4,4]`. “Dinâmico” pode permanecer (shader da Pond), visualmente como na prévia.
 - As imagens da grade são as minhas, uma por variação (Chiba, Freeside, Sprawl), e moram no repositório. As fotos da origem não entram (decidido em 2026-11-14, P-31). Vão para o repositório só as versões de 1920×1080, em PNG, sem perda: medi os formatos sem perda mais leves e as seis imagens juntas ainda somariam 40 MB (P-37).
+- Conferido no Figma em 2026-11-17 (`F4-T06`, modal `13:16208`), o que esta ficha não dizia:
+  - Título "Papel de parede" (na shell: Wallpaper) em Serif 32, em (30,20). Miniaturas em duas colunas, x 24 e x 324 (24 entre elas), e três linhas, y 84, 256 e 428 (16 entre elas). O modal fecha em 608, com 24 de base.
+  - Miniatura de imagem: borda `border` de 1, raio 12. O degradê do hover tem 276×80 e começa em y 76; o título é 13 Medium `text` em (16,108), numa caixa de 244×20, e o autor é 11 Medium `muted` em (16,128), numa caixa de 244×14.
+  - "Dinâmico" (na shell: Dynamic) mostra o título sempre, 13 Medium `text` em (16,120), sem segunda linha e sem degradê.
+  - Selecionada: o anel `accent` de 1 fica 4 px para fora (284×164, raio 16). A marca é um círculo de 24 em `accent` em (240,12), no canto de cima à direita, com o `check` de 16 em `onAccent`. Na origem a marca era branca, de 26, no canto de baixo.
+  - "Escolher imagem" (na shell: Choose an image): fundo `cardHover`, contorno `borderStrong` de 1 tracejado, `image-plus` de 20 em (128,52) e o texto 13 Medium `text` centrado numa caixa de 276×24 em y 80.
+  - O board desenha seis miniaturas: "Escolher imagem", "Dinâmico", Chiba, Freeside, Sprawl e uma quarta imagem, "Matrix", que eu não tenho. Só uma miniatura traz texto de hover: "Chiba à noite" e "Paleta Armitage".
+- Escolhas minhas na `F4-T06`, onde o Figma não decide:
+  - A ordem é a do board: "Choose an image", "Dynamic", as três imagens e, no fim, as que eu acrescentar. Na origem as acrescentadas vinham antes do "Dinâmico". Com as cinco fixas o sexto lugar fica vazio, e a primeira imagem que eu escolher entra ali (P-59).
+  - O título de cada imagem é o nome da variação (Chiba, Freeside, Sprawl) e a segunda linha é "Armitage palette" (P-59).
+  - Com mais de seis miniaturas a grade rola dentro do modal, que continua em 608, como na origem.
+  - O hover e o foco de "Choose an image" usam o fundo `pressed`, como o botão Manual. O foco pelo teclado mostra o mesmo anel da selecionada, como na origem.
+  - A mensagem de erro fica onde ficava na origem, entre o título e a grade, que desce 28; a cor passa a `dangerText`.
+  - O seletor de arquivo continua sendo o `zenity` (P-60).
 
 ## A CONFIRMAR
 

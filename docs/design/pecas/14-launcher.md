@@ -34,6 +34,57 @@ Inspiração visual: Raycast, simples. Vidro Armitage, sempre escuro.
 - Véu do desktop atrás: preto 20% (ficha 19).
 - Posição no desktop de 1440×900 da prévia: launcher em (400, 160) — “terço de cima, centrado”. Em monitores reais, centre horizontalmente e ancore nessa proporção vertical; se a regra exata de multi-monitor faltar, **pergunte**.
 
+## Conferido no Figma (2026-11-17, `F5-T01`, board `13:17120`)
+
+Li os seis estados pelo `get_design_context`: vazio `13:17130`, aberto pelo "+" `13:17179`, digitando `13:17230`, resultados agrupados `13:17275`, cálculo `13:17343` e sem resultado `13:17387`. As coordenadas abaixo são do quadro do launcher (640 de largura, borda de 1 incluída).
+
+- **Superfície:** 640 de largura, raio 24, o vidro da ficha 00 no tipo launcher (degradê #0D0E11 94% → #16171A 92% aos 55% → #2A2C31 92%, borda branca 20%, sombras 0 12 32 preto 45% e 0 2 6 preto 30%, brilho interno de 1 px branco 8%). O brilho do acento é uma elipse de 768×80 em (−64, altura − 40), colada ao rodapé. Só a altura muda entre os estados.
+- **Cabeçalho (0 a 56):** ícone `search` de 20 em (18,18); texto e cursor em (52,16), altura 24: Geist Regular 17 com linha de 24, `text` quando digitado e `muted` no placeholder; cursor de 1×24 em `accentText`, com 1 de folga do texto. A sugestão fantasma vem depois do cursor, em `muted` a 70%. Divisor `border` de 640×1 em y 56.
+- **Rótulo de seção:** caixa de 400×24 em x 20, Geist Medium 11 `muted`, centrado na vertical. O primeiro em y 64; os seguintes, 8 abaixo da última linha do grupo anterior (176 → 184, 296 → 304, 372 → 380).
+- **Linha de resultado:** 624×44 em x 8, raio 12, a primeira logo abaixo do rótulo (y 88), uma a cada 44. Fundo: nenhum no repouso, `hover` (branco 6%) sob o ponteiro, `accentSubtle` na selecionada.
+  - Bloco de 28×28, raio 8, `control`, em (8,8), com o ícone de 16 em (6,6).
+  - Título Geist Medium 13 `text` e detalhe Geist Regular 13, lado a lado em (48,12), linha de 20, com 8 entre eles. O detalhe é `text` na selecionada e `muted` nas outras.
+  - Tipo: Geist Medium 11, alinhado à direita numa caixa de 140×44 que termina em x 576; `text` na selecionada e `muted` nas outras.
+  - Tecla ↵ (componente Tecla da ficha 00) em (584,12), só na selecionada.
+  - Comando perigoso ("Desligar agora"): o ícone do bloco em `dangerText`; o bloco continua `control`.
+- **Rodapé (44):** divisor `border` de 640×1; ícone do modo de 16 a 80% em (16, divisor + 14); nome do modo Geist Medium 11 `muted` numa caixa de 240×44 em x 40; ações numa faixa de 344×20 em (280, divisor + 12), alinhadas à direita (terminam em x 624), com 8 entre os itens: texto Geist Medium 11 (`text` na ação principal, `muted` na segunda), teclas e um divisor `border` de 1×16 entre as duas ações.
+- **Folga antes do rodapé:** o board se contradiz. Em "Resultados agrupados" e "Sem resultado" a última linha termina 4 px antes do divisor; em "Digitando" e "Cálculo" ela passa 4 px por baixo dele. Implemento 4 px de folga sempre (proposta da P-68, que não trava): "Digitando" com três linhas fica com 268, e não 260, e "Cálculo" com 368, e não 360.
+- **Vazio (352):** "Recentes" em y 64, três linhas (88, 132, 176); "Ferramentas" em y 228; quatro chips (componente Chip da ficha 00: altura 36, raio 10, ícone 16 e rótulo Geist Medium 13) em y 256, a partir de x 20, com 8 entre eles; divisor do rodapé em 308, 16 abaixo dos chips. Ícones dos chips: `pipette`, `smile`, `scan` e `clipboard`.
+- **Aberto pelo "+" (352):** o vazio com a etiqueta de contexto de 24 de altura, raio 12, `accentSubtle` com borda `accentRing` de 1 e texto Geist Medium 11 `accentText` centrado, em y 16, terminando em x 620 (112 de largura com "No workspace 3").
+- **Digitando (260 no board):** "ter" + cursor + "minal" fantasma; seção "Melhor resultado" com três linhas de tipos diferentes (Aplicativo, Ajuste, Arquivo).
+- **Resultados agrupados (496):** seções Aplicativos (y 64), Arquivos (184), Ajustes (304) e Comandos (380); divisor do rodapé em 452.
+- **Cálculo (360 no board):** ícone `calculator` no cabeçalho e no rodapé; seção "Calculadora"; cartão de 624×128 em (8,88), raio 16, `cardHover` com borda `border`; dentro dele, a expressão em Geist Serif 28 `muted` numa caixa de 260×48 em (24,28) e a legenda "Expressão" (Geist Medium 11 `muted`) em (24,80), caixa de 260×20; o círculo "igual" de 32, `control`, em (296,36), com o `equal` de 16; o resultado em Geist Serif 40 `text` em (340,28) e a legenda "Resultado" em (340,80); tudo centrado nas caixas. Linhas "Copiar resultado" (com o valor no detalhe) e "Em hexadecimal" (`0x1CC`) em y 232 e 276, 16 abaixo do cartão, tipo "Ação". A busca mostra a expressão crua (`128*3,5+12`) e o cartão a mostra formatada (`128 × 3,5 + 12`). Rodapé: "Calculadora", "Copiar ↵" e "Colar Ctrl ↵".
+- **Sem resultado (332):** círculo de 48, `control`, em (296,80), com o `search-x` de 20; título Geist Medium 15 `text` centrado numa caixa de 640×24 em y 136 ("Nada encontrado para “xyzzy”", com aspas curvas); dica Geist Regular 13 `muted` centrada numa caixa de 640×20 em y 160; duas linhas de ação em y 196 e 240, sem rótulo de seção, com a busca entre aspas no detalhe e tipo "Ação"; divisor do rodapé em 288.
+- As notas do board, palavra por palavra: "Mesmo launcher, com o contexto “No workspace 3”: o app escolhido abre nesse workspace (substitui o Vicinae)."; "Sugestão fantasma completa a palavra (Tab aceita). Resultados atualizam a cada tecla."; "Grupos fixos: Aplicativos, Arquivos, Ajustes, Comandos. ↑↓ navegam, ↵ abre. Comandos perigosos com ícone em tom de perigo."; "Expressões viram resultado na hora; ↵ copia. Vírgula decimal (pt-BR)."; "Sugere buscar na web ou nos arquivos."
+
+## Textos em inglês (decisão 0012)
+
+A ficha e o board estão em português; a shell mostra o equivalente em inglês. Escolhi assim:
+
+| Board | Shell |
+|---|---|
+| Buscar apps, arquivos e comandos | Search apps, files and commands |
+| Recentes · Ferramentas · Melhor resultado | Recent · Tools · Best match |
+| Aplicativos · Arquivos · Ajustes · Comandos | Apps · Files · Settings · Commands |
+| Aplicativo · Arquivo · Ajuste · Comando · Ação | App · File · Setting · Command · Action |
+| Seletor de cor · Emoji · Captura de tela · Área de transf. | Color picker · Emoji · Screenshot · Clipboard |
+| Launcher · Abrir · Ações | Launcher · Open · Actions |
+| Calculadora · Copiar · Colar · Expressão · Resultado | Calculator · Copy · Paste · Expression · Result |
+| Copiar resultado · Em hexadecimal | Copy result · In hexadecimal |
+| No workspace 3 | On workspace 3 |
+| Nada encontrado para “xyzzy” | Nothing found for “xyzzy” |
+| Confira a digitação ou tente outra busca. | Check the spelling or try another search. |
+| Buscar na web · Buscar nos arquivos | Search the web · Search files |
+
+## Escolhas minhas, onde a ficha e o Figma não decidem
+
+- **Atalho:** a ficha fala em Super+Espaço; pela P-11 (2026-11-15) o launcher é o Super+E, e o Super+Espaço troca o layout do teclado.
+- **Número do cálculo:** a ficha e o board dizem vírgula decimal pt-BR; a decisão 0012, que é minha e mais nova, diz que datas e números seguem o locale do sistema. Vale a decisão (P-70, que não trava).
+- **Monitor, animação e clique fora** (P-69, que não trava; padrão dos Ajustes): pelo atalho o launcher abre no monitor em foco e pelo "+" no monitor daquele organizador; fica centrado na largura, com o topo a 160/900 da altura da tela, arredondado para pixel inteiro; aparece e some com a opacidade e a escala de 0,96 a 1 em 180 ms (`settingsCloseDuration`), como os modais dos Ajustes; clicar no véu fecha, como Esc.
+- **Véu:** preto a 20% na tela inteira (ficha 19), token `launcherScrim`.
+- **Hover e seleção** são coisas separadas, como o board desenha em "Resultados agrupados": o ponteiro dá o fundo `hover`, as setas movem a selecionada (`accentSubtle`), e o clique abre a linha clicada.
+- Passando da altura que cabe na tela, a lista rola entre o cabeçalho e o rodapé, que ficam fixos.
+
 ## A CONFIRMAR
 
 - Fontes da busca (apps, arquivos, ajustes, comandos): o Figma não escolhe o backend. Sugestão: desktop entries + local files + páginas dos Ajustes + sessão (desligar etc.). Confirme antes de amarrar um indexador pesado.

@@ -61,6 +61,9 @@ Singleton {
   readonly property color text: "#F2F3F5"
   readonly property color muted: "#C2C4C7"            // NÃO usar #B4B6BA do tema Armitage original
   readonly property color placeholder: "#86888B"      // só decorativo; nunca texto que informa
+  // Cor do logo da marca (P-58): um meio termo entre text (#F2F3F5) e muted (#C2C4C7), que não têm token
+  // entre eles. É a média canal a canal: (242+194)/2 = 218, (243+196)/2 = 219,5 → 220, (245+199)/2 = 222.
+  readonly property color brandMark: "#DADCDE"
   readonly property color danger: "#EF6663"
   readonly property color dangerText: "#F7B2B1"       // texto/ícone de perigo (legível no vidro)
   readonly property color success: "#5AC576"
@@ -263,9 +266,7 @@ Singleton {
   readonly property int settingsInfoManualBlock: 40      // bloco accentSubtle de raio 10 em (12,12), book-open 20 em accentText
   readonly property int settingsInfoManualBlockRadius: 10
   readonly property int settingsInfoManualTextX: 64      // "Manual" 15 Medium e a legenda 13 Regular muted, linhas de 20
-  readonly property int settingsInfoFooterTop: 536       // "Wintermute Shell" Serif 17 (caixa de 24) e a versão Mono 11 muted
-  readonly property int settingsInfoGridX: 398           // grade de "+" 7×3 de 152×56, passo 20
-  readonly property int settingsInfoGridCell: 20
+  readonly property int settingsInfoFooterTop: 536       // rodapé de 56: broto 40×40, "Wintermute" Serif 17 e a versão Mono 11 muted, "ARCH" à direita (P-58)
   // Manual (Figma 13:16158): modal de 500×656 sem título
   readonly property int settingsManualWidth: 500
   readonly property int settingsManualHeight: 656

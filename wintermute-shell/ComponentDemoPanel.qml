@@ -996,7 +996,7 @@ PanelWindow {
                 itemGap: 40
 
                 Specimen {
-                  caption: "Information 580×620 · 7 linhas a cada 48, botão Manual 520×64, rodapé com a grade de + (contatos: P-50)"
+                  caption: "Information 580×620 · 7 linhas a cada 48, botão Manual 520×64, rodapé com o broto, Wintermute e ARCH (P-58)"
                   stageWidth: 600; stageHeight: 633
                   Information.Panel { y: 13; service: demoInformation }
                 }

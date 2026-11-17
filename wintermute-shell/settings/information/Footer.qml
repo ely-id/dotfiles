@@ -1,26 +1,48 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Effects
 import "../.." as Shell
 
-// Rodapé das Informações (ficha 13; Figma 13:16083), a partir de y 536 no modal: "Wintermute Shell" em
-// Serif 17 (caixa de 24) e a versão em Mono 11 Medium muted logo abaixo (caixa de 20), à esquerda; à
-// direita, a grade de "+" 7×3 de 152×56 em x 398, Mono 11 Medium muted, passo 20, com opacidades
-// 1 / 0,6 / 0,3 em sequência. O Figma diz que a grade some aos poucos no hover dos contatos, mas não
-// desenha contatos, e os da origem (X, Instagram, site e e-mail) eram da marca dela e saíram. Até eu
-// definir os contatos (P-50), a grade fica parada.
+// Rodapé das Informações (ficha 13), de 56 de altura, a partir de y 536 no modal de 580×620. Só enfeites:
+// sem contato, sem link e sem hover (P-50). Três elementos, como pedi na P-58 ("Broto | Wintermute | logo
+// ARCH"), e a grade de "+" saiu.
+//   - À esquerda, o logo provisório (o broto, de 40×40, P-51) em x 30, centrado na faixa: (56 − 40) / 2 = 8.
+//     A cor é Theme.brandMark, o meio termo entre text e muted. O arquivo é um só (assets/brand/logo.svg,
+//     decisão 0013) e a cor vem da colorização.
+//   - "Wintermute" (e não "Wintermute Shell", decisão 0013) em Serif 17, caixa de 24, e a versão em Mono 11
+//     Medium muted, caixa de 20, os dois em x 78 = 30 + 40 + 8. O bloco de 24 + 20 = 44 fica centrado na
+//     faixa, como o broto: (56 − 44) / 2 = 6. Essa posição vertical não tem board: é composição (A-05).
+//   - À direita, o "ARCH" (símbolo icon/information/arch do Figma, nó 7:1799, 151,43×42,96) numa caixa de
+//     152×43 em x 398, alinhado à direita para terminar em x 550 = 580 − 30. Topo em y 6, o mesmo do bloco de
+//     texto: (56 − 43) / 2 = 6,5, arredondado para baixo. Em muted; as listras a 50% são do desenho.
 Item {
   id: root
   implicitWidth: Shell.Theme.settingsModalWidth
   implicitHeight: 56
 
-  readonly property var steps: [1, 0.6, 0.3]
+  Image {
+    objectName: "informationBrandMark"
+    x: Shell.Theme.settingsBodyInset
+    y: 8
+    width: 40
+    height: 40
+    source: Qt.resolvedUrl("../../assets/brand/logo.svg")
+    sourceSize: Qt.size(80, 80)
+    smooth: true
+    layer.enabled: true
+    layer.effect: MultiEffect {
+      colorization: 1
+      colorizationColor: Shell.Theme.brandMark
+    }
+  }
 
   Text {
-    x: Shell.Theme.settingsBodyInset
-    y: 0
+    objectName: "informationBrandName"
+    x: 78
+    y: 6
     height: 24
     verticalAlignment: Text.AlignVCenter
-    text: "Wintermute Shell"
+    text: "Wintermute"
     color: Shell.Theme.text
     font.family: Shell.Theme.titleFontFamily
     font.weight: Font.Normal
@@ -28,8 +50,9 @@ Item {
     font.letterSpacing: 0
   }
   Text {
-    x: Shell.Theme.settingsBodyInset
-    y: 24
+    objectName: "informationVersion"
+    x: 78
+    y: 30
     height: 20
     verticalAlignment: Text.AlignVCenter
     text: "V0.1 · preview"
@@ -40,30 +63,21 @@ Item {
     font.letterSpacing: 0
   }
 
-  Item {
-    objectName: "informationPlusGrid"
-    x: Shell.Theme.settingsInfoGridX
-    width: 7 * Shell.Theme.settingsInfoGridCell + 12
-    height: 56
-
-    Repeater {
-      model: 21
-      delegate: Text {
-        required property int index
-        objectName: "informationPlus" + index
-        // Centro de cada "+" em (10 + 20·coluna, 7 + 20·linha), como no Figma.
-        x: 10 + (index % 7) * Shell.Theme.settingsInfoGridCell - width / 2
-        y: 7 + Math.floor(index / 7) * Shell.Theme.settingsInfoGridCell - height / 2
-        width: 12
-        horizontalAlignment: Text.AlignHCenter
-        text: "+"
-        opacity: root.steps[index % 3]
-        color: Shell.Theme.muted
-        font.family: Shell.Theme.monoFontFamily
-        font.weight: Font.Medium
-        font.pixelSize: Shell.Theme.fontMonoCaption
-        font.letterSpacing: 0
-      }
+  Image {
+    objectName: "informationArch"
+    x: 398
+    y: 6
+    width: 152
+    height: 43
+    source: Qt.resolvedUrl("../../assets/information/arch.svg")
+    sourceSize: Qt.size(304, 86)
+    fillMode: Image.PreserveAspectFit
+    horizontalAlignment: Image.AlignRight
+    smooth: true
+    layer.enabled: true
+    layer.effect: MultiEffect {
+      colorization: 1
+      colorizationColor: Shell.Theme.muted
     }
   }
 }

@@ -10,7 +10,8 @@ import "../.." as Shell
 // y 84, cada uma com o número num círculo de 24 (control com borda border, Mono 11 Medium), o rótulo 15
 // Medium em muted em x 66 e o valor em Serif 17 em x 186, com divisor border de 1 entre elas. Embaixo,
 // o botão Manual de 520×64 (bloco accentSubtle com book-open em accentText, "Manual" e a legenda, seta
-// em text) e o rodapé com o nome, a versão e a grade de "+". Lê os fatos por `service` (decisão 0011).
+// em text) e o rodapé só com enfeites: o broto, "Wintermute" com a versão e o "ARCH" (Footer.qml). Lê os
+// fatos por `service` (decisão 0011).
 Settings.Modal {
   id: root
   objectName: "informationPanel"

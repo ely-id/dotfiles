@@ -10,6 +10,10 @@ import ".."
 //
 // Medidas no quadro do launcher: o primeiro rótulo em y 64, cada linha de 44 logo abaixo do rótulo, o rótulo
 // seguinte 8 abaixo da última linha do grupo e o divisor do rodapé 4 abaixo da última linha (P-68).
+//
+// No modo cálculo (`service.calculation` não nulo) o launcher inteiro é o cálculo: o rótulo "Calculator" em
+// y 64, o cartão de 128 logo abaixo e, 16 depois dele, as linhas de ação sem rótulo. As seções do serviço
+// não aparecem.
 Item {
   id: root
 
@@ -25,7 +29,7 @@ Item {
   readonly property alias blurRegion: glass.blurRegion
 
   // Posições absolutas (no quadro) de cada rótulo e de cada linha, e do divisor do rodapé.
-  readonly property var plan: buildPlan(service.sections)
+  readonly property var plan: buildPlan(service.sections, service.calculation)
   readonly property int rowCount: plan.rows.length
   readonly property real listTop: Theme.launcherSearchHeight + Theme.launcherDividerHeight
   // Sem lista, o divisor do rodapé é o próprio divisor do cabeçalho.
@@ -37,11 +41,24 @@ Item {
   width: implicitWidth
   height: implicitHeight
 
-  function buildPlan(sections) {
+  function buildPlan(sections, calculation) {
     const labels = [];
     const rows = [];
     let y = Theme.launcherSearchHeight + Theme.launcherSectionTop;
     let lastEnd = -1;
+    let card = null;
+    if (calculation) {
+      labels.push({ text: "Calculator", y: y });
+      y += Theme.launcherLabelHeight;
+      card = { y: y, expression: calculation.expression, result: calculation.result };
+      y += Theme.launcherCalcCardHeight + Theme.launcherCalcCardGap;
+      (calculation.rows || []).forEach((row, i) => {
+        rows.push({ row: row, y: y, first: false, labelY: y });
+        y += Theme.launcherResultHeight;
+      });
+      lastEnd = y;
+      sections = [];
+    }
     (sections || []).forEach(section => {
       const list = section.rows || [];
       if (list.length === 0)
@@ -58,6 +75,7 @@ Item {
     return {
       labels: labels,
       rows: rows,
+      card: card,
       footerY: lastEnd < 0 ? Theme.launcherSearchHeight : lastEnd + Theme.launcherFooterGap
     };
   }
@@ -125,7 +143,9 @@ Item {
       id: search
       width: parent.width
       text: root.service.query
-      ghost: root.service.ghost
+      // Sem sugestão fantasma no modo cálculo.
+      ghost: root.service.calculation ? "" : root.service.ghost
+      iconName: root.service.searchIcon
       forceCursor: root.forceCursor
       onEdited: text => root.service.setQuery(text)
       onUpPressed: root.move(-1)
@@ -168,6 +188,14 @@ Item {
           y: modelData.y - root.listTop
           text: modelData.text
         }
+      }
+
+      Launcher.CalculatorCard {
+        visible: root.plan.card !== null
+        x: Theme.launcherRowX
+        y: root.plan.card ? root.plan.card.y - root.listTop : 0
+        expression: root.plan.card ? root.plan.card.expression : ""
+        result: root.plan.card ? root.plan.card.result : ""
       }
 
       Repeater {

@@ -366,6 +366,22 @@ Singleton {
   readonly property int launcherFooterActionsHeight: 20
   readonly property int launcherFooterActionsGap: 8
   readonly property int launcherFooterDividerHeight: 16             // divisor de 1×16 entre as duas ações
+  // Cartão do cálculo (estado "Cálculo", nó 13:17343; cartão 13:17351). 624×128 em (8,88), raio radiusCard, fundo cardHover e
+  // borda border de 1. Medidas dentro do cartão, borda incluída; o resultado e a expressão são caixas de 260×48.
+  readonly property int launcherCalcCardHeight: 128
+  readonly property int launcherCalcCardGap: 16                     // linhas de ação 16 abaixo do cartão (y 232 com o cartão em 88)
+  readonly property int launcherCalcBoxWidth: 260                   // caixas da expressão e do resultado: 260×48 em y 28
+  readonly property int launcherCalcBoxHeight: 48
+  readonly property int launcherCalcBoxY: 28
+  readonly property int launcherCalcExpressionX: 24                 // expressão (13:17352) em (24,28)
+  readonly property int launcherCalcResultX: 340                    // resultado (13:17356) em (340,28)
+  readonly property int launcherCalcCaptionY: 80                    // legendas "Expression"/"Result" (13:17353, 13:17357): 260×20 em y 80, mesmo x de cada caixa
+  readonly property int launcherCalcCaptionHeight: 20
+  readonly property int launcherCalcEqualX: 296                     // círculo "igual" (13:17354) de 32 em (296,36), raio 16
+  readonly property int launcherCalcEqualY: 36
+  readonly property int launcherCalcEqualSize: 32
+  readonly property int launcherCalcEqualIconSize: 16               // ícone `equal` de 16 em (8,8) do círculo
+  readonly property int launcherCalcEqualIconOffset: 8
 
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.
@@ -389,6 +405,8 @@ Singleton {
   readonly property int fontPanelTitle: 20      // Geist Serif Regular
   readonly property int fontModalTitle: 32      // Geist Serif Regular
   readonly property int fontSearch: 17          // Geist Regular (launcher)
+  readonly property int fontLauncherExpression: 28   // Geist Serif Regular; expressão do cartão do cálculo (launcher, nó 13:17352, estilo "Armitage/Serif Regular 28")
+  readonly property int fontLauncherResult: 40       // Geist Serif Regular; resultado do cartão do cálculo (launcher, nó 13:17356, estilo "Armitage/Serif Regular 40")
   readonly property int fontInfoValue: 17       // Geist Serif Regular
   readonly property int fontClock: 34           // Geist Serif Regular (mesmo texto do clockTimeSize)
   readonly property int fontBatteryPercent: 40  // Geist Serif Regular

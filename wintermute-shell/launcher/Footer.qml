@@ -94,7 +94,8 @@ Item {
 
           delegate: KeyCap {
             required property string modelData
-            anchors.verticalCenter: parent.verticalCenter
+            // Ao trocar de modo a lista de ações é refeita e o pai some antes da tecla.
+            anchors.verticalCenter: parent ? parent.verticalCenter : undefined
             text: modelData
           }
         }

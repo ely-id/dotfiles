@@ -934,6 +934,21 @@ PanelWindow {
                   Demo.LauncherSpecimen { state: "grouped"; selected: 0; hovered: 2 }
                 }
                 Specimen {
+                  caption: "Cálculo 640×368 · busca 128*3.5+12 · cartão 624×128 em (8,88) · Copy result selecionada e In hexadecimal · rodapé só com Copy ↵"
+                  stageWidth: 640; stageHeight: 368
+                  Demo.LauncherSpecimen { state: "calc"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Cálculo sem hexadecimal 640×324 · busca 10/4, resultado 2.5 (não inteiro: só a linha Copy result)"
+                  stageWidth: 640; stageHeight: 324
+                  Demo.LauncherSpecimen { state: "calc"; expression: "10/4" }
+                }
+                Specimen {
+                  caption: "Cálculo no locale com vírgula 640×368 · busca (2+3)*4,5+1,5 · resultado 24 · hexadecimal 0x18 selecionado"
+                  stageWidth: 640; stageHeight: 368
+                  Demo.LauncherSpecimen { state: "calc"; expression: "(2+3)*4,5+1,5"; separator: ","; selected: 1 }
+                }
+                Specimen {
                   caption: "Sem fonte de dados (F5-T01) · só cabeçalho, com o cursor na frente do placeholder, e rodapé (640×100)"
                   stageWidth: 640; stageHeight: 100
                   Demo.LauncherSpecimen { state: "empty-shell" }

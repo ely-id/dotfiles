@@ -31,6 +31,7 @@
 #   CICLO_ALCANCE     fases que o ciclo trabalha (padrão: "F4 F5 F6 F7")
 #   CICLO_LOTE        fases cujo QA ao vivo acontece junto, no fim (padrão: "F4 F5 F6", ajuste A-03)
 #   CICLO_MAX_SESSOES, CICLO_MAX_TURNOS, CICLO_ORCAMENTO   limites do "rodar"
+#   CICLO_MODO        modo de permissão do "rodar" (padrão: auto; acceptEdits se o Auto não estiver disponível)
 
 set -uo pipefail
 
@@ -205,7 +206,7 @@ cmd_rodar() {
     log="$dir_estado/logs/$(date +%Y%m%d-%H%M%S).json"
     echo "Sessão $n de $max do ciclo. Log: $log"
     (cd "$repo" && claude -p "/ciclo" --model fable --effort high \
-        --permission-mode acceptEdits \
+        --permission-mode "${CICLO_MODO:-auto}" \
         --max-turns "${CICLO_MAX_TURNOS:-400}" \
         --max-budget-usd "${CICLO_ORCAMENTO:-25}" \
         --output-format json > "$log") \

@@ -86,7 +86,7 @@ Para o projeto andar sem eu abrir sessão por sessão, uso o ciclo de agentes ([
 
 ### Como rodo pelo app de desktop
 
-1. Abro uma sessão nova do Claude Code em `~/Projects/dotfiles`, escolho o Fable como modelo, o effort em high e o modo de permissão que aceita edições.
+1. Abro uma sessão nova do Claude Code em `~/Projects/dotfiles`, escolho o Fable como modelo, o effort em high e o modo de permissão **Auto**, no seletor abaixo da caixa de texto. Comecei no "Edit automatically", e com o orquestrador e os subagentes rodando juntos cada comando de terminal virava um pedido de aprovação; no Auto, um verificador aprova o que é rotina, e as regras de `.claude/settings.json` continuam mandando perguntar antes de `sudo`, pacotes, `git push` e escrita em `~/.config/`. O app guarda o modo por pasta, então escolho uma vez.
 2. Digito `/ciclo`. A sessão trabalha tarefa atrás de tarefa, fecha um relatório a cada bloco e para sozinha no próximo portão meu.
 3. Se eu quiser uma garantia de que ela não para antes da hora, uso o `/goal` no lugar: `/goal Seguir a skill ciclo até que a saída mais recente de .agents/scripts/ciclo.sh estado --dentro mostre um RESULTADO diferente de continuar`. O avaliador do `/goal` só lê a conversa, e a saída do `ciclo.sh` fica nela.
 4. Quando ela para, a última linha diz o que eu faço: responder uma pendência e digitar `/ciclo` de novo, ou entrar no Niri para o QA ao vivo.

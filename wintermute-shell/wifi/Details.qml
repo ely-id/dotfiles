@@ -9,13 +9,13 @@ DeviceDetails {
   readonly property bool connected: selection.ssid === service.connectedSsid
   title: String(selection.ssid || service.connectedSsid)
   titleIcon: Component { SignalIcon { bars: Number(root.selection.bars || 3); tint: Theme.accentText } }
-  primaryText: "Esquecer"
+  primaryText: "Forget"
   primaryEnabled: (selection.uuids || []).length > 0
-  secondaryText: connected ? "Desconectar" : "Conectar"
+  secondaryText: connected ? "Disconnect" : "Connect"
   detailRows: connected ? [
-    {label: "Velocidade", value: service.linkSpeed},
+    {label: "Speed", value: service.linkSpeed},
     {label: "IPv4", value: service.ipv4},
-    {label: "Banda", value: service.band},
+    {label: "Band", value: service.band},
     {label: "Gateway", value: service.gateway},
     {label: "DNS", value: service.dns},
     {label: "Interface", value: service.device || "—"}

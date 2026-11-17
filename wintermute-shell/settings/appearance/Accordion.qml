@@ -20,7 +20,7 @@ Rectangle {
   clip: true
   activeFocusOnTab: true
   Accessible.role: Accessible.Button
-  Accessible.name: title + ", " + summary + (navigation || !enabled ? "" : expanded ? ", aberto" : ", fechado")
+  Accessible.name: title + ", " + summary + (navigation || !enabled ? "" : expanded ? ", open" : ", closed")
   Accessible.onPressAction: if (enabled) toggled()
   Keys.onReturnPressed: toggled()
   Keys.onSpacePressed: toggled()

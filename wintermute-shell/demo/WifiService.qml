@@ -8,7 +8,7 @@ QtObject {
   property bool panelOpen: false
   property string phase: "idle"
   property string statusText: ""
-  readonly property string incorrectPasswordText: "Senha incorreta"
+  readonly property string incorrectPasswordText: "Incorrect password"
   readonly property var wiredNetworks: []
   readonly property var networks: [
     { ssid: "Wintermute-5G", signal: 92, bars: 3, locked: true, connected: true,
@@ -23,7 +23,7 @@ QtObject {
   property string connectedSsid: "Wintermute-5G"
   property string linkSpeed: "866 Mb/s"
   property string ipv4: "192.168.0.42"
-  property string band: "5 GHz · canal 36"
+  property string band: "5 GHz · channel 36"
   property string gateway: "192.168.0.1"
   property string dns: "1.1.1.1"
   property string device: "wlan0"

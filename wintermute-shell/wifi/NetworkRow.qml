@@ -42,7 +42,7 @@ ListRow {
     x: 192; y: 6
     width: 100
     small: true
-    text: "Desconectar"
+    text: "Disconnect"
     interactive: root.interactive
     onClicked: root.disconnectClicked()
   }

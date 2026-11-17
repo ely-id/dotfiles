@@ -31,11 +31,11 @@ Shell.Card {
       : low ? Shell.Theme.danger : Shell.Theme.text
   readonly property color batteryIconColor: (!previewBattery && Battery.State.charging) ? Shell.Theme.successText
       : low ? Shell.Theme.dangerText : Shell.Theme.text
-  readonly property var weekdaysShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"]
-  readonly property var weekdaysCompact: ["DM", "SG", "TR", "QA", "QI", "SX", "SB"]
+  readonly property var weekdaysShort: ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+  readonly property var weekdaysCompact: ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
 
   Accessible.role: Accessible.Button
-  Accessible.name: "Abrir calendário"
+  Accessible.name: "Open calendar"
   Accessible.onPressAction: clicked()
 
   MouseArea {
@@ -112,7 +112,7 @@ Shell.Card {
         y: 4
         width: parent.width
         height: 16
-        text: root.weekdaysShort[root.previewTime.getDay()] || "sex"
+        text: root.weekdaysShort[root.previewTime.getDay()] || "fri"
         color: Shell.Theme.muted
         font.family: Shell.Theme.fontFamily
         font.weight: Font.Medium
@@ -204,7 +204,7 @@ Shell.Card {
 
       Text {
         anchors.centerIn: parent
-        text: "Bateria em " + Battery.State.level + "%"
+        text: "Battery at " + Battery.State.level + "%"
         color: Shell.Theme.dangerText
         font.family: Shell.Theme.fontFamily
         font.weight: Font.Medium
@@ -224,7 +224,7 @@ Shell.Card {
       cursorShape: Qt.PointingHandCursor
       onClicked: root.batteryClicked()
       Accessible.role: Accessible.Button
-      Accessible.name: "Abrir bateria"
+      Accessible.name: "Open battery"
       Accessible.description: Battery.State.description
       Accessible.onPressAction: root.batteryClicked()
     }
@@ -282,7 +282,7 @@ Shell.Card {
       y: 64
       width: 48
       height: 20
-      text: root.weekdaysCompact[root.previewTime.getDay()] || "SX"
+      text: root.weekdaysCompact[root.previewTime.getDay()] || "FR"
       color: Shell.Theme.muted
       opacity: Shell.Theme.ramp(root.collapsedProgress, 0.48, 0.80)
       font.family: Shell.Theme.monoFontFamily
@@ -340,7 +340,7 @@ Shell.Card {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.batteryClicked()
         Accessible.role: Accessible.Button
-        Accessible.name: "Abrir bateria"
+        Accessible.name: "Open battery"
         Accessible.description: Battery.State.description
         Accessible.onPressAction: root.batteryClicked()
       }

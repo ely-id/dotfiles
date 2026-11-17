@@ -48,7 +48,7 @@ Item {
       width: 276; height: 32
       verticalAlignment: Text.AlignVCenter
       elide: Text.ElideRight
-      text: "Entrar em “" + String(root.selection.ssid || "Rede Wi-Fi") + "”"
+      text: "Join “" + String(root.selection.ssid || "Wi-Fi network") + "”"
       color: Theme.text
       font.family: Theme.titleFontFamily
       font.weight: Font.Normal
@@ -57,7 +57,7 @@ Item {
     }
     Text {
       x: 20; y: 72
-      text: "Senha"
+      text: "Password"
       visible: !root.isEnterprise
       color: Theme.text
       font.family: Theme.fontFamily
@@ -70,7 +70,7 @@ Item {
       x: 20; y: 100
       visible: !root.isEnterprise
       password: true
-      placeholderText: "Senha"
+      placeholderText: "Password"
       onAccepted: root.connect()
     }
     FormViewport {
@@ -93,7 +93,7 @@ Item {
       x: 20
       y: root.isEnterprise ? form.y + form.height + 16 : 160
       kind: "primary"
-      text: "Conectar"
+      text: "Connect"
       interactive: root.canConnect
       onClicked: root.connect()
     }

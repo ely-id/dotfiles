@@ -13,7 +13,7 @@ Item {
   height: contentHeight
 
   property string selectedTheme: Shell.Theme.name
-  property string wallpaperSummary: "Dinâmico"
+  property string wallpaperSummary: "Dynamic"
   property bool brightnessAvailable: true
   property real brightness: 0.8
   property bool brightnessExpanded: false
@@ -38,7 +38,7 @@ Item {
 
   Text {
     x: 30; y: 64; height: 20
-    text: "Variação"
+    text: "Variation"
     font.family: Shell.Theme.fontFamily; font.pixelSize: Shell.Theme.fontBody; font.weight: Font.Medium
     font.letterSpacing: 0
     color: Shell.Theme.muted; verticalAlignment: Text.AlignVCenter
@@ -59,15 +59,15 @@ Item {
     x: 30; y: 260; width: root.width - 60; spacing: 8
     Accordion {
       objectName: "wallpaperSection"
-      width: parent.width; title: "Papel de parede"
+      width: parent.width; title: "Wallpaper"
       summary: root.wallpaperSummary
       navigation: true
       onToggled: root.wallpaperRequested()
     }
     Accordion {
       objectName: "brightnessSection"
-      width: parent.width; title: "Brilho da tela"
-      summary: root.brightnessAvailable ? Math.round(root.brightness * 100) + "%" : "Indisponível"
+      width: parent.width; title: "Screen brightness"
+      summary: root.brightnessAvailable ? Math.round(root.brightness * 100) + "%" : "Unavailable"
       enabled: root.brightnessAvailable
       expanded: enabled && root.brightnessExpanded
       expandedHeight: 111
@@ -83,14 +83,14 @@ Item {
         onDragFinished: root.brightnessDragFinished()
         activeFocusOnTab: true
         Accessible.role: Accessible.Slider
-        Accessible.name: "Brilho da tela"
+        Accessible.name: "Screen brightness"
         Keys.onLeftPressed: root.brightnessMoved(value - 0.1)
         Keys.onRightPressed: root.brightnessMoved(value + 0.1)
       }
     }
     Accordion {
       objectName: "displaySection"
-      width: parent.width; title: "Tela"
+      width: parent.width; title: "Display"
       summary: root.displaySummary
       navigation: true
       onToggled: root.displayRequested()

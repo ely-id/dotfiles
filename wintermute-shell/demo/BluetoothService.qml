@@ -14,25 +14,25 @@ QtObject {
   property var prompt: ({ kind: "" })
   readonly property var devices: [
     { path: "/demo/p1", address: "00:11:22:33:44:01", name: "Fones Lume", deviceName: "Fones Lume",
-      icon: "headphones", type: "Fone de ouvido", connected: true, paired: true, bonded: true,
+      icon: "headphones", type: "Headphones", connected: true, paired: true, bonded: true,
       trusted: true, blocked: false, battery: 82, model: "", nativeBusy: false },
     { path: "/demo/p2", address: "00:11:22:33:44:02", name: "Teclado K3", deviceName: "Teclado K3",
-      icon: "keyboard", type: "Teclado", connected: false, paired: true, bonded: true,
+      icon: "keyboard", type: "Keyboard", connected: false, paired: true, bonded: true,
       trusted: true, blocked: false, battery: 64, model: "", nativeBusy: false },
     { path: "/demo/p3", address: "00:11:22:33:44:03", name: "Mouse MX", deviceName: "Mouse MX",
       icon: "mouse", type: "Mouse", connected: false, paired: true, bonded: true,
       trusted: true, blocked: false, battery: -1, model: "", nativeBusy: true },
     { path: "/demo/p4", address: "00:11:22:33:44:04", name: "Controle", deviceName: "Controle",
-      icon: "gamepad-2", type: "Controle", connected: false, paired: true, bonded: true,
+      icon: "gamepad-2", type: "Controller", connected: false, paired: true, bonded: true,
       trusted: true, blocked: false, battery: -1, model: "", nativeBusy: false },
     { path: "/demo/n1", address: "00:11:22:33:44:11", name: "Caixa Orbe", deviceName: "Caixa Orbe",
-      icon: "speaker", type: "Alto-falante", connected: false, paired: false, bonded: false,
+      icon: "speaker", type: "Speaker", connected: false, paired: false, bonded: false,
       trusted: false, blocked: false, battery: -1, model: "", nativeBusy: false },
     { path: "/demo/n2", address: "00:11:22:33:44:12", name: "Buds Pro", deviceName: "Buds Pro",
-      icon: "headphones", type: "Fone de ouvido", connected: false, paired: false, bonded: false,
+      icon: "headphones", type: "Headphones", connected: false, paired: false, bonded: false,
       trusted: false, blocked: false, battery: -1, model: "", nativeBusy: false },
     { path: "/demo/n3", address: "00:11:22:33:44:13", name: "Celular Aurora", deviceName: "Celular Aurora",
-      icon: "smartphone", type: "Celular", connected: false, paired: false, bonded: false,
+      icon: "smartphone", type: "Phone", connected: false, paired: false, bonded: false,
       trusted: false, blocked: false, battery: -1, model: "", nativeBusy: false }
   ]
   readonly property var pairedDevices: devices.filter(d => d.paired)

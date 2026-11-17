@@ -13,9 +13,9 @@ function classifier(icon) {
 
 function typeLabel(icon) {
   if (/touchpad/i.test(String(icon || ""))) return "Trackpad";
-  return ({headphones: 'Fone de ouvido', keyboard: 'Teclado', mouse: 'Mouse',
-           speaker: 'Alto-falante', smartphone: 'Celular', 'gamepad-2': 'Controle',
-           bluetooth: 'Dispositivo Bluetooth'})[classifier(icon)];
+  return ({headphones: 'Headphones', keyboard: 'Keyboard', mouse: 'Mouse',
+           speaker: 'Speaker', smartphone: 'Phone', 'gamepad-2': 'Controller',
+           bluetooth: 'Bluetooth device'})[classifier(icon)];
 }
 
 function powerDeviceFor(address, devices) {

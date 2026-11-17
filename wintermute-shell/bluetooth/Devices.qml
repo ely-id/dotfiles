@@ -13,10 +13,10 @@ Shell.DeviceList {
   viewportHeight: service.enabled ? 306 : 156
   devices: service.enabled ? service.pairedDevices : []
   deviceKey: "path"
-  emptyText: !service.available ? "Nenhum adaptador Bluetooth encontrado."
+  emptyText: !service.available ? "No Bluetooth adapter found."
       : service.blocked ? "Bluetooth is blocked. Turn it on to unblock it."
-      : !service.enabled ? "O Bluetooth está desligado."
-      : "Nenhum dispositivo pareado. Procure dispositivos próximos para parear."
+      : !service.enabled ? "Bluetooth is off."
+      : "No paired devices. Search for nearby devices to pair one."
   message: service.errorText
   headerControl: Component { Shell.Toggle {
     checked: root.service.enabled
@@ -45,7 +45,7 @@ Shell.DeviceList {
     Bluetooth.Row {
       y: 14
       width: Shell.PanelStyle.rowWidth
-      label: "Procurar dispositivos próximos"
+      label: "Search for nearby devices"
       iconName: "bluetooth-searching"
       labelSize: Shell.Theme.fontLabel
       titleColor: Shell.Theme.muted

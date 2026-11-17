@@ -33,8 +33,8 @@ Item {
 
     Repeater {
       model: [
-        {tab: "output", label: "Saída", x: 20, width: 64},
-        {tab: "input", label: "Entrada", x: 92, width: 96}
+        {tab: "output", label: "Output", x: 20, width: 64},
+        {tab: "input", label: "Input", x: 92, width: 96}
       ]
       delegate: MouseArea {
         id: tabButton
@@ -129,7 +129,7 @@ Item {
       height: 40
       visible: root.deviceCount === 0
       text: root.selectedTab === "output"
-          ? "Nenhum dispositivo de saída" : "Nenhum dispositivo de entrada"
+          ? "No output devices" : "No input devices"
       horizontalAlignment: Text.AlignHCenter
       color: Theme.muted
       font.family: Theme.fontFamily

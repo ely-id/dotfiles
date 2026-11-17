@@ -47,7 +47,7 @@ Singleton {
           || b.signal - a.signal || a.ssid.localeCompare(b.ssid))
   readonly property string uploadRate: txCounter.rate
   readonly property string downloadRate: rxCounter.rate
-  readonly property string incorrectPasswordText: "Senha incorreta"
+  readonly property string incorrectPasswordText: "Incorrect password"
   property string phase: "idle"
   property string statusText: ""
   property string pendingSsid: ""
@@ -242,7 +242,7 @@ Singleton {
     pendingSsid = ssid;
     phase = kind === "connect" ? "connecting" : "working";
     statusText = kind === "connect"
-        ? "Conectando a " + ssid + "…" : "Aplicando a mudança no Wi-Fi…";
+        ? "Connecting to " + ssid + "…" : "Applying the Wi-Fi change…";
     actionProcess.command = commands[0];
     actionProcess.running = true;
   }
@@ -323,7 +323,7 @@ Singleton {
             : frequency >= 5000 ? (frequency - 5000) / 5
             : frequency >= 4910 ? (frequency - 4000) / 5
             : frequency >= 2400 ? (frequency - 2407) / 5 : "—";
-        root.band = band + " · canal " + channel;
+        root.band = band + " · channel " + channel;
       }
     }
   }
@@ -364,20 +364,20 @@ Singleton {
       root.phase = succeeded ? "complete" : "failed";
       if (succeeded) {
         root.statusText = root._actionKind === "connect"
-            ? "Conectado" : "Wi-Fi atualizado";
+            ? "Connected" : "Wi-Fi updated";
       } else if (root._actionKind === "connect") {
         if (root._passwordFailed)
           root.statusText = root.incorrectPasswordText;
         else if (root._actionError.includes("No network with SSID"))
-          root.statusText = "Rede não encontrada";
+          root.statusText = "Network not found";
         else if (root._actionError.includes("802-1x.ca-cert"))
-          root.statusText = "Não foi possível ler o certificado CA";
+          root.statusText = "Could not read the CA certificate";
         else if (root._actionError.includes("Timeout"))
-          root.statusText = "Tempo de conexão esgotado";
+          root.statusText = "Connection timed out";
         else
-          root.statusText = "Falha na conexão";
+          root.statusText = "Connection failed";
       } else {
-        root.statusText = root._actionError || "Não foi possível atualizar o Wi-Fi";
+        root.statusText = root._actionError || "Could not update Wi-Fi";
       }
       root.actionFinished(root._actionKind, succeeded, root.statusText);
       root.refreshDetails();

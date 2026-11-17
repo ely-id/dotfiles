@@ -15,7 +15,7 @@ Bluetooth.Row {
   readonly property bool failed: service.failed(device.path || "")
   readonly property bool showBattery: Number(device.battery) >= 0
   signal infoClicked
-  label: String(device.name || device.address || "Dispositivo Bluetooth")
+  label: String(device.name || device.address || "Bluetooth device")
   selected: !!device.connected
   labelRight: showBattery ? 184 : 216
   leading: Component { Image {

@@ -47,7 +47,7 @@ DeviceList {
     ListRow {
       y: 14
       width: PanelStyle.rowWidth
-      title: "Adicionar rede"
+      title: "Add network"
       iconName: "plus"
       labelSize: Theme.fontLabel
       titleColor: Theme.muted

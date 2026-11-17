@@ -62,20 +62,20 @@ Column {
   }
 
   FormRow {
-    label: "Usuário"
-    InputField { id: username; placeholderText: "Usuário" }
+    label: "Username"
+    InputField { id: username; placeholderText: "Username" }
   }
   FormRow {
-    label: "Senha"
+    label: "Password"
     InputField {
       id: password
       password: true
-      placeholderText: "Senha"
+      placeholderText: "Password"
       onAccepted: root.accepted()
     }
   }
   FormRow {
-    label: "Autenticação"
+    label: "Authentication"
     SelectField {
       text: root.eap.toUpperCase()
       onActiveFocusChanged: if (activeFocus) root.fieldFocused(this)
@@ -84,7 +84,7 @@ Column {
     }
   }
   FormRow {
-    label: "Autenticação interna"
+    label: "Inner authentication"
     visible: root.innerOptions.length > 1
     SelectField {
       text: root.innerOptions.find(option => option.mode === root.innerAuth)?.label || ""
@@ -94,22 +94,22 @@ Column {
     }
   }
   FormRow {
-    label: "Domínio do servidor"
+    label: "Server domain"
     InputField {
       id: domain
-      placeholderText: "ex.: wifi.exemplo.edu.br"
+      placeholderText: "e.g. wifi.example.edu"
       onAccepted: root.accepted()
     }
   }
   FormRow {
-    label: "Identidade anônima (opcional)"
-    InputField { id: anonymous; placeholderText: "Identidade anônima" }
+    label: "Anonymous identity (optional)"
+    InputField { id: anonymous; placeholderText: "Anonymous identity" }
   }
   FormRow {
-    label: "Certificado CA (opcional)"
+    label: "CA certificate (optional)"
     InputField {
       id: certificate
-      placeholderText: "/caminho/do/certificado.pem"
+      placeholderText: "/path/to/certificate.pem"
       onAccepted: root.accepted()
     }
   }

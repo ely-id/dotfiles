@@ -18,7 +18,7 @@ Shell.PanelBackground {
   implicitWidth: 280
   implicitHeight: 232
   Accessible.role: Accessible.Pane
-  Accessible.name: "Bateria"
+  Accessible.name: "Battery"
 
   function duration(seconds) {
     const minutes = Math.round(seconds / 60);
@@ -31,7 +31,7 @@ Shell.PanelBackground {
     acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
   }
 
-  Label { x: 20; y: 16; text: "Bateria"; color: Shell.Theme.muted }
+  Label { x: 20; y: 16; text: "Battery"; color: Shell.Theme.muted }
 
   Image {
     x: status.x - 20
@@ -49,7 +49,7 @@ Shell.PanelBackground {
     x: 260 - width
     y: 16
     visible: root.service.charging
-    text: root.charging ? "Carregando" : "Carregada"
+    text: root.charging ? "Charging" : "Charged"
     color: Shell.Theme.successText
   }
 
@@ -80,8 +80,8 @@ Shell.PanelBackground {
     visible: root.charging || !root.service.charging
     color: Shell.Theme.muted
     text: root.charging
-        ? (root.service.timeToFull > 0 ? root.duration(root.service.timeToFull) + " para encher" : "")
-        : (root.service.timeToEmpty > 0 ? root.duration(root.service.timeToEmpty) + " restantes" : "")
+        ? (root.service.timeToFull > 0 ? root.duration(root.service.timeToFull) + " until full" : "")
+        : (root.service.timeToEmpty > 0 ? root.duration(root.service.timeToEmpty) + " left" : "")
   }
 
   Rectangle {
@@ -101,7 +101,7 @@ Shell.PanelBackground {
     }
   }
 
-  Label { x: 20; y: 128; text: "Perfil de energia"; color: Shell.Theme.muted }
+  Label { x: 20; y: 128; text: "Power profile"; color: Shell.Theme.muted }
 
   Repeater {
     model: root.service.profiles

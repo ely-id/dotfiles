@@ -29,7 +29,7 @@ Shell.GlassSurface {
     width: 100
     anchors.verticalCenter: parent.verticalCenter
     elide: Text.ElideRight
-    text: "Bateria em " + root.service.level + "%"
+    text: "Battery at " + root.service.level + "%"
     color: Shell.Theme.dangerText
     font.family: Shell.Theme.fontFamily
     font.weight: Font.Medium
@@ -58,7 +58,7 @@ Shell.GlassSurface {
       cursorShape: Qt.PointingHandCursor
       onClicked: root.dismissed()
       Accessible.role: Accessible.Button
-      Accessible.name: "Dispensar"
+      Accessible.name: "Dismiss"
       Accessible.onPressAction: root.dismissed()
     }
   }

@@ -131,7 +131,7 @@ Card {
     anchors.horizontalCenter: parent.horizontalCenter
     y: 8
     height: 20
-    text: "Sem internet"
+    text: "No internet"
     color: Theme.muted
     font.family: Theme.fontFamily
     font.weight: Font.Medium
@@ -265,8 +265,8 @@ Card {
         else root.collapseClicked();
       }
       Accessible.role: Accessible.Button
-      Accessible.name: slot === 0 ? "Wi-Fi" : slot === 1 ? "Som"
-          : slot === 2 ? "Ajustes" : root.collapseProgress < 0.5 ? "Recolher barra" : "Expandir barra"
+      Accessible.name: slot === 0 ? "Wi-Fi" : slot === 1 ? "Sound"
+          : slot === 2 ? "Settings" : root.collapseProgress < 0.5 ? "Collapse sidebar" : "Expand sidebar"
       Accessible.onPressAction: action.clicked()
 
       Rectangle {

@@ -8,7 +8,7 @@ QtObject {
     { id: "1", appName: "Calendário", body: "Revisão do portfólio às 15:00.",
       timestamp: "10 min", iconName: "calendar" },
     { id: "2", appName: "Mensagens", body: "Elo: o mercado chega às 18h, alguém em casa?",
-      timestamp: "agora", iconName: "mail" },
+      timestamp: "now", iconName: "mail" },
     { id: "3", appName: "Instalações", body: "Steam foi atualizado.",
       timestamp: "1 h", iconName: "download" }
   ]

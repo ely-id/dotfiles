@@ -48,9 +48,9 @@ Shell.Card {
           && Installs.State.findApp(name) !== null
       readonly property bool showDismiss: root.customModel === null
           && dismiss.visible && (rowHover.hovered || dismiss.hovered)
-      readonly property string summary: status === "installed" ? "Instalado"
-          : status === "failed" ? "Falhou" : progress < 0 ? "Instalando"
-          : "Instalando " + Math.round(progress * 100) + "%"
+      readonly property string summary: status === "installed" ? "Installed"
+          : status === "failed" ? "Failed" : progress < 0 ? "Installing"
+          : "Installing " + Math.round(progress * 100) + "%"
 
       y: root.contentPadding + index * root.rowHeight
       width: root.width

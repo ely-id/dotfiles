@@ -20,7 +20,7 @@ Item {
   Settings.Modal {
     id: modal
     x: 0; y: 13
-    title: "Aparência"
+    title: "Appearance"
     bodyTop: 0
     contentHeight: body.contentHeight
     Appearance.Body {

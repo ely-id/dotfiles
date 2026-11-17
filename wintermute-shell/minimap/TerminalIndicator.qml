@@ -28,10 +28,10 @@ Item {
       : Shell.Theme.successText
 
   Accessible.role: Accessible.Indicator
-  Accessible.name: dotState === "working" ? "Terminal com agente trabalhando"
-      : dotState === "attention" ? "Terminal com agente aguardando atenção"
-      : dotState === "unread" ? "Terminal com agente concluído (não lido)"
-      : "Terminal com agente concluído (lido)"
+  Accessible.name: dotState === "working" ? "Terminal with an agent working"
+      : dotState === "attention" ? "Terminal with an agent waiting for attention"
+      : dotState === "unread" ? "Terminal with an agent finished (unread)"
+      : "Terminal with an agent finished (read)"
 
   Image {
     anchors.fill: parent

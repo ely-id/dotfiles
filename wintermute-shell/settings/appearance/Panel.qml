@@ -9,7 +9,7 @@ import "../.." as Shell
 // real (tema, papel de parede, brilho e tela) e a navegação.
 Settings.Modal {
   id: root
-  title: "Aparência"
+  title: "Appearance"
   bodyTop: 0
   contentHeight: body.contentHeight
   onBackRequested: Settings.State.back()
@@ -18,7 +18,7 @@ Settings.Modal {
   Body {
     id: body
     selectedTheme: Shell.Theme.name
-    wallpaperSummary: Appearance.State.wallpaperMode === "dynamic" ? "Dinâmico" : "Personalizado"
+    wallpaperSummary: Appearance.State.wallpaperMode === "dynamic" ? "Dynamic" : "Custom"
     brightnessAvailable: Appearance.State.brightnessAvailable
     brightness: Appearance.State.brightness
     brightnessExpanded: Appearance.State.expandedSection === "brightness"

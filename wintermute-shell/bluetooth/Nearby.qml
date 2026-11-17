@@ -10,16 +10,16 @@ import ".." as Shell
 Shell.DeviceList {
   id: root
   property var service: stackController ? stackController.service : Bluetooth.State
-  title: "Dispositivos próximos"
+  title: "Nearby devices"
   listBottomPadding: 8
   listTop: 96
   viewportHeight: Math.max(236, Math.min(316, 104 + 44 * devices.length))
   devices: service.enabled ? service.nearbyDevices : []
   deviceKey: "path"
-  sectionLabel: service.enabled && service.discovering ? "Procurando…" : ""
-  emptyText: !service.enabled ? "O Bluetooth está desligado."
-      : service.discovering ? "Procurando dispositivos…\nColoque o dispositivo no modo de pareamento."
-      : "Nenhum dispositivo próximo encontrado."
+  sectionLabel: service.enabled && service.discovering ? "Searching…" : ""
+  emptyText: !service.enabled ? "Bluetooth is off."
+      : service.discovering ? "Searching for devices…\nPut the device in pairing mode."
+      : "No nearby devices found."
   message: service.errorText
   headerControl: Component { Item {
     Image {

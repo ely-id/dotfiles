@@ -308,7 +308,7 @@ PanelWindow {
     }
     ListRow {
       x: 8; y: 254; width: 300
-      title: "Adicionar rede"
+      title: "Add network"
       iconName: "plus"
       interactive: listPage.interactive
     }
@@ -324,7 +324,7 @@ PanelWindow {
 
     Text {
       x: 20; y: 16; width: 276; height: 32
-      text: "Entrar em “" + (joinPage.selection.name ?? "Casa_Lima") + "”"
+      text: "Join “" + (joinPage.selection.name ?? "Casa_Lima") + "”"
       color: Theme.text
       font.family: Theme.titleFontFamily
       font.weight: Font.Normal
@@ -334,18 +334,18 @@ PanelWindow {
     }
     Text {
       x: 20; y: 72
-      text: "Senha"
+      text: "Password"
       color: Theme.text
       font.family: Theme.fontFamily
       font.weight: Font.Medium
       font.pixelSize: Theme.fontLabel
       font.letterSpacing: 0
     }
-    Field { x: 20; y: 100; placeholderText: "Senha"; password: true }
+    Field { x: 20; y: 100; placeholderText: "Password"; password: true }
     ActionButton {
       x: 20; y: 160
       kind: "primary"
-      text: "Conectar"
+      text: "Connect"
       interactive: joinPage.interactive
       onClicked: joinPage.stackController.pop()
     }
@@ -376,7 +376,7 @@ PanelWindow {
     Chip {
       anchors.centerIn: parent
       visible: !demoStack.visible
-      text: "Abrir de novo"
+      text: "Reopen"
       iconName: "panel-left-open"
       onClicked: demoStack.open()
     }
@@ -1109,7 +1109,7 @@ PanelWindow {
                   stageWidth: PanelStyle.stackWidth; stageHeight: 144
                   Demo.WifiSpecimen {
                     page: "status"; height: 144
-                    phase: "connecting"; statusText: "Conectando a Casa_Lima…"
+                    phase: "connecting"; statusText: "Connecting to Casa_Lima…"
                   }
                 }
                 Specimen {
@@ -1117,7 +1117,7 @@ PanelWindow {
                   stageWidth: PanelStyle.stackWidth; stageHeight: 144
                   Demo.WifiSpecimen {
                     page: "status"; height: 144
-                    phase: "complete"; statusText: "Conectado"
+                    phase: "complete"; statusText: "Connected"
                   }
                 }
                 Specimen {
@@ -1125,7 +1125,7 @@ PanelWindow {
                   stageWidth: PanelStyle.stackWidth; stageHeight: 144
                   Demo.WifiSpecimen {
                     page: "status"; height: 144
-                    phase: "failed"; statusText: "Senha incorreta"
+                    phase: "failed"; statusText: "Incorrect password"
                   }
                 }
               }
@@ -1295,7 +1295,7 @@ PanelWindow {
                   stageWidth: 600; stageHeight: 469
                   Settings.Modal {
                     x: 0; y: 13
-                    title: "Aparência"
+                    title: "Appearance"
                     bodyTop: 0
                     contentHeight: appearanceBody.contentHeight
                     Appearance.Body {
@@ -1605,35 +1605,35 @@ PanelWindow {
 
               Specimen {
                 caption: "Primário"; stageWidth: 276; stageHeight: 48
-                ActionButton { kind: "primary"; text: "Conectar"; visualState: "rest" }
+                ActionButton { kind: "primary"; text: "Connect"; visualState: "rest" }
               }
               Specimen {
                 caption: "Primário · hover"; stageWidth: 276; stageHeight: 48
-                ActionButton { kind: "primary"; text: "Conectar"; visualState: "hover" }
+                ActionButton { kind: "primary"; text: "Connect"; visualState: "hover" }
               }
               Specimen {
                 caption: "Primário · desativado"; stageWidth: 276; stageHeight: 48
-                ActionButton { kind: "primary"; text: "Conectar"; visualState: "disabled" }
+                ActionButton { kind: "primary"; text: "Connect"; visualState: "disabled" }
               }
               Specimen {
                 caption: "Secundário"; stageWidth: 146; stageHeight: 40
-                ActionButton { kind: "secondary"; text: "Desconectar"; visualState: "rest" }
+                ActionButton { kind: "secondary"; text: "Disconnect"; visualState: "rest" }
               }
               Specimen {
                 caption: "Secundário · hover"; stageWidth: 146; stageHeight: 40
-                ActionButton { kind: "secondary"; text: "Desconectar"; visualState: "hover" }
+                ActionButton { kind: "secondary"; text: "Disconnect"; visualState: "hover" }
               }
               Specimen {
                 caption: "Secundário · desativado"; stageWidth: 146; stageHeight: 40
-                ActionButton { kind: "secondary"; text: "Desconectar"; visualState: "disabled" }
+                ActionButton { kind: "secondary"; text: "Disconnect"; visualState: "disabled" }
               }
               Specimen {
                 caption: "Perigo"; stageWidth: 146; stageHeight: 40
-                ActionButton { kind: "danger"; text: "Esquecer rede"; visualState: "rest" }
+                ActionButton { kind: "danger"; text: "Forget network"; visualState: "rest" }
               }
               Specimen {
                 caption: "Perigo · hover"; stageWidth: 146; stageHeight: 40
-                ActionButton { kind: "danger"; text: "Esquecer rede"; visualState: "hover" }
+                ActionButton { kind: "danger"; text: "Forget network"; visualState: "hover" }
               }
             }
 
@@ -1729,15 +1729,15 @@ PanelWindow {
 
               Specimen {
                 caption: "Vazio"; stageWidth: 276; stageHeight: 44
-                Field { placeholderText: "Nome da rede"; visualState: "empty" }
+                Field { placeholderText: "Network name"; visualState: "empty" }
               }
               Specimen {
                 caption: "Hover"; stageWidth: 276; stageHeight: 44
-                Field { placeholderText: "Nome da rede"; visualState: "hover" }
+                Field { placeholderText: "Network name"; visualState: "hover" }
               }
               Specimen {
                 caption: "Foco"; stageWidth: 276; stageHeight: 44
-                Field { placeholderText: "Nome da rede"; visualState: "focus" }
+                Field { placeholderText: "Network name"; visualState: "focus" }
               }
               Specimen {
                 caption: "Preenchido"; stageWidth: 276; stageHeight: 44
@@ -1745,11 +1745,11 @@ PanelWindow {
               }
               Specimen {
                 caption: "Senha"; stageWidth: 276; stageHeight: 44
-                Field { text: "Senha"; password: true; visualState: "password" }
+                Field { text: "Password"; password: true; visualState: "password" }
               }
               Specimen {
                 caption: "Erro"; stageWidth: 276; stageHeight: 44
-                Field { text: "Senha"; password: true; error: true; visualState: "error" }
+                Field { text: "Password"; password: true; error: true; visualState: "error" }
               }
             }
 
@@ -1787,7 +1787,7 @@ PanelWindow {
                 caption: "Lista · selecionada"; stageWidth: 300; stageHeight: 44
                 ListRow {
                   title: "Wintermute-5G"
-                  detail: "Conectado"
+                  detail: "Connected"
                   iconName: "wifi"
                   visualState: "selected"
                 }
@@ -1796,7 +1796,7 @@ PanelWindow {
               Specimen {
                 caption: "Ajuste · navega"; stageWidth: 520; stageHeight: 52
                 SettingsRow {
-                  title: "Idioma do teclado"
+                  title: "Keyboard language"
                   value: "Português (BR)"
                   navigation: true
                   visualState: "rest"
@@ -1805,7 +1805,7 @@ PanelWindow {
               Specimen {
                 caption: "Ajuste · hover"; stageWidth: 520; stageHeight: 52
                 SettingsRow {
-                  title: "Escala"
+                  title: "Scale"
                   value: "125%"
                   navigation: false
                   visualState: "hover"
@@ -1814,7 +1814,7 @@ PanelWindow {
               Specimen {
                 caption: "Ajuste · chave"; stageWidth: 520; stageHeight: 52
                 SettingsRow {
-                  title: "Aceleração do mouse"
+                  title: "Mouse acceleration"
                   toggle: true
                   checked: root.interactiveToggleChecked
                   onToggled: next => root.interactiveToggleChecked = next
@@ -1946,24 +1946,24 @@ PanelWindow {
 
               Specimen {
                 caption: "Etiqueta · acento"; stageWidth: 75; stageHeight: 20
-                Tag { kind: "accent"; text: "Conectado" }
+                Tag { kind: "accent"; text: "Connected" }
               }
               Specimen {
                 caption: "Neutra"; stageWidth: 46; stageHeight: 20
-                Tag { kind: "neutral"; text: "Salva" }
+                Tag { kind: "neutral"; text: "Saved" }
               }
               Specimen {
                 caption: "Sucesso"; stageWidth: 78; stageHeight: 20
-                Tag { kind: "success"; text: "Carregando" }
+                Tag { kind: "success"; text: "Charging" }
               }
               Specimen {
                 caption: "Perigo"; stageWidth: 52; stageHeight: 20
-                Tag { kind: "danger"; text: "Falhou" }
+                Tag { kind: "danger"; text: "Failed" }
               }
 
               Specimen {
                 caption: "Chip"; stageWidth: 138; stageHeight: 36
-                Chip { text: "Seletor de cor"; iconName: "pipette"; visualState: "rest" }
+                Chip { text: "Color picker"; iconName: "pipette"; visualState: "rest" }
               }
               Specimen {
                 caption: "Chip · hover"; stageWidth: 86; stageHeight: 36
@@ -1971,7 +1971,7 @@ PanelWindow {
               }
               Specimen {
                 caption: "Chip · selecionado"; stageWidth: 146; stageHeight: 36
-                Chip { text: "Captura de tela"; iconName: "scan"; visualState: "selected" }
+                Chip { text: "Screenshot"; iconName: "scan"; visualState: "selected" }
               }
 
               Specimen {

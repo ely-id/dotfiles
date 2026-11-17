@@ -44,9 +44,9 @@ Singleton {
 
   function displayName(node) {
     if (!node)
-      return "Dispositivo desconhecido";
+      return "Unknown device";
     return String(node.description || node.nickname || node.name
-                  || "Dispositivo desconhecido");
+                  || "Unknown device");
   }
 
   // Ícone Lucide da linha (ficha 07): saída = alto-falante, fones ou monitor (HDMI e afins);

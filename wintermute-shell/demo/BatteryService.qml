@@ -13,9 +13,9 @@ QtObject {
   readonly property int level: Math.round(percentage)
   readonly property bool low: !charging && level <= 10
   readonly property var profiles: [
-    { key: "power-saver", name: "Economia", icon: "leaf" },
-    { key: "balanced", name: "Equilibrado", icon: "gauge" },
-    { key: "performance", name: "Desempenho", icon: "zap" }
+    { key: "power-saver", name: "Power saver", icon: "leaf" },
+    { key: "balanced", name: "Balanced", icon: "gauge" },
+    { key: "performance", name: "Performance", icon: "zap" }
   ]
 
   function profileAvailable(key) { return true; }

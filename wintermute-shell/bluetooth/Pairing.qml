@@ -14,7 +14,7 @@ Item {
   readonly property var prompt: service.prompt
   readonly property bool needsInput: prompt.kind === "pin" || prompt.kind === "passkey"
   readonly property var promptDevice: service.deviceFor(prompt.path || "")
-  readonly property string deviceName: promptDevice ? promptDevice.name : "seu dispositivo"
+  readonly property string deviceName: promptDevice ? promptDevice.name : "your device"
   readonly property string codeText: String(prompt.code || "").replace(/^(\d{3})(\d{3})$/, "$1 $2")
   readonly property bool canSubmit: prompt.kind === "pin" ? code.text.length > 0 && code.text.length <= 16
       : prompt.kind === "passkey" ? /^\d{1,6}$/.test(code.text) : true
@@ -27,7 +27,7 @@ Item {
       x: 20; y: 16
       width: 276; height: 32
       verticalAlignment: Text.AlignVCenter
-      text: "Parear dispositivo"
+      text: "Pair device"
       color: Shell.Theme.text
       font.family: Shell.Theme.titleFontFamily
       font.weight: Font.Normal
@@ -37,10 +37,10 @@ Item {
     Text {
       x: 20; y: 72; width: 276
       wrapMode: Text.Wrap
-      text: root.prompt.kind === "display" ? "Digite este código no seu dispositivo Bluetooth e pressione Enter."
-          : root.prompt.kind === "confirm" ? "Confirme se este código aparece em “" + root.deviceName + "”."
-          : root.needsInput ? "Digite o código de pareamento mostrado no seu dispositivo."
-          : "Permitir que este dispositivo pareie?"
+      text: root.prompt.kind === "display" ? "Type this code on your Bluetooth device and press Enter."
+          : root.prompt.kind === "confirm" ? "Confirm that this code is shown on “" + root.deviceName + "”."
+          : root.needsInput ? "Type the pairing code shown on your device."
+          : "Allow this device to pair?"
       color: Shell.Theme.muted
       font.family: Shell.Theme.fontFamily
       font.weight: Font.Normal
@@ -62,12 +62,12 @@ Item {
     Shell.Field {
       id: code; x: 20; y: 100
       visible: root.needsInput
-      placeholderText: "Código de pareamento"
+      placeholderText: "Pairing code"
       onAccepted: if (root.canSubmit) root.service.answer(true, text)
     }
     Shell.ActionButton {
       x: 8; y: 184
-      text: "Cancelar"
+      text: "Cancel"
       interactive: root.interactive
       onClicked: root.service.cancelPairing()
     }
@@ -75,7 +75,7 @@ Item {
       x: 162; y: 184
       kind: "primary"
       compact: true
-      text: "Parear"
+      text: "Pair"
       visible: root.prompt.kind !== "display"
       interactive: root.interactive && root.canSubmit
       onClicked: root.service.answer(true, code.text)

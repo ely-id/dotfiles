@@ -11,7 +11,7 @@ Singleton {
   readonly property real percentage: present ? Math.max(0, Math.min(100, device.percentage * 100)) : 0
   readonly property bool charging: present && (device.state === UPowerDeviceState.Charging || !UPower.onBattery)
   readonly property string description: present
-      ? "Bateria " + Math.round(percentage) + "%, " + UPowerDeviceState.toString(device.state) : ""
+      ? "Battery " + Math.round(percentage) + "%, " + UPowerDeviceState.toString(device.state) : ""
   readonly property int level: Math.round(percentage)
   readonly property bool low: present && !charging && level <= 10
   readonly property int alertLevel: !low ? 0 : level <= 3 ? 3 : level <= 5 ? 5 : 10
@@ -19,9 +19,9 @@ Singleton {
   property int alerted: 0
   // Perfis de energia (fichas 08 e 13). O Desempenho usa `zap` nos dois lugares (P-07).
   readonly property var profiles: [
-    { key: "power-saver", profile: PowerProfile.PowerSaver, name: "Economia", icon: "leaf", accent: "#CBE25B" },
-    { key: "balanced", profile: PowerProfile.Balanced, name: "Equilibrado", icon: "gauge", accent: "#E99FFF" },
-    { key: "performance", profile: PowerProfile.Performance, name: "Desempenho", icon: "zap", accent: "#FFE51D" }
+    { key: "power-saver", profile: PowerProfile.PowerSaver, name: "Power saver", icon: "leaf" },
+    { key: "balanced", profile: PowerProfile.Balanced, name: "Balanced", icon: "gauge" },
+    { key: "performance", profile: PowerProfile.Performance, name: "Performance", icon: "zap" }
   ]
   readonly property bool chargingNow: present && device.state === UPowerDeviceState.Charging
   readonly property real changeRate: present ? device.changeRate : 0

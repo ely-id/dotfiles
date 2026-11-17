@@ -62,7 +62,7 @@ Item {
     x: Notifications.Style.contentPadding
     y: Notifications.Style.contentPadding
     height: 28
-    text: root.itemCount + " notificações"
+    text: root.itemCount + " notifications"
     color: Shell.Theme.text
     font.family: Shell.Theme.titleFontFamily
     font.weight: Font.Normal
@@ -77,7 +77,7 @@ Item {
     x: root.width - Notifications.Style.contentPadding - width
     y: 21
     height: 19
-    text: "Limpar tudo"
+    text: "Clear all"
     color: clearPointer.containsMouse ? Shell.Theme.text : Shell.Theme.muted
     font.family: Shell.Theme.fontFamily
     font.weight: Font.Medium

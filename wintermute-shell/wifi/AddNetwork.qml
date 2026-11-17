@@ -11,7 +11,7 @@ Item {
   property bool interactive: true
   property var menu: ({})
   property bool dropdownOpen: false
-  property string securityValue: "WPA2/WPA3 Pessoal"
+  property string securityValue: "WPA2/WPA3 Personal"
   property string securityMode: "wpa-psk"
   property bool hiddenNetwork: false
   readonly property bool isEnterprise: securityMode === "wpa-eap"
@@ -51,7 +51,7 @@ Item {
       x: 20; y: 16
       width: 276; height: 32
       verticalAlignment: Text.AlignVCenter
-      text: "Adicionar rede"
+      text: "Add network"
       color: Theme.text
       font.family: Theme.titleFontFamily
       font.weight: Font.Normal
@@ -76,14 +76,14 @@ Item {
         font.letterSpacing: 0
       }
 
-      FieldLabel { text: "Nome da rede (SSID)" }
+      FieldLabel { text: "Network name (SSID)" }
       Field {
         id: networkName
         x: 20; y: 28
-        placeholderText: "Nome da rede"
+        placeholderText: "Network name"
         onFocusedChanged: if (focused) form.reveal(this)
       }
-      FieldLabel { y: 84; text: "Segurança" }
+      FieldLabel { y: 84; text: "Security" }
       SelectField {
         x: 20; y: 112
         text: root.securityValue
@@ -95,12 +95,12 @@ Item {
         }
       }
 
-      FieldLabel { y: 168; text: "Senha"; visible: root.needsPassword }
+      FieldLabel { y: 168; text: "Password"; visible: root.needsPassword }
       Field {
         id: password
         x: 20; y: 196
         password: true
-        placeholderText: "Senha"
+        placeholderText: "Password"
         visible: root.needsPassword
         onAccepted: root.connect()
       }
@@ -123,7 +123,7 @@ Item {
       Text {
         x: 48
         anchors.verticalCenter: hidden.verticalCenter
-        text: "Rede oculta"
+        text: "Hidden network"
         color: Theme.text
         font.family: Theme.fontFamily
         font.weight: Font.Medium
@@ -137,7 +137,7 @@ Item {
       x: 20
       y: form.y + form.height + (root.isEnterprise ? 16 : 0)
       kind: "primary"
-      text: "Conectar"
+      text: "Connect"
       interactive: root.canConnect
       onClicked: root.connect()
     }

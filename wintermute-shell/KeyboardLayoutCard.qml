@@ -23,7 +23,7 @@ Card {
         required property int index
         width: root.width - 32; height: 16
         Accessible.role: Accessible.StaticText
-        Accessible.name: modelData + (index === root.activeIndex ? ", ativo" : "")
+        Accessible.name: modelData + (index === root.activeIndex ? ", active" : "")
         Text {
           width: parent.width - 24
           height: 16

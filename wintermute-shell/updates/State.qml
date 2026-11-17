@@ -44,7 +44,7 @@ Singleton {
     pending = "";
     Settings.State.close();
     root.status = "updating";
-    Installs.State.update("system-update", "Sistema", "installing", -1, "", "refresh-cw");
+    Installs.State.update("system-update", "System", "installing", -1, "", "refresh-cw");
     Quickshell.execDetached(["sh", "-c",
       'rm -f "$1.after"; echo updating > "$1"; '
       + 'ghostty --title="Cachy-Update" -e cachy-update; '
@@ -128,20 +128,20 @@ Singleton {
       const wasUpdating = root.status === "updating";
       if (result === "updating") {
         root.status = "updating";
-        Installs.State.update("system-update", "Sistema", "installing", -1, "", "refresh-cw");
+        Installs.State.update("system-update", "System", "installing", -1, "", "refresh-cw");
       } else if (result === "restart") {
         root.status = "restart";
         if (wasUpdating)
-          Installs.State.update("system-update", "Sistema", "installed", 100, "", "refresh-cw");
+          Installs.State.update("system-update", "System", "installed", 100, "", "refresh-cw");
       } else if (wasUpdating && result === "complete") {
         root.status = "complete";
-        Installs.State.update("system-update", "Sistema", "installed", 100, "", "refresh-cw");
+        Installs.State.update("system-update", "System", "installed", 100, "", "refresh-cw");
       } else if (wasUpdating && result === "available") {
         root.status = "available";
         Installs.State.dismiss("system-update");
       } else if (wasUpdating && result === "failed") {
         root.status = "available";
-        Installs.State.update("system-update", "Sistema", "failed", -1, "", "refresh-cw");
+        Installs.State.update("system-update", "System", "failed", -1, "", "refresh-cw");
       }
     }
   }

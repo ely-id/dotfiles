@@ -13,8 +13,8 @@ Item {
   property string title: ""
   property var detailRows: []
   property Component titleIcon
-  property string primaryText: "Esquecer"
-  property string secondaryText: "Desconectar"
+  property string primaryText: "Forget"
+  property string secondaryText: "Disconnect"
   property bool primaryEnabled: true
   property bool secondaryEnabled: true
   property string message: ""

@@ -103,7 +103,7 @@ Item {
           y: 0
           width: root.empty ? 104 : Math.max(16, Math.ceil(captionMetrics.advanceWidth))
           height: 48
-          text: root.empty ? "Notificações" : String(root.effectiveCount)
+          text: root.empty ? "Notifications" : String(root.effectiveCount)
           color: Shell.Theme.text
           font.family: Shell.Theme.fontFamily
           font.weight: Font.Medium

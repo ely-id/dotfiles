@@ -12,14 +12,14 @@ Item {
   property Item anchorItem
   property string currentMode: "wpa-psk"
   readonly property var securityOptions: [
-    { label: "Aberta (sem senha)", mode: "open" },
-    { label: "Aberta aprimorada (OWE)", mode: "owe" },
-    { label: "WPA Pessoal (legado)", mode: "wpa" },
-    { label: "WPA2 Pessoal", mode: "wpa2" },
-    { label: "WPA2/WPA3 Pessoal", mode: "wpa-psk" },
-    { label: "Somente WPA3 Pessoal", mode: "sae" },
-    { label: "WPA2/3 Empresarial", mode: "wpa-eap" },
-    { label: "Chave WEP (legado)", mode: "wep" }
+    { label: "Open (no password)", mode: "open" },
+    { label: "Enhanced open (OWE)", mode: "owe" },
+    { label: "WPA Personal (legacy)", mode: "wpa" },
+    { label: "WPA2 Personal", mode: "wpa2" },
+    { label: "WPA2/WPA3 Personal", mode: "wpa-psk" },
+    { label: "WPA3 Personal only", mode: "sae" },
+    { label: "WPA2/3 Enterprise", mode: "wpa-eap" },
+    { label: "WEP key (legacy)", mode: "wep" }
   ]
   property var options: securityOptions
   signal selected(string label, string mode)

@@ -77,7 +77,7 @@ Item {
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
     Accessible.role: Accessible.Button
-    Accessible.name: "Abrir launcher neste workspace"
+    Accessible.name: "Open launcher on this workspace"
     Accessible.onPressAction: root.activated()
     onClicked: root.activated()
   }

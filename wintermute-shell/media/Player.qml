@@ -16,7 +16,7 @@ Shell.Card {
   property real collapseProgress: 0
   property bool previewActive: false
   property string previewTitle: "Neon Drift"
-  property string previewArtist: "Sintetizador"
+  property string previewArtist: "Synthesizer"
   property bool previewRevealed: false
 
   readonly property real layoutProgress: Shell.Theme.collapseWidth(collapseProgress)
@@ -29,7 +29,7 @@ Shell.Card {
 
   readonly property string displayTitle: previewActive ? previewTitle
       : (Media.State.title !== "" ? Media.State.title
-          : (Media.State.identity !== "" ? Media.State.identity : "Faixa desconhecida"))
+          : (Media.State.identity !== "" ? Media.State.identity : "Unknown track"))
   readonly property string displaySubtitle: previewActive ? previewArtist : Media.State.subtitle
 
   width: Shell.Theme.lerp(Shell.Theme.sidebarCardExpandedWidth,

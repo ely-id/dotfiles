@@ -7,6 +7,15 @@
 
 Os componentes são reutilizáveis. Todas as peças das fases seguintes instanciam estes. Grade de 4 px. Ícones Lucide 16 (botão 32) ou 20 (botão 40), no centro geométrico: padding = (tamanho − ícone) / 2.
 
+## Cor dos ícones
+
+- Os ícones Lucide de `wintermute-shell/icons/` são desenhados em **branco puro** (`#FFFFFF`), e a cor vem **sempre da peça**, pela colorização (`MultiEffect` com `colorization: 1`) com um token, inclusive quando a cor é `text` (P-64, respondida em 2026-11-17: "desenhar os ícones em branco puro e deixar a cor sempre por conta da peça"; `F4-T25`).
+- O motivo: a colorização do Qt multiplica a cor pedida pela luminância do desenho. Até a `F4-T25` os ícones tinham o traço em `#F2F3F5`, e um ícone colorido por token (`accentText`, `dangerText`, `successText`, `muted`...) saía cerca de 5% mais escuro que o token (243/255). Com o desenho em branco, a cor sai igual ao token; medi num ícone de 96 px, com diferença zero nos oito tokens em uso e nas três variações.
+- Ícone sem colorização não existe mais: sairia branco puro, e não `text`. Peça nova que mostra ícone de `icons/` dá a cor pelo token.
+- O que a troca mudou nos ícones que já eram `text`: em posição inteira, nada (comparei 45 espécimes nas três variações, antes e depois, sem um pixel fora do ruído). Em posição de meio pixel o ícone sai um pouco mais suave, porque o ícone colorizado passa por uma camada e deixa de ser encaixado na grade de pixels. Os ícones coloridos por token sempre foram assim. Só vi isso em trechos da vitrine cujo layout cai em fração; se aparecer na shell, no QA ao vivo, o conserto é arredondar a posição da peça, não voltar a cor para o desenho.
+- **Só os ícones de `icons/` são colorizados.** Ícone de aplicativo, imagem de notificação, capa de mídia e ícone real da bandeja mantêm as próprias cores. Nos componentes que recebem as duas coisas pela mesma propriedade (`IconButton`, `Chip`, `AppTile`, `ListRow`, o título do `DeviceList`, a bandeja dos Ajustes), a colorização só liga quando o ícone vem por `iconName` ou de dentro da pasta `icons/` da shell.
+- O logo (`assets/brand/logo.svg`) e o "ARCH" (`assets/information/arch.svg`) já eram brancos desde a `F4-T17`, pela mesma conta.
+
 ## Vidro
 
 Fonte: `tokens.json` → `glass` e `armitage-shell/figma/prelude2.js` (`GLASSF`, `RIM`, `GFX`, `glow`, `glass`).

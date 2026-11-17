@@ -47,7 +47,7 @@
 ## Rede cabeada
 
 - Quando há cabo conectado, o botão da barra e a linha da lista de redes usam o ícone Lucide `cable`, no lugar de `ethernet.svg` e `ethernet-no-internet.svg` da origem. Definido em 2026-11-15 (P-39).
-- O SVG `cable` (Lucide, ISC) entrou em `wintermute-shell/icons/` na S07, com o traço `#F2F3F5` como os outros ícones. Ele vale com ou sem internet: o Lucide não tem uma variante “sem internet” e a origem trocava de arquivo, então o estado de cabo sem internet deixou de ter ícone próprio (a barra continua mostrando as taxas e o estado de conexão).
+- O SVG `cable` (Lucide, ISC) entrou em `wintermute-shell/icons/` na S07, com o traço `#F2F3F5` como os outros ícones (desde a `F4-T25` todos são brancos, `#FFFFFF`, e a cor vem da peça: ficha 00). Ele vale com ou sem internet: o Lucide não tem uma variante “sem internet” e a origem trocava de arquivo, então o estado de cabo sem internet deixou de ter ícone próprio (a barra continua mostrando as taxas e o estado de conexão).
 
 ## Dados
 

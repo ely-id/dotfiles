@@ -63,7 +63,7 @@ wintermute-shell/settings/manual/keybinds.py generate --output ~/.config/niri/cf
 | `GlassSurface.qml`, `GradientFill.qml`, `PanelBorder.qml`, `Shadow.qml`, `Card.qml`, `CardStack.qml`, `CardLayer.qml`, `PanelBackground.qml` | Superfície de vidro Armitage (degradê vertical com dithering, borda interna em degradê, brilho superior de 1 px, brilho de acento na base e sombra em duas camadas) e cartões empilhados |
 | `IconButton.qml`, `PanelCloseButton.qml`, `ActionButton.qml`, `Toggle.qml`, `Slider.qml`, `Field.qml`, `CheckBox.qml`, `RadioButton.qml`, `ListRow.qml`, `SettingsRow.qml`, `SegmentedSelector.qml`, `Chip.qml`, `Tag.qml`, `KeyCap.qml`, `AppTile.qml`, `DeviceList.qml`, `DeviceDetails.qml` | Biblioteca de componentes base Armitage (ficha `00-componentes-base.md`) |
 | `ComponentDemoPanel.qml`, `FontTestPanel.qml` | Painéis de inspeção e QA para as fases F1 (componentes base) e F0 (fontes e variações) |
-| `icons/` | Os 111 ícones Lucide do conjunto Armitage (`#F2F3F5`) e `LICENSE-lucide.txt` (ISC) |
+| `icons/` | Os 112 ícones Lucide do conjunto Armitage, desenhados em branco (`#FFFFFF`): a cor vem sempre da peça, pela colorização com um token (ficha 00). Mais o `LICENSE-lucide.txt` (ISC) |
 | `minimap/` | Organizador de workspaces na barra: linhas, círculos de janela, botão `+`, arraste e indicador de terminal com agente |
 | `calendar/` | Cartão do relógio + bateria na barra (`Clock.qml`) e pop-up de calendário mensal (`Card.qml`, `Window.qml`) |
 | `media/` | Cartão do reprodutor MPRIS na barra (`Player.qml`, `State.qml`) |

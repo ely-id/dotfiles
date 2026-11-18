@@ -6,7 +6,8 @@ import "../launcher" as Launcher
 //   state    "empty" (busca vazia: três recentes e as ferramentas), "empty-tools" (sem recentes),
 //            "no-result" (busca "xyzzy", com as duas linhas de ação), "no-result-bare" (o mesmo sem as
 //            linhas), "typing" (busca "ter" com a sugestão "minal"), "grouped" (busca "no", quatro
-//            seções) ou "calc" (a busca é `expression`; o cálculo ocupa o launcher)
+//            seções), "calc" (a busca é `expression`; o cálculo ocupa o launcher) ou "color" (a página de resultado do
+//            seletor de cor: #3FA9D9 "pega agora" no Firefox e o histórico do board)
 //   selected índice da linha selecionada, contando as linhas de todas as seções
 //   hovered  índice da linha sob o ponteiro, ou -1
 //   chip     chip das ferramentas com o foco do teclado, ou -1 (com um chip em foco nenhuma linha fica selecionada)
@@ -14,6 +15,8 @@ import "../launcher" as Launcher
 //   expression  o que digitei na busca no estado "calc" (padrão 128*3.5+12)
 //   separator   separador decimal do cálculo, "." ou "," (padrão ".")
 //   context     número do workspace de onde abri pelo "+" (etiqueta "On workspace N"); 0 abre sem etiqueta (padrão 0)
+//   copied      no estado "color", a linha recém-copiada: "", "hex", "rgb" ou "hsl" (padrão "")
+//   historyHover no estado "color", a amostra do histórico sob o ponteiro (a dica mostra o HEX dela), ou -1 (padrão -1)
 Item {
   id: root
 
@@ -25,6 +28,8 @@ Item {
   property string expression: "128*3.5+12"
   property string separator: "."
   property int context: 0
+  property string copied: ""
+  property int historyHover: -1
 
   implicitWidth: panel.width
   implicitHeight: panel.height
@@ -35,6 +40,7 @@ Item {
     expression: root.expression
     decimalSeparator: root.separator
     contextNumber: root.context
+    copied: root.copied
   }
 
   Launcher.Panel {
@@ -44,6 +50,7 @@ Item {
     hoverIndex: root.hovered
     chipIndex: root.chip
     chipHoverIndex: root.chipHovered
+    historyHoverIndex: root.historyHover
     forceCursor: true
   }
 }

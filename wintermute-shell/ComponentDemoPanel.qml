@@ -979,6 +979,27 @@ PanelWindow {
                   Demo.LauncherSpecimen { state: "no-result-bare" }
                 }
               }
+
+              SectionBlock {
+                title: "Seletor de cor (ficha 15, board 13:17120, nó 13:17499) · peça real com serviço fictício"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Resultado em repouso 640×476 · voltar de 32 em (12,12) · amostra de 96 em (20,76) · nome em Serif 24 · origem \"Picked just now · Firefox\" · \"Pick another\" de 120×32 em (136,140) · formatos de 600×44 em y 188, 236 e 284 · histórico de 12 amostras em y 364 · divisor do rodapé em 432"
+                  stageWidth: 640; stageHeight: 476
+                  Demo.LauncherSpecimen { state: "color" }
+                }
+                Specimen {
+                  caption: "O estado do board: HEX copiado (check e \"Copied\" em successText, botão selecionado em accent) · segunda amostra do histórico em hover, com a borda knob de 2 e a dica de 88×28 em (32,400)"
+                  stageWidth: 640; stageHeight: 476
+                  Demo.LauncherSpecimen { state: "color"; copied: "hex"; historyHover: 1 }
+                }
+                Specimen {
+                  caption: "Hover na primeira amostra · a dica encosta na margem de 20 do launcher (x 20), em vez de sair para x −8"
+                  stageWidth: 640; stageHeight: 476
+                  Demo.LauncherSpecimen { state: "color"; historyHover: 0 }
+                }
+              }
             }
 
             // =================================================================

@@ -11,7 +11,10 @@ import ".."
 // Medidas no quadro do launcher: o primeiro rótulo em y 64, cada linha de 44 logo abaixo do rótulo, o rótulo
 // seguinte 8 abaixo da última linha do grupo e o divisor do rodapé 4 abaixo da última linha (P-68).
 //
-// Quatro formas, escolhidas pelo texto da busca (`plan.kind`):
+// Cinco formas. A página do seletor de cor (`service.page`, F5-T08) tira a busca e a lista de cena e vale por si; as
+// outras quatro são escolhidas pelo texto da busca (`plan.kind`):
+//   color  `service.page === "color"`: o cabeçalho de busca vira voltar e título, o corpo é o resultado do seletor de cor
+//          (ColorPage.qml) e o divisor do rodapé fica fixo em y 432, com 476 de altura no total, sem rolar.
 //   calc   `service.calculation` não nulo: o launcher inteiro é o cálculo, com o rótulo "Calculator" em y 64, o
 //          cartão de 128 logo abaixo e, 16 depois dele, as linhas de ação sem rótulo. As seções não aparecem.
 //   empty  busca vazia: "Recent" (as linhas de `service.recents`) e "Tools" (a fila de chips de `service.tools`),
@@ -30,6 +33,8 @@ Item {
   // Para fixar o hover e o cursor na vitrine.
   property int hoverIndex: -1
   property bool forceCursor: false
+  // Amostra do histórico do seletor de cor sob o ponteiro (-1: nenhuma). Para fixar o hover na vitrine.
+  property int historyHoverIndex: -1
   // Chip das ferramentas com o foco do teclado (índice em `service.tools`), ou -1. Para fixar na vitrine.
   property int chipIndex: -1
   // Chip sob o ponteiro, para fixar o hover na vitrine.
@@ -40,21 +45,26 @@ Item {
   readonly property alias blurRegion: glass.blurRegion
 
   // Posições absolutas (no quadro) de cada rótulo e de cada linha, e do divisor do rodapé.
-  readonly property var plan: buildPlan(service.sections, service.calculation, String(service.query).trim(),
-      service.recents, service.tools, service.fallbackRows)
+  readonly property var plan: buildPlan(service.page, service.sections, service.calculation,
+      String(service.query).trim(), service.recents, service.tools, service.fallbackRows)
   readonly property int rowCount: plan.rows.length
   readonly property int chipCount: plan.chips ? plan.chips.items.length : 0
   readonly property real listTop: Theme.launcherSearchHeight + Theme.launcherDividerHeight
   // Sem lista, o divisor do rodapé é o próprio divisor do cabeçalho.
-  readonly property real footerY: Math.max(Theme.launcherSearchHeight,
-      Math.min(plan.footerY, maxHeight - Theme.launcherFooterHeight))
+  // A página do seletor de cor tem altura fixa (476): não encolhe para caber, porque não rola.
+  readonly property real footerY: plan.kind === "color" ? plan.footerY
+      : Math.max(Theme.launcherSearchHeight, Math.min(plan.footerY, maxHeight - Theme.launcherFooterHeight))
 
   implicitWidth: Theme.launcherWidth
   implicitHeight: footerY + Theme.launcherFooterHeight
   width: implicitWidth
   height: implicitHeight
 
-  function buildPlan(sections, calculation, query, recents, tools, fallbackRows) {
+  function buildPlan(page, sections, calculation, query, recents, tools, fallbackRows) {
+    if (page === "color") {
+      return { kind: "color", labels: [], rows: [], card: null, chips: null, notice: null,
+          footerY: Theme.launcherColorFooterY };
+    }
     const labels = [];
     const rows = [];
     let y = Theme.launcherSearchHeight + Theme.launcherSectionTop;
@@ -126,8 +136,16 @@ Item {
     };
   }
 
+  // O foco do teclado: no campo de busca, ou, na página do seletor de cor (que não tem campo), na própria página.
+  function focusCurrent() {
+    if (plan.kind === "color")
+      colorPage.forceActiveFocus(Qt.OtherFocusReason);
+    else
+      search.focusEditor();
+  }
+
   function focusSearch() {
-    search.focusEditor();
+    focusCurrent();
   }
 
   function move(delta) {
@@ -230,6 +248,10 @@ Item {
       root.chipIndex = -1;
       list.contentY = 0;
     }
+    // Entrar na página ou voltar dela: o campo some ou volta, e o foco acompanha (depois que a cena se refaz).
+    function onPageChanged() {
+      Qt.callLater(root.focusCurrent);
+    }
   }
 
   GlassSurface {
@@ -244,6 +266,7 @@ Item {
 
     Launcher.SearchField {
       id: search
+      visible: root.plan.kind !== "color"
       width: parent.width
       text: root.service.query
       // Sem sugestão fantasma no modo cálculo.
@@ -274,6 +297,7 @@ Item {
 
     Flickable {
       id: list
+      visible: root.plan.kind !== "color"
       y: root.listTop
       width: parent.width
       height: Math.max(0, root.footerY - root.listTop)
@@ -341,6 +365,15 @@ Item {
           onClicked: root.activateIndex(index)
         }
       }
+    }
+
+    Launcher.ColorPage {
+      id: colorPage
+      visible: root.plan.kind === "color"
+      width: parent.width
+      height: Theme.launcherColorFooterY
+      service: root.service
+      historyHoverIndex: root.historyHoverIndex
     }
 
     Launcher.Footer {

@@ -74,7 +74,7 @@ wintermute-shell/settings/manual/keybinds.py generate --output ~/.config/niri/cf
 | `bluetooth/` | Painel empilhado de Bluetooth: pareados, próximos, pareamento e detalhes (`actions.py` via BlueZ/D-Bus) |
 | `audio/` | Painel de som: abas de saída/entrada, slider de volume e lista de dispositivos PipeWire |
 | `battery/` | Pop-up de bateria e seletor de perfil de energia (`power-profiles-daemon`), indicador e alerta de bateria baixa |
-| `launcher/` | Launcher (ficha 14): janela por tela com o véu, o vidro com busca, lista por seções e rodapé, e o estado `State.qml` que a peça lê |
+| `launcher/` | Launcher (ficha 14): janela por tela com o véu, o vidro com busca, lista por seções e rodapé, e o estado `State.qml` que a peça lê. Também a página do seletor de cor (ficha 15): `ColorPage.qml`, `Colors.js` (formatos, nome da cor e histórico) e o histórico em `$XDG_STATE_HOME/wintermute-shell/colors.json` |
 | `settings/` | Tela inicial de Ajustes, botões de sessão (`session.py`), bandeja do sistema (`Tray.qml`), leitor KDL (`kdl.py`) e subpáginas em `appearance/`, `display/`, `system/`, `information/` e `manual/` |
 | `screenshot/` | Prévia de captura de tela na barra (`Preview.qml`), cópia para a área de transferência (`clipboard.py`) e código do plugin C++ de arraste (`native/`, desligado até a F6) |
 | `wallpaper/` | Camada de papel de parede por monitor (`desktop/`), shader dinâmico (`daylight/`) e script de seleção (`control.py`) |

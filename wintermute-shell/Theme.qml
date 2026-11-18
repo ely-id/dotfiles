@@ -408,6 +408,52 @@ Singleton {
   readonly property int launcherCalcEqualSize: 32
   readonly property int launcherCalcEqualIconSize: 16               // ícone `equal` de 16 em (8,8) do círculo
   readonly property int launcherCalcEqualIconOffset: 8
+  // Página de resultado do seletor de cor (ficha 15, board 13:17120, nó 13:17499). Coordenadas no quadro do launcher (640×476); o quadro
+  // do Figma tem as dos nós 1 px acima e à esquerda por causa da borda do pai, e aqui já estão somadas.
+  readonly property int launcherColorFooterY: 432                   // altura fixa da página: divisor do rodapé em y 432, vidro de 476
+  readonly property int launcherColorBackX: 12                      // botão voltar (IconButton de 32, raio 10) em (12,12), com o `chevron-left`
+  readonly property int launcherColorBackY: 12
+  readonly property int launcherColorTitleWidth: 400                // título "Color picker": caixa de 400×24 em (52,16), as mesmas de launcherFieldX/Y/Height
+  readonly property int launcherColorSwatchX: 20                    // amostra 96×96 em (20,76), raio radiusCard, borda border de 1
+  readonly property int launcherColorSwatchY: 76
+  readonly property int launcherColorSwatchSize: 96
+  readonly property int launcherColorNameX: 136                     // nome (13:17505): caixa de 300×32 em (136,84)
+  readonly property int launcherColorNameY: 84
+  readonly property int launcherColorNameWidth: 300
+  readonly property int launcherColorNameHeight: 32
+  readonly property int launcherColorOriginY: 116                   // origem (13:17506): caixa de 300×20 em (136,116)
+  readonly property int launcherColorOriginHeight: 20
+  readonly property int launcherColorButtonY: 140                   // "Pick another" (13:17507): 120×32 em (136,140), ActionButton small
+  readonly property int launcherColorButtonWidth: 120
+  readonly property int launcherColorFormatX: 20                    // linhas de formato (13:17509, 13:17515, 13:17519): 600×44 em x 20, y 188, 236 e 284
+  readonly property int launcherColorFormatY: 188
+  readonly property int launcherColorFormatStep: 48                 // passo de 48 (44 de altura e 4 entre elas)
+  readonly property int launcherColorFormatWidth: 600
+  readonly property int launcherColorFormatHeight: 44
+  readonly property int launcherColorFormatLabelX: 16               // rótulo (HEX, RGB, HSL): caixa de 56×44 em x 16, Geist Mono Medium 11 muted
+  readonly property int launcherColorFormatLabelWidth: 56
+  readonly property int launcherColorFormatValueX: 72               // valor: caixa de 360×44 em x 72, Geist Mono Medium 13 text
+  readonly property int launcherColorFormatValueWidth: 360
+  readonly property int launcherColorFormatButtonX: 560             // botão de copiar (IconButton de 32) em (560,6)
+  readonly property int launcherColorFormatButtonY: 6
+  readonly property int launcherColorCheckX: 456                    // linha copiada: `check` de 16 em successText em (456,14)
+  readonly property int launcherColorCheckY: 14
+  readonly property int launcherColorCheckSize: 16
+  readonly property int launcherColorCopiedX: 476                   // "Copied": caixa de 80×44 em x 476, Geist Medium 13 successText
+  readonly property int launcherColorCopiedWidth: 80
+  readonly property int launcherCopiedDuration: 1500                // a linha copiada mostra o `check` e "Copied" por 1,5 s (ficha 15, nota do board 13:17547)
+  readonly property int launcherColorHistoryLabelY: 336             // rótulo "History" (13:17523): caixa de 400×24 em (20,336)
+  readonly property int launcherColorHistoryY: 364                  // 12 amostras de 32×32, raio 8, borda border de 1, em y 364, uma a cada 40
+  readonly property int launcherColorHistorySize: 32
+  readonly property int launcherColorHistoryRadius: 8
+  readonly property int launcherColorHistoryStep: 40
+  readonly property int launcherColorHistoryMax: 12                 // o histórico guarda as 12 últimas cores
+  readonly property int launcherColorHistoryHoverBorder: 2          // sob o ponteiro a borda passa a knob de 2 (13:17525)
+  readonly property int launcherColorTipWidth: 88                   // dica do valor (13:17536): vidro de 88×28, raio 8, 4 abaixo da amostra, centrada nela
+  readonly property int launcherColorTipHeight: 28
+  readonly property int launcherColorTipRadius: 8
+  readonly property int launcherColorTipGap: 4
+  readonly property int launcherColorTipMargin: 20                  // a dica não passa dos 20 de margem do launcher (ficha 15, "Como funciona")
 
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.
@@ -433,6 +479,7 @@ Singleton {
   readonly property int fontSearch: 17          // Geist Regular (launcher)
   readonly property int fontLauncherExpression: 28   // Geist Serif Regular; expressão do cartão do cálculo (launcher, nó 13:17352, estilo "Armitage/Serif Regular 28")
   readonly property int fontLauncherResult: 40       // Geist Serif Regular; resultado do cartão do cálculo (launcher, nó 13:17356, estilo "Armitage/Serif Regular 40")
+  readonly property int fontLauncherColorName: 24    // Geist Serif Regular; nome da cor na página do seletor de cor (launcher, nó 13:17505, estilo "Armitage/Serif Regular 24")
   readonly property int fontInfoValue: 17       // Geist Serif Regular
   readonly property int fontClock: 34           // Geist Serif Regular (mesmo texto do clockTimeSize)
   readonly property int fontBatteryPercent: 40  // Geist Serif Regular

@@ -72,6 +72,17 @@ Li os dois estados pelo `get_design_context`: "pegando a cor" `13:17430` (560×3
 - **Teclado:** Enter copia o HEX, P pede outra cor, Esc e Backspace voltam ao launcher. As amostras do histórico e os botões de copiar são do ponteiro.
 - **Arquivos:** `launcher/ColorPage.qml`, `ColorFormatRow.qml`, `ColorHistory.qml` e `Colors.js`; tokens `launcherColor*`, `fontLauncherColorName` (24) e `launcherCopiedDuration` (1500) no `Theme.qml`.
 
+## Pegando a cor: como funciona (`F5-T12`, proposta da P-77, que não trava)
+
+- **Tela congelada:** ao pedir a cor, o launcher some e um quadro capturado de cada monitor fica na frente de tudo, para a cor não mudar enquanto escolho. A captura é a do próprio Quickshell (`ScreencopyView`), sem ferramenta de fora. Não desenho véu nenhum por cima: a tela parece a mesma.
+- **Lupa:** centrada no ponteiro, que some; mostra os 7×7 pixels em volta dele, cada um com 16, e o do meio marcado. Vale em todos os monitores: aparece naquele em que o ponteiro está.
+- **Valor:** a pílula fica 12 abaixo da lupa, alinhada a ela; quando não cabe embaixo, vai 12 acima.
+- **Dicas:** a pílula fica centrada na largura do monitor em que o ponteiro está, a 16 da base, como no board.
+- **Setas:** andam 1 px a partir de onde a lupa está; mexer o mouse volta a seguir o ponteiro.
+- **Clique:** guarda a cor (com o aplicativo que estava em foco) e reabre o launcher na página de resultado.
+- **Esc:** volta para onde eu estava, sem guardar: a página de resultado, se vim dela; senão o launcher.
+- **Na bancada** não existe captura de tela: a lupa é conferida sobre uma cena fictícia, a do board (a janela com o degradê de `#12283E` a `#3FA9D9` a `#F4A846`). A captura de verdade só se vê no Niri.
+
 ## Comportamento
 
 - ↵ no resultado copia HEX por padrão.

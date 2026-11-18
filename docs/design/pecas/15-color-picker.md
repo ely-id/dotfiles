@@ -81,6 +81,11 @@ Li os dois estados pelo `get_design_context`: "pegando a cor" `13:17430` (560×3
 - **Setas:** andam 1 px a partir de onde a lupa está; mexer o mouse volta a seguir o ponteiro.
 - **Clique:** guarda a cor (com o aplicativo que estava em foco) e reabre o launcher na página de resultado.
 - **Esc:** volta para onde eu estava, sem guardar: a página de resultado, se vim dela; senão o launcher.
+- **Como a lupa lê os pixels:** uma captura só do quadro congelado vai para um `Canvas` (`launcher/PixelReader.qml`), e a cada movimento leio dali os 7×7 pixels em volta do ponto. O mesmo caminho serve para a tela de verdade e para a cena de teste. Os pixels são os do quadro: num monitor com escala, a seta anda 1 pixel do quadro, não 1 ponto lógico. O que cai fora da tela fica na cor de fundo da lupa (`launcherLoupeBackdrop`, o preto do board).
+- **Nas bordas laterais** a pílula do valor não sai do monitor: deixa de ficar alinhada à lupa só ali, para o HEX continuar legível.
+- **Antes de capturar** espero o launcher terminar de sumir (os 180 ms da animação mais 100 ms de folga, para ele não sair no quadro). Se o quadro não chega em 2 s (sem o protocolo de captura, como no GNOME), a lupa desiste, o launcher reabre onde estava e fica um aviso no log. Esses dois tempos são limites de funcionamento, não medidas de desenho, e moram no `launcher/LoupeState.qml`.
+- **Aplicativo da origem:** o da última janela que esteve em foco antes de o launcher abrir, com o nome da entrada `.desktop`; vazio se eu não souber.
+- **Arquivos:** `launcher/ColorLoupe.qml` (a peça), `PixelReader.qml`, `LoupeState.qml` e `LoupeWindow.qml` (uma janela por tela, com o `ScreencopyView`); tokens `launcherLoupe*` no `Theme.qml`.
 - **Na bancada** não existe captura de tela: a lupa é conferida sobre uma cena fictícia, a do board (a janela com o degradê de `#12283E` a `#3FA9D9` a `#F4A846`). A captura de verdade só se vê no Niri.
 
 ## Comportamento

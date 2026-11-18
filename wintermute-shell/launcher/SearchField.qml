@@ -4,7 +4,8 @@ import ".."
 
 // Cabeçalho de busca do launcher (ficha 14): ícone de 20 em (18,18) e o campo de 24 de altura em (52,16),
 // Geist Regular 17. O cursor é meu, de 1×24 em accentText, porque o do TextInput não deixa 1 de folga do
-// texto. A sugestão fantasma vem depois do cursor, com 1 de folga, em muted a 70%.
+// texto. A sugestão fantasma vem depois do cursor, com 1 de folga, em muted a 70%. Com contexto, a etiqueta fica
+// à direita do cabeçalho e o campo termina 8 antes dela, em vez de 20 antes da borda.
 Item {
   id: root
 
@@ -17,6 +18,8 @@ Item {
   property string iconName: "search"
   // Com os chips das ferramentas em foco, ← e → andam nos chips; senão são do campo e movem o cursor do texto.
   property bool captureHorizontal: false
+  // O contexto em que o launcher foi aberto ("On workspace 3"); vazio, sem etiqueta.
+  property string contextLabel: ""
 
   signal edited(string text)
   signal accepted
@@ -55,12 +58,21 @@ Item {
     layer.effect: MultiEffect { colorization: 1; colorizationColor: Theme.text }
   }
 
-  // Caixa do campo: de x 52 até 20 da borda direita, 24 de altura, cortando o que passar.
+  ContextTag {
+    id: contextTag
+    visible: root.contextLabel !== ""
+    text: root.contextLabel
+    x: root.width - Theme.launcherContextRightMargin - width
+    y: Theme.launcherContextY
+  }
+
+  // Caixa do campo: de x 52 até 20 da borda direita (ou 8 antes da etiqueta), 24 de altura, cortando o que passar.
   Item {
     id: field
     x: Theme.launcherFieldX
     y: Theme.launcherFieldY
-    width: root.width - x - Theme.launcherFieldRightMargin
+    width: contextTag.visible ? contextTag.x - Theme.launcherContextFieldGap - x
+        : root.width - x - Theme.launcherFieldRightMargin
     height: Theme.launcherFieldHeight
     clip: true
 

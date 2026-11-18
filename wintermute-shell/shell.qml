@@ -87,6 +87,14 @@ ShellRoot {
     target: Settings.State
     function onOpenedChanged() { if (Settings.State.opened) Launcher.State.close(); }
   }
+  // O "+" do organizador pede o launcher pelo NiriMsg (que fica na raiz e não importa launcher/): abre no monitor
+  // daquele organizador, com o número do workspace na etiqueta.
+  Connections {
+    target: NiriMsg
+    function onLauncherRequested(outputName, workspaceId, number) {
+      Launcher.State.open(outputName, { workspaceId: workspaceId, number: number });
+    }
+  }
   Connections {
     target: Launcher.State
     function onOpenedChanged() { if (Launcher.State.opened) Settings.State.close(); }

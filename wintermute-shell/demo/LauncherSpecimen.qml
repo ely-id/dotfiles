@@ -13,6 +13,7 @@ import "../launcher" as Launcher
 //   chipHovered chip das ferramentas sob o ponteiro, ou -1
 //   expression  o que digitei na busca no estado "calc" (padrão 128*3.5+12)
 //   separator   separador decimal do cálculo, "." ou "," (padrão ".")
+//   context     número do workspace de onde abri pelo "+" (etiqueta "On workspace N"); 0 abre sem etiqueta (padrão 0)
 Item {
   id: root
 
@@ -23,6 +24,7 @@ Item {
   property int chipHovered: -1
   property string expression: "128*3.5+12"
   property string separator: "."
+  property int context: 0
 
   implicitWidth: panel.width
   implicitHeight: panel.height
@@ -32,6 +34,7 @@ Item {
     scenario: root.state
     expression: root.expression
     decimalSeparator: root.separator
+    contextNumber: root.context
   }
 
   Launcher.Panel {

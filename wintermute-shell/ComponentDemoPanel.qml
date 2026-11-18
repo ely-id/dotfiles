@@ -954,6 +954,11 @@ PanelWindow {
                   Demo.LauncherSpecimen { state: "empty"; selected: 0 }
                 }
                 Specimen {
+                  caption: "Aberto pelo + 640×352 · o vazio com a etiqueta \"On workspace 3\" de 112×24 em y 16, borda direita em x 620 (recuo de 14, raio 12, accentSubtle com accentRing) · o app escolhido abre nesse workspace"
+                  stageWidth: 640; stageHeight: 352
+                  Demo.LauncherSpecimen { state: "empty"; selected: 0; context: 3 }
+                }
+                Specimen {
                   caption: "Vazio sem recentes 640×188 · Tools em y 64 · chips em y 92 · divisor em 144 · nada selecionado"
                   stageWidth: 640; stageHeight: 188
                   Demo.LauncherSpecimen { state: "empty-tools" }

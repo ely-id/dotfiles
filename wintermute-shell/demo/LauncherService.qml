@@ -3,7 +3,7 @@ import "../launcher/Calculator.js" as Calculator
 
 // Serviço fictício do launcher para a vitrine e a bancada (decisão 0011). Tem a mesma superfície de
 // launcher/State.qml: opened, outputName, query, ghost, sections, recents, tools, fallbackRows, decimalSeparator,
-// calculation, mode, modeLabel, modeIcon, searchIcon, actions e as funções open, close, toggle, setQuery,
+// calculation, mode, modeLabel, modeIcon, searchIcon, actions, context, contextLabel e as funções open, close, toggle, setQuery,
 // acceptGhost, copyCommand, copyText, openTool e activate. Os dados são inventados.
 // `scenario` escolhe o estado:
 //   "empty"        busca vazia com três recentes e as quatro ferramentas
@@ -21,6 +21,12 @@ QtObject {
   property string expression: "128*3.5+12"
   // Fixo no ponto, para o espécime não depender do locale da máquina; o de verdade lê Qt.locale().
   property string decimalSeparator: "."
+
+  // O número do workspace de onde o launcher foi aberto pelo "+" (0: aberto pelo atalho, sem etiqueta).
+  // No serviço de verdade `context` é { workspaceId, number }; aqui o id não importa.
+  property int contextNumber: 0
+  readonly property var context: contextNumber > 0 ? { workspaceId: -1, number: contextNumber } : null
+  readonly property string contextLabel: context ? "On workspace " + context.number : ""
 
   property bool opened: true
   property string outputName: ""
@@ -112,7 +118,7 @@ QtObject {
     }
   ]
 
-  function open(requestedOutputName) { opened = true; }
+  function open(requestedOutputName, requestedContext) { opened = true; }
   function close() { opened = false; closes += 1; }
   function toggle(requestedOutputName) { opened = !opened; }
   function setQuery(text) { query = text; ghost = ""; }

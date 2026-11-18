@@ -16,6 +16,10 @@ Singleton {
   property bool opened: false
   property string outputName: ""
   property string query: ""
+  // De onde o launcher foi aberto: { workspaceId, number } quando vem do "+" do organizador (o aplicativo escolhido
+  // abre nesse workspace), null pelo atalho e pelo IPC. `number` é o que o organizador mostra, não o id do Niri.
+  property var context: null
+  readonly property string contextLabel: context ? "On workspace " + context.number : ""
   // O resto da palavra sugerida (para "ter", "minal"). Vazio quando não há sugestão.
   property string ghost: ""
   // Lista de { label, rows }; cada linha é { title, detail, kind, icon, iconSource, danger }.
@@ -54,15 +58,19 @@ Singleton {
     { label: "Actions", keys: ["Ctrl", "K"], primary: false }
   ]
 
-  function open(requestedOutputName) {
+  // `requestedContext` é opcional: sem ele o launcher abre sem etiqueta. Quem abre pelo "+" já deixou o workspace
+  // em foco (NiriMsg.openLauncher), então o que eu escolher nasce nele.
+  function open(requestedOutputName, requestedContext) {
     outputName = requestedOutputName || Settings.State.focusedOutputName();
     query = "";
     ghost = "";
+    context = requestedContext || null;
     opened = true;
   }
 
   function close() {
     opened = false;
+    context = null;
   }
 
   function toggle(requestedOutputName) {

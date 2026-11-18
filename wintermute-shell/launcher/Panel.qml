@@ -251,6 +251,7 @@ Item {
       iconName: root.service.searchIcon
       forceCursor: root.forceCursor
       captureHorizontal: root.chipIndex >= 0
+      contextLabel: root.service.contextLabel
       onEdited: text => root.service.setQuery(text)
       onUpPressed: root.moveUp()
       onDownPressed: root.moveDown()

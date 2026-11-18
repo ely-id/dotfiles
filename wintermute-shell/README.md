@@ -59,7 +59,7 @@ wintermute-shell/settings/manual/keybinds.py generate --output ~/.config/niri/cf
 | `shell.qml` | Raiz da shell: instancia o papel de parede, a barra lateral, os pop-ups, a tela de Ajustes e os receptores IPC por monitor |
 | `Theme.qml`, `LegacyColors.qml`, `PanelStyle.qml` | Tokens Armitage, variações de acento, tipografia Geist e camada de compatibilidade com o código de partida |
 | `Sidebar.qml`, `BottomControls.qml` | Janela da barra lateral (`WlrLayershell`) e cartão inferior de controles (Wi-Fi, som, ajustes e recolher) |
-| `NiriMsg.qml` | Integração com o Niri (`niri msg event-stream` e soquete IPC): workspaces, janelas, foco e marcador do launcher (até a F5) |
+| `NiriMsg.qml` | Integração com o Niri (`niri msg event-stream` e soquete IPC): workspaces, janelas, foco e o pedido do launcher pelo "+" do organizador |
 | `Shortcuts.qml` | Receptores IPC de volume, mídia e brilho |
 | `GlassSurface.qml`, `GradientFill.qml`, `PanelBorder.qml`, `Shadow.qml`, `Card.qml`, `CardStack.qml`, `CardLayer.qml`, `PanelBackground.qml` | Superfície de vidro Armitage (degradê vertical com dithering, borda interna em degradê, brilho superior de 1 px, brilho de acento na base e sombra em duas camadas) e cartões empilhados |
 | `IconButton.qml`, `PanelCloseButton.qml`, `ActionButton.qml`, `Toggle.qml`, `Slider.qml`, `Field.qml`, `CheckBox.qml`, `RadioButton.qml`, `ListRow.qml`, `SettingsRow.qml`, `SegmentedSelector.qml`, `Chip.qml`, `Tag.qml`, `KeyCap.qml`, `AppTile.qml`, `DeviceList.qml`, `DeviceDetails.qml` | Biblioteca de componentes base Armitage (ficha `00-componentes-base.md`) |

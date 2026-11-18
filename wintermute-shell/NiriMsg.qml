@@ -11,14 +11,10 @@ Singleton {
   property var keyboardLayouts: []
   property int keyboardLayoutIndex: 0
   signal keyboardLayoutSwitched
+  // Pedido do launcher pelo "+" do organizador; o shell.qml liga ao Launcher.State.open (a raiz não importa launcher/).
+  signal launcherRequested(string outputName, int workspaceId, int number)
   property bool overviewOpen: false
   property var dragOrigin: null
-  property bool _workspaceLauncherOpen: false
-  // Marcador até a F5 construir o launcher próprio (ficha 14): registra quando
-  // o "+" do organizador ou o foco num workspace vazio pediria o launcher, sem
-  // chamar o Vicinae externo.
-  property bool launcherPlaceholderOpen: false
-  property int launcherWorkspaceId: -1
   property var _windows: ({})
   property var _appInfoCache: ({})
   property ListModel workspaceRows: ListModel {}
@@ -39,25 +35,22 @@ Singleton {
     Quickshell.execDetached(["niri", "msg", "action", "focus-workspace", String(index)]);
   }
 
-  function _openLauncherPlaceholder(workspaceId, reason) {
-    _workspaceLauncherOpen = true;
-    launcherPlaceholderOpen = true;
-    launcherWorkspaceId = workspaceId !== undefined ? Number(workspaceId) : -1;
-    console.info("[Wintermute] Marcador do launcher (F5): abrir no workspace "
-        + launcherWorkspaceId + " (" + reason + ")");
-  }
-
-  function _closeLauncherPlaceholder(reason) {
-    _workspaceLauncherOpen = false;
-    launcherPlaceholderOpen = false;
-    console.info("[Wintermute] Marcador do launcher (F5): fechar (" + reason + ")");
-  }
-
+  // O "+" de uma linha do organizador: foca o workspace e, dando certo, pede o launcher no monitor dele. O
+  // aplicativo escolhido depois nasce no workspace em foco. O número é o que o organizador mostra para a linha
+  // (sidebarWorkspaceNumber; sem ele, a posição da linha no monitor), lido antes de focar.
   function openLauncher(workspaceId) {
     const workspace = workspaces.find(workspace => workspace.id === workspaceId);
     if (!workspace) return;
+    let number = 0;
+    for (let i = 0; i < workspaceRows.count; i++) {
+      const row = workspaceRows.get(i);
+      if (row.workspaceId === workspaceId) {
+        number = Number(row.sidebarWorkspaceNumber) || (Number(row.sidebarRowOrdinal) || 0) + 1;
+        break;
+      }
+    }
     _move(workspace.isFocused ? [] : [{ FocusWorkspace: { reference: { Id: workspaceId } } }], success => {
-      if (success) _openLauncherPlaceholder(workspaceId, "botão + do organizador");
+      if (success) launcherRequested(workspace.output, workspaceId, number);
     });
   }
 
@@ -263,10 +256,6 @@ Singleton {
         isActive: target && w.output === target.output ? w.id === a.id : w.isActive,
         isFocused: a.focused ? w.id === a.id : w.isFocused
       }));
-      if (a.focused && target && !target.isFocused && !dragOrigin && !overviewOpen
-          && !Object.values(_windows).some(w => w.workspaceId === a.id)) {
-        _openLauncherPlaceholder(a.id, "workspace vazio focado");
-      }
     } else if (ev.WorkspaceActiveWindowChanged) {
       const a = ev.WorkspaceActiveWindowChanged;
       workspaces = workspaces.map(w => w.id === a.workspace_id
@@ -311,11 +300,6 @@ Singleton {
       _windows = wins;
     } else {
       return;
-    }
-    const focusedWorkspace = workspaces.find(w => w.isFocused);
-    if (_workspaceLauncherOpen && (overviewOpen || (focusedWorkspace
-        && Object.values(_windows).some(w => w.workspaceId === focusedWorkspace.id)))) {
-      _closeLauncherPlaceholder(overviewOpen ? "overview aberto" : "janela aberta no workspace");
     }
     _recompute();
   }

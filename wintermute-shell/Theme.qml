@@ -383,6 +383,15 @@ Singleton {
   readonly property int launcherNoResultHintHeight: 20
   readonly property int launcherNoResultTextMargin: 20              // o texto não passa de 20 de cada lado da caixa de 640
   readonly property int launcherNoResultActionsGap: 16              // linhas de ação 16 abaixo da dica (180 → 196); sem elas o divisor do rodapé fica nessa posição, a mesma folga de 16 que o board deixa entre os chips e o rodapé
+  // Etiqueta de contexto "On workspace N" (estado "Aberto pelo +", nó 13:17179; etiqueta 13:17185). Coordenadas no quadro do launcher.
+  readonly property int launcherContextHeight: 24                   // quadro de 24 de altura, raio 12, em y 16
+  readonly property int launcherContextRadius: 12
+  readonly property int launcherContextY: 16
+  readonly property int launcherContextRightMargin: 20              // borda direita em x 620 (20 da borda do launcher)
+  // O quadro 13:17185 tem 112 de largura com "No workspace 3" e o texto 13:17186 ocupa a caixa inteira, centrado: o Figma não dá recuo.
+  // "No workspace 3" mede 84 em Geist Medium 11 no Qt, então o recuo é (112 - 84) / 2 = 14 de cada lado.
+  readonly property int launcherContextPadding: 14
+  readonly property int launcherContextFieldGap: launcherRowTextGap // o campo de busca termina 8 antes da etiqueta, a folga entre título e detalhe das linhas
   // Cartão do cálculo (estado "Cálculo", nó 13:17343; cartão 13:17351). 624×128 em (8,88), raio radiusCard, fundo cardHover e
   // borda border de 1. Medidas dentro do cartão, borda incluída; o resultado e a expressão são caixas de 260×48.
   readonly property int launcherCalcCardHeight: 128

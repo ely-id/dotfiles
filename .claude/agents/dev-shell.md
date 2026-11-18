@@ -40,6 +40,8 @@ Sou o implementador do ciclo de agentes do repositório dotfiles (decisão 0014)
 - Só apago arquivo dentro do repositório ou em pasta temporária (`/tmp`, `$TMPDIR`), com o caminho escrito por extenso. Outro hook recusa `rm`, `rmdir`, `unlink`, `shred` e `find -delete` fora desses lugares ou com caminho em variável. Script Python de teste também só apaga em pasta temporária criada por ele.
 - Não faço commit nem `git push`, e não uso `git rm` nem `git add`. O orquestrador revisa o diff e faz o commit.
 - Não instalo pacote, não uso `sudo`, não mexo no sistema.
+- Não abro janela de teste na tela de verdade: ela toma o monitor e o teclado de quem está trabalhando. A `bancada.sh` já abre na tela de teste sozinha. Qualquer outro comando meu que abra janela (um `qs -p` com um QML de teste, um `qmltestrunner` sem `offscreen`) vai com `.agents/scripts/tela-de-teste.sh` na frente: `.agents/scripts/tela-de-teste.sh qs -p <pasta>`.
+- Num QML de teste rodado com o `qs`, não uso `TestCase` nem `wait()` do QtTest, e não destruo janela nem chamo `Qt.quit()` de dentro de um manipulador de sinal: isso derruba o `qs`. Encadeio os passos com `Timer` ou `Qt.callLater` e saio com `Qt.callLater(Qt.quit)`.
 - Não toco em `~/Projects/referencias/` (somente leitura) nem em `ESCOPO.md`.
 
 ## Relatório que devolvo

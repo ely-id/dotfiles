@@ -15,8 +15,11 @@
 #      bancada, abro a peça numa janela comum, gravo o PNG e fecho;
 #   5. resumo os erros e avisos do log.
 #
-# A janela aparece por um instante na tela: a peça precisa ser desenhada de
-# verdade. Funciona no GNOME e no Niri. O desfoque do compositor não aparece
+# A peça precisa ser desenhada de verdade, numa janela. Por padrão essa janela
+# abre na tela de teste (tela-de-teste.sh), que não aparece em monitor nenhum:
+# assim os prints não tomam o monitor nem o teclado enquanto eu trabalho. Com
+# BANCADA_NA_TELA=1 a janela aparece por um instante na tela de verdade, como
+# era antes. Funciona no GNOME e no Niri. O desfoque do compositor não aparece
 # nos prints; isso só se confere ao vivo.
 #
 # Uso:
@@ -43,6 +46,11 @@
 set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+# Reabro a mim mesma dentro da tela de teste, uma vez só por chamada.
+if [ -z "${WINTERMUTE_TELA_DE_TESTE:-}" ] && [ "${BANCADA_NA_TELA:-0}" != "1" ]; then
+  exec "$repo/.agents/scripts/tela-de-teste.sh" "${BASH_SOURCE[0]}" "$@"
+fi
 shell_src="$repo/wintermute-shell"
 
 uso() { sed -n '/^# Uso:/,/^# Saída:/p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
@@ -129,11 +137,12 @@ for v in $variacoes; do
   kill "$pid" 2>/dev/null || true
   wait "$pid" 2>/dev/null || true
 
-  # Dois ruídos do Qt ficam de fora: o do textinput do Wayland (nota da F10) e o
-  # do portal, que recusa registrar um segundo app ID na mesma conexão.
+  # Ruídos do Qt que ficam de fora: o do textinput do Wayland (nota da F10), o
+  # do portal, que recusa registrar um segundo app ID na mesma conexão, e os
+  # que reclamam da falta do portal na tela de teste, que não tem portal.
   erros=$(grep -E 'ERROR|TypeError|ReferenceError|is not a type|is not installed|Cannot assign|Cannot override|BANCADA: não' "$log" \
-    | grep -vE 'qt.qpa.wayland.textinput|Failed to register with host portal' || true)
-  avisos=$(grep -E 'WARN' "$log" | grep -vE 'qt.qpa.wayland.textinput|Failed to register with host portal' || true)
+    | grep -vE 'qt.qpa.wayland.textinput|Failed to register with host portal|org.freedesktop.portal.Desktop was not provided' || true)
+  avisos=$(grep -E 'WARN' "$log" | grep -vE 'qt.qpa.wayland.textinput|Failed to register with host portal|org.freedesktop.portal.Desktop was not provided' || true)
   n_erros=$(printf '%s' "$erros" | grep -c . || true)
   n_avisos=$(printf '%s' "$avisos" | grep -c . || true)
   erros_total=$(( erros_total + n_erros ))

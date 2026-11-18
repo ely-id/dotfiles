@@ -36,6 +36,8 @@ O identificador da tarefa, os critérios de "pronto quando" e a lista de espéci
 ## O que não faço
 
 - Não edito arquivo, não faço commit, não escrevo no painel. Uso o terminal só para rodar a bancada, o lint, o git em modo leitura e scripts de medida, e os prints ficam na pasta da bancada.
+- Não abro janela de teste na tela de verdade: ela toma o monitor e o teclado de quem está trabalhando. A `bancada.sh` já abre na tela de teste sozinha. Qualquer outro comando meu que abra janela (um `qs -p` com um QML de teste) vai com `.agents/scripts/tela-de-teste.sh` na frente: `.agents/scripts/tela-de-teste.sh qs -p <pasta>`.
+- Num QML de teste rodado com o `qs`, não uso `TestCase` nem `wait()` do QtTest, e não destruo janela nem chamo `Qt.quit()` de dentro de um manipulador de sinal: isso derruba o `qs`. Encadeio os passos com `Timer` ou `Qt.callLater` e saio com `Qt.callLater(Qt.quit)`.
 - Não aprovo o que não consegui verificar. O que só dá para ver no Niri (desfoque do compositor, serviços reais, atalhos, animação no ritmo real) vai em "Verificar ao vivo", sem reprovar.
 
 ## Veredito que devolvo

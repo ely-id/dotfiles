@@ -107,7 +107,7 @@ A ficha e o board estão em português; a shell mostra o equivalente em inglês.
 
 ## Escolhas minhas, onde a ficha e o Figma não decidem
 
-- **Atalho:** a ficha fala em Super+Espaço; pela P-11 (2026-11-15) o launcher é o Super+E, e o Super+Espaço troca o layout do teclado.
+- **Atalho:** a ficha fala em Super+Espaço; pela P-11 (2026-11-15) o launcher é o Super+E, e o Super+Espaço troca o layout do teclado. Desde a `F5-T07` o Super+E está no `settings/manual/shortcuts.json` com a ação `ipc: launcher toggle`, e o `keybinds.kdl` gerado traz a bind ativa. No Niri ela só vale depois de eu aplicar o arquivo gerado, na sessão ao vivo.
 - **Número do cálculo:** a ficha e o board dizem vírgula decimal pt-BR; a decisão 0012, que é minha e mais nova, diz que datas e números seguem o locale do sistema. Vale a decisão (P-70, que não trava).
 - **Monitor, animação e clique fora** (P-69, que não trava; padrão dos Ajustes): pelo atalho o launcher abre no monitor em foco e pelo "+" no monitor daquele organizador; fica centrado na largura, com o topo a 160/900 da altura da tela, arredondado para pixel inteiro; aparece e some com a opacidade e a escala de 0,96 a 1 em 180 ms (`settingsCloseDuration`), como os modais dos Ajustes; clicar no véu fecha, como Esc.
 - **Véu:** preto a 20% na tela inteira (ficha 19), token `launcherScrim`.

@@ -18,7 +18,7 @@ As peças são as mesmas dos boards 2 e 5a/5b, montadas num desktop **1440×900*
 
 1. **Barra aberta (10 + 156).** Janelas do niri começam depois da barra. Na composição do Figma, a primeira janela está em **x 188**. Janela focada com anel de **acento 2 px**, raio 12; a coluna seguinte pode sair da tela (niri).
 2. **Barra recolhida (10 + 48).** Recolher (Super+B ou o botão) devolve 108 px às janelas, em 300 ms. No Figma a primeira janela está em **x 80**.
-3. **Launcher aberto** (Super+Espaço ou “+”). Véu preto **20%** sobre o desktop; launcher em (400, 160) no frame 1440×900.
+3. **Launcher aberto** (Super+Espaço ou “+”; pela P-11, de 2026-11-15, o atalho é o Super+E, e o Super+Espaço troca o layout do teclado). Véu preto **20%** sobre o desktop; launcher em (400, 160) no frame 1440×900.
 4. **Captura em andamento.** Seleção começando do zero; barra de modos embaixo; ações ao lado da seleção. Exemplo da composição: seleção 640×400 em (560, 180).
 
 ## Véu à esquerda

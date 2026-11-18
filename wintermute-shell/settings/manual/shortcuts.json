@@ -1,7 +1,7 @@
 [
   { "section": "Wintermute" },
   { "bind": "Mod+Grave", "label": "Collapse or expand the sidebar", "ipc": "sidebar toggle", "overlay": true },
-  { "bind": "Mod+E", "label": "Launcher", "waits": "F5", "overlay": true },
+  { "bind": "Mod+E", "label": "Launcher", "ipc": "launcher toggle", "overlay": true },
   { "bind": "Mod+Escape", "label": "Settings", "ipc": "settings toggle", "overlay": true },
   { "bind": "Mod+L", "label": "Lock screen", "waits": "F7", "overlay": true },
   { "bind": "Mod+Shift+1", "label": "Screenshot a region", "niri": "screenshot" },

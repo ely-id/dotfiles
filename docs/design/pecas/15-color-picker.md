@@ -62,13 +62,15 @@ Li os dois estados pelo `get_design_context`: "pegando a cor" `13:17430` (560×3
 
 ## Como funciona (`F5-T08`, propostas da P-75 e da P-76, que não travam)
 
-- **Nome da cor** (P-75): o da cor mais próxima entre as cores nomeadas do CSS (a lista pública do W3C), em inglês e com espaços, comparando no espaço Lab.
+- **Nome da cor** (P-75): o da cor mais próxima entre as cores nomeadas do CSS (a lista pública do W3C), em inglês e com espaços, comparando no espaço Lab. A lista (139 nomes, sem os repetidos `grey`, `aqua` e `fuchsia`) está em `launcher/Colors.js`. Para o `#3FA9D9` do board dá "Deep sky blue"; o "Azul céu" de lá é só texto de exemplo.
 - **Fluxo** (P-76): o chip "Color picker" abre o resultado com a cor mais recente; sem nenhuma cor guardada, vai direto para a lupa (`F5-T12`). "Pick another", pelo botão ou pela tecla P, abre a lupa. Enter copia o HEX. Esc ou o botão voltar retornam ao launcher; um segundo Esc fecha.
 - **Origem:** "Picked just now" para a cor que acabei de pegar; para as do histórico, a data e a hora no formato do sistema; depois, " · " e o aplicativo em foco quando peguei, se eu souber.
-- **Formatos:** HEX em maiúsculas, `rgb(63, 169, 217)` e `hsl(199, 68%, 55%)`, com inteiros.
+- **Formatos:** HEX em maiúsculas, `rgb(63, 169, 217)` e `hsl(199, 67%, 55%)`, com inteiros arredondados. O board escreve `68%` na saturação de `#3FA9D9`, mas a conta do HSL dá 66,96% (154/230): é um deslize do texto de exemplo, e a shell mostra o valor calculado.
 - **Copiar:** o botão da linha copia aquele formato; a linha mostra o `check` e "Copied" por 1,5 s e o botão fica selecionado nesse tempo.
 - **Histórico:** as 12 últimas, a mais nova primeiro, sem repetir (pegar de novo uma cor leva-a para a frente), em `~/.local/state/wintermute-shell/colors.json`. Clicar numa amostra a põe como a cor mostrada. Não se mistura com a área de transferência.
 - **Dica do valor:** nas amostras das pontas, a pílula não sai dos 20 de margem do launcher.
+- **Teclado:** Enter copia o HEX, P pede outra cor, Esc e Backspace voltam ao launcher. As amostras do histórico e os botões de copiar são do ponteiro.
+- **Arquivos:** `launcher/ColorPage.qml`, `ColorFormatRow.qml`, `ColorHistory.qml` e `Colors.js`; tokens `launcherColor*`, `fontLauncherColorName` (24) e `launcherCopiedDuration` (1500) no `Theme.qml`.
 
 ## Comportamento
 

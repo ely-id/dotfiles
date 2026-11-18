@@ -209,9 +209,26 @@ Singleton {
     copiedTimer.restart();
   }
 
-  // A lupa sobre a tela é a F5-T12; por enquanto o pedido só fica no log e nada muda.
+  // Pegar uma cor: o launcher some e a lupa aparece sobre a tela congelada (LoupeState.qml, ficha 15). Guardo de onde
+  // vim para o Esc: a página de resultado, com a cor que eu via, ou a busca. Se o launcher nem estava aberto (um
+  // teste, por exemplo), o `begin` só esconde o que não existe.
   function pickAnother() {
-    console.info("launcher: lupa pedida, ainda sem destino (F5-T12)");
+    LoupeState.begin({
+      output: outputName,
+      context: context,
+      fromPage: page === "color",
+      shown: colorShown,
+      stamp: colorFreshStamp
+    });
+  }
+
+  // Volta à página de resultado com a cor que a lupa interrompeu (Esc na lupa). Vem depois do `open`, que zera a marca
+  // de "pega agora": devolvo a que a cor tinha, porque é a mesma tela de antes.
+  function restoreColorPage(shown, stamp) {
+    colorShown = shown;
+    colorFreshStamp = stamp || "";
+    colorCopied = "";
+    page = "color";
   }
 
   // Voltar ao launcher: busca vazia, sem a cor mostrada. A marca de "pega agora" fica até o launcher fechar.

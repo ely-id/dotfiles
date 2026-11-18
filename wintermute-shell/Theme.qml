@@ -454,6 +454,28 @@ Singleton {
   readonly property int launcherColorTipRadius: 8
   readonly property int launcherColorTipGap: 4
   readonly property int launcherColorTipMargin: 20                  // a dica não passa dos 20 de margem do launcher (ficha 15, "Como funciona")
+  // Lupa do seletor de cor, estado "pegando a cor" (ficha 15, board 13:17120, nó 13:17430). Coordenadas relativas ao ponteiro
+  // (lupa e valor) ou ao monitor (dicas); o quadro do board não tem borda, então as coordenadas de lá já são as do quadro.
+  readonly property color launcherLoupeBackdrop: "#000000"          // fundo da lupa (13:17434, `black`); tokens.json extras_figma.launcherLoupeBackdrop
+  readonly property int launcherLoupeSize: 112                      // lupa 112×112, círculo de raio 56, centrada no ponteiro (13:17434)
+  readonly property int launcherLoupeRingWidth: 2                   // traço `knob` de 2 por fora da área dos pixels; o do pixel central, também de 2, vai por dentro
+  readonly property int launcherLoupeGrid: 7                        // grade de 7×7 pixels de 16×16, sem folga (13:17435 a 13:17483)
+  readonly property int launcherLoupeCell: 16
+  readonly property int launcherLoupeValueWidth: 112                // valor sob o cursor (13:17485): vidro de 112×28, raio 14, alinhado à lupa
+  readonly property int launcherLoupeValueHeight: 28
+  readonly property int launcherLoupeValueRadius: 14
+  readonly property int launcherLoupeValueGap: 12                   // 12 abaixo da lupa (board: lupa em y 72, pílula em y 196); sem espaço embaixo, 12 acima
+  readonly property int launcherLoupeSampleSize: 12                 // amostra redonda de 12 em (8,8) da pílula (13:17486)
+  readonly property int launcherLoupeSampleOffset: 8
+  readonly property int launcherLoupeHexX: 24                       // HEX (13:17487): caixa de 80×28 a partir de x 24, centrado, Geist Mono Medium 11
+  readonly property int launcherLoupeHexWidth: 80
+  readonly property int launcherLoupeTipsHeight: 40                 // dicas (13:17488): vidro de altura 40, raio 20, centrado na largura do monitor
+  readonly property int launcherLoupeTipsRadius: 20
+  readonly property int launcherLoupeTipsBottom: 16                 // a 16 da base (board: 340 − 284 − 40)
+  readonly property int launcherLoupeTipsPaddingX: 16               // fila de itens a partir de (16,10), 8 entre os itens, 16 de recuo de cada lado
+  readonly property int launcherLoupeTipsPaddingY: 10
+  readonly property int launcherLoupeTipsGap: 8
+  readonly property int launcherLoupeTipsRowHeight: 20              // a fila tem a altura da tecla (20); o texto de 16 fica centrado nela
 
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.

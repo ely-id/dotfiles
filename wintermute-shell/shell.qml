@@ -82,10 +82,16 @@ ShellRoot {
     function close() { Launcher.State.close(); }
   }
 
-  // O launcher e os Ajustes pedem teclado exclusivo na mesma camada, então abrir um fecha o outro.
+  // O launcher e os Ajustes pedem teclado exclusivo na mesma camada, então abrir um fecha o outro. A lupa do seletor
+  // de cor (launcher/LoupeWindow.qml) também: abrir qualquer um dos dois enquanto ela está aberta a cancela, sem
+  // reabrir o launcher.
   Connections {
     target: Settings.State
-    function onOpenedChanged() { if (Settings.State.opened) Launcher.State.close(); }
+    function onOpenedChanged() {
+      if (!Settings.State.opened) return;
+      Launcher.State.close();
+      Launcher.LoupeState.abort();
+    }
   }
   // O "+" do organizador pede o launcher pelo NiriMsg (que fica na raiz e não importa launcher/): abre no monitor
   // daquele organizador, com o número do workspace na etiqueta.
@@ -97,7 +103,11 @@ ShellRoot {
   }
   Connections {
     target: Launcher.State
-    function onOpenedChanged() { if (Launcher.State.opened) Settings.State.close(); }
+    function onOpenedChanged() {
+      if (!Launcher.State.opened) return;
+      Settings.State.close();
+      Launcher.LoupeState.abort();
+    }
   }
 
   IpcHandler {
@@ -143,6 +153,7 @@ ShellRoot {
       PanelDismissWindow { bar: sidebar }
       Settings.Window { menuScreen: modelData }
       Launcher.Window { menuScreen: modelData }
+      Launcher.LoupeWindow { menuScreen: modelData }
       FontTestPanel {
         panelScreen: modelData
         opened: root.testPanelOpen

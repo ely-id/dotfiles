@@ -1000,6 +1000,32 @@ PanelWindow {
                   Demo.LauncherSpecimen { state: "color"; historyHover: 0 }
                 }
               }
+
+              SectionBlock {
+                title: "Lupa do seletor de cor (ficha 15, board 13:17120, nó 13:17430) · peça real sobre uma cena fictícia, sem captura"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Pegando a cor 560×340 · lupa de 112 centrada no ponto (190,166) · grade de 7×7 de 16, pixel do meio com o traço de 2 por dentro · valor de 112×28 a 12 abaixo · dicas de 40 a 16 da base · o degradê varia 1 nível por pixel, então as colunas quase não se distinguem"
+                  stageWidth: 560; stageHeight: 340
+                  Demo.ColorLoupeSpecimen {}
+                }
+                Specimen {
+                  caption: "Ponto perto da base (190,270) · o valor não cabe embaixo e vai 12 acima da lupa"
+                  stageWidth: 560; stageHeight: 340
+                  Demo.ColorLoupeSpecimen { pointX: 190; pointY: 270 }
+                }
+                Specimen {
+                  caption: "Ponto no canto (12,12) · os pixels de fora da cena ficam na cor de fundo da lupa · o valor não sai da tela"
+                  stageWidth: 560; stageHeight: 340
+                  Demo.ColorLoupeSpecimen { pointX: 12; pointY: 12 }
+                }
+                Specimen {
+                  caption: "Ponto na borda direita da imagem (324,166) · a lupa mostra a passagem da imagem para a janela, pixel por pixel"
+                  stageWidth: 560; stageHeight: 340
+                  Demo.ColorLoupeSpecimen { pointX: 324; pointY: 166 }
+                }
+              }
             }
 
             // =================================================================

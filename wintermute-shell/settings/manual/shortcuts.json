@@ -4,7 +4,7 @@
   { "bind": "Mod+E", "label": "Launcher", "ipc": "launcher toggle", "overlay": true },
   { "bind": "Mod+Escape", "label": "Settings", "ipc": "settings toggle", "overlay": true },
   { "bind": "Mod+L", "label": "Lock screen", "waits": "F7", "overlay": true },
-  { "bind": "Mod+Shift+1", "label": "Screenshot a region", "niri": "screenshot" },
+  { "bind": "Mod+Shift+1", "label": "Screenshot a region", "ipc": "screenshot open" },
   { "bind": "Mod+Shift+2", "label": "Screenshot the screen", "niri": "screenshot-screen" },
   { "bind": "Mod+Shift+3", "label": "Screenshot the window", "niri": "screenshot-window" },
 

@@ -2,12 +2,16 @@ pragma Singleton
 
 import QtQuick
 import ".."
+import "." as Screenshot
+import "Crop.js" as Crop
 import "Windows.js" as Win
+import QtCore
 import Quickshell
+import Quickshell.Io
 
 // O estado da janela de captura de tela (ficha 17, F6-T01 e T02). As janelas (CaptureWindow.qml, uma por tela) leem
 // `opened`, `mode`, `showCursor`, `delaySeconds` e `pointerOutput`; o IPC `screenshot` do shell.qml e o chip "Screenshot" do
-// launcher chamam `open`, `close` e `toggle`. A prévia pós-captura tem outro estado (State.qml) e não passa por aqui.
+// launcher chamam `open`, `close` e `toggle`. A prévia pós-captura tem outro estado (State.qml): a captura só lhe entrega o arquivo.
 //
 // A seleção de área (F6-T11) mora aqui, e não na peça, para as janelas de todos os monitores a verem: `selection` é um
 // retângulo { x, y, width, height } em pixels lógicos do monitor `selectionOutput` (ou null), e `selecting` diz que ele
@@ -16,6 +20,12 @@ import Quickshell
 // Os modos Window e Screen (F6-T12) escolhem uma janela ou um monitor, e a escolha chama `captureWindow(id)` ou `captureScreen(nome)`. A
 // lista das janelas é uma foto tirada quando a captura abre (`windowSnapshot`, por monitor), porque o quadro de fundo também está congelado:
 // se as janelas mexerem depois, o destaque tem de continuar batendo com a imagem. As contas são do Windows.js.
+//
+// Capturar e copiar (F6-T13): a imagem sai do quadro congelado que a janela já mostra, recortado, e não da captura do Niri: o que
+// eu vejo congelado é exatamente o que sai, nos três modos. Cada janela registra aqui o recortador do quadro dela (FrameCropper.qml,
+// `registerFrame`), e `grab` faz a conta do recorte em pixels do quadro (Crop.js), grava um PNG num arquivo temporário, copia para a
+// área de transferência (clipboard.py copy-file) e, quando a escolha é a de capturar, entrega o arquivo à prévia (State.qml). A janela
+// só fecha depois de o PNG estar gravado, porque o recorte precisa do quadro vivo. Salvar e anotar continuam sem destino.
 //
 // A regra de ouro da ficha: a captura sempre começa do zero. Nenhuma propriedade abaixo é lida de arquivo nem guardada
 // entre uma abertura e outra: `reset()` devolve tudo ao padrão na abertura e de novo no fechamento, para a próxima vez
@@ -61,6 +71,40 @@ Singleton {
   readonly property int settleMargin: 100
 
   property string pendingOutput: ""
+
+  // Capturar e copiar (F6-T13). Os recortadores dos quadros, por monitor ({ nomeDoMonitor: FrameCropper }), que as janelas registram
+  // enquanto o quadro existe; o pedido em andamento (`saving`) e um número que cada fechamento troca, para um pedido que ficou
+  // para trás (fechei com Esc enquanto gravava) não copiar nem mostrar nada; o último arquivo gravado, para a próxima captura o
+  // apagar (é o único estado que passa de uma abertura para a outra, e não é de interface), e o contador do nome.
+  property var frames: ({})
+  property bool saving: false
+  property int grabToken: 0
+  property string lastFile: ""
+  property int fileCounter: 0
+
+  // Os comandos e a entrega à prévia saem por funções que o teste troca. `exec` roda sem esperar (a cópia e a remoção do arquivo
+  // antigo; o wl-copy fica vivo em segundo plano servindo a área de transferência), `makeDir` cria a pasta do arquivo e chama
+  // `done(true)` ou `done(false)`, e `deliver` mostra o arquivo na prévia da barra.
+  property var exec: argv => Quickshell.execDetached(argv)
+  property var makeDir: (dir, done) => {
+    makeDirComponent.createObject(root, { command: ["mkdir", "-p", "--", dir], done: done }).running = true;
+  }
+  property var deliver: (path, outputName) => Screenshot.State.receive(path, outputName)
+
+  readonly property string helper: decodeURIComponent(Qt.resolvedUrl("clipboard.py").toString().replace(/^file:\/\//, ""))
+
+  Component {
+    id: makeDirComponent
+    Process {
+      id: maker
+      property var done
+      stderr: StdioCollector { onStreamFinished: if (text.trim()) console.warn("screenshot: " + text.trim()) }
+      onExited: code => {
+        maker.done(code === 0);
+        maker.destroy();
+      }
+    }
+  }
 
   Timer {
     id: settleTimer
@@ -132,6 +176,8 @@ Singleton {
   function close() {
     settleTimer.stop();
     giveUpTimer.stop();
+    saving = false;
+    ++grabToken;
     phase = "";
     pendingOutput = "";
     pointerOutput = "";
@@ -180,17 +226,119 @@ Singleton {
     selecting = false;
   }
 
-  // As quatro ações da pílula de ações e as escolhas dos modos Window e Screen. Capturar e copiar são a F6-T13, salvar a F6-T03
-  // (esperando a P-15 e a P-16) e anotar a F6-T14: até lá elas só dizem no log que ainda não têm destino, e a janela continua aberta.
-  function copySelection() { pending("copiar a área"); }
+  // As quatro ações da pílula de ações e as escolhas dos modos Window e Screen. Capturar (`capture`, `captureWindow`, `captureScreen`)
+  // grava, copia, mostra na prévia e fecha; copiar (`copySelection`) grava, copia e fecha, sem a prévia. Salvar é a F6-T03 (esperando a
+  // P-15 e a P-16) e anotar a F6-T14: até lá elas só dizem no log que ainda não têm destino, e a janela continua aberta.
+  function copySelection() { grabSelection(false); }
   function saveSelection() { pending("salvar a área"); }
   function annotateSelection() { pending("anotar a área"); }
-  function capture() { pending("capturar a área"); }
-  function captureWindow(id) { pending("capturar a janela " + id); }
-  function captureScreen(outputName) { pending("capturar a tela " + outputName); }
+  function capture() { grabSelection(true); }
+
+  function captureWindow(id) {
+    const found = Crop.findWindow(windowSnapshot, id);
+    if (!found) {
+      console.warn("screenshot: a janela " + id + " não está na foto das janelas, ou não tem posição; nada foi capturado");
+      return;
+    }
+    grab(found.output, found.rect, true);
+  }
+
+  function captureScreen(outputName) { grab(outputName, null, true); }
 
   function pending(action) {
-    console.log("screenshot: " + action + " ainda não tem destino (F6-T03, T13 e T14); nada foi feito");
+    console.log("screenshot: " + action + " ainda não tem destino (F6-T03 e T14); nada foi feito");
+  }
+
+  function grabSelection(withPreview) {
+    if (!selection || selecting) {
+      console.warn("screenshot: não há área selecionada; nada foi capturado");
+      return;
+    }
+    grab(selectionOutput, selection, withPreview);
+  }
+
+  function registerFrame(outputName, cropper) {
+    const next = Object.assign({}, frames);
+    next[outputName] = cropper;
+    frames = next;
+  }
+
+  function unregisterFrame(outputName, cropper) {
+    if (frames[outputName] !== cropper)
+      return;
+    const next = Object.assign({}, frames);
+    delete next[outputName];
+    frames = next;
+  }
+
+  // A pasta dos arquivos temporários: wintermute-shell/ em $XDG_RUNTIME_DIR (a pasta da sessão, que some no logout e só eu leio);
+  // sem ela, a pasta temporária do sistema.
+  function captureDir() {
+    let base = Quickshell.env("XDG_RUNTIME_DIR") || "";
+    if (base === "")
+      base = decodeURIComponent(StandardPaths.writableLocation(StandardPaths.TempLocation).toString().replace(/^file:\/\//, ""));
+    return base.replace(/\/+$/, "") + "/wintermute-shell";
+  }
+
+  // Um nome que não se repete: a hora em milissegundos e um contador (duas capturas no mesmo milissegundo).
+  function nextFile(dir) {
+    return dir + "/capture-" + Date.now() + "-" + (++fileCounter) + ".png";
+  }
+
+  // Grava o PNG do recorte e entrega. `rect` é um retângulo em pixels lógicos do monitor `outputName`, ou null para o monitor inteiro.
+  // A ordem é: pasta, recorte gravado, cópia, prévia (se `withPreview`), fechar. Se a gravação falhar, fica um aviso no log, a janela
+  // fecha e nada vai para a área de transferência nem para a prévia.
+  function grab(outputName, rect, withPreview) {
+    if (phase !== "open" || saving)
+      return;
+    const cropper = frames[outputName];
+    if (!cropper || !cropper.ready) {
+      console.warn("screenshot: não há quadro pronto em " + outputName + "; nada foi capturado. Fechando.");
+      close();
+      return;
+    }
+    const pixels = rect
+        ? Crop.toPixels(rect, cropper.source.width, cropper.source.height, cropper.frameWidth, cropper.frameHeight)
+        : Crop.screenPixels(cropper.frameWidth, cropper.frameHeight);
+    if (!pixels) {
+      console.warn("screenshot: o que escolhi está fora do monitor; nada foi capturado");
+      return;
+    }
+    saving = true;
+    const token = ++grabToken;
+    const dir = captureDir();
+    makeDir(dir, made => {
+      if (token !== grabToken)
+        return;
+      if (!made) {
+        finishGrab(token, false, "", outputName, withPreview);
+        return;
+      }
+      const path = nextFile(dir);
+      cropper.save(pixels, path, ok => finishGrab(token, ok, path, outputName, withPreview));
+    });
+  }
+
+  function finishGrab(token, ok, path, outputName, withPreview) {
+    if (token !== grabToken) {
+      // Fechei a captura enquanto ela gravava: o arquivo ficou pronto e sem uso. Apago, para não sobrar na pasta.
+      if (ok && path !== "")
+        exec(["rm", "-f", "--", path]);
+      return;
+    }
+    if (!ok) {
+      console.warn("screenshot: não consegui gravar a imagem da captura; nada foi copiado nem mostrado. Fechando.");
+      close();
+      return;
+    }
+    // Cada captura nova apaga o arquivo da anterior, para não acumular.
+    if (lastFile !== "" && lastFile !== path)
+      exec(["rm", "-f", "--", lastFile]);
+    lastFile = path;
+    exec(["python3", helper, "copy-file", path]);
+    if (withPreview)
+      deliver(path, outputName);
+    close();
   }
 
   function toggleCursor() {

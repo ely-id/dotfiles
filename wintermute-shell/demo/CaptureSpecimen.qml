@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Shapes
 import ".."
 import "../screenshot" as Screenshot
 
@@ -15,7 +16,8 @@ import "../screenshot" as Screenshot
 //   frameWidth, frameHeight  o tamanho do quadro em pixels (padrão 0: sem escala); as pílulas mostram pixels do monitor
 //   pointX, pointY  o ponto do ponteiro, em pixels do palco (padrão 420,236, o do board). Perto da borda direita ou de baixo
 //               a pílula de coordenadas passa para o outro lado do ponteiro
-//   showCursor  "mostrar o cursor" ligado (o botão no estado selecionado)
+//   showCursor  "mostrar o cursor" ligado (o botão no estado selecionado): o fundo ganha um ponteiro fictício, como o quadro com cursor
+//               da janela de verdade (screenshot/CaptureWindow.qml tira dois quadros, um sem o cursor e um com)
 //               Com o ponto sobre a barra ou sobre a dica (ex.: 420,396), a mira e as coordenadas somem, como na shell
 //   hoverMode   o modo sob o ponteiro (0 a 2), para fixar o hover; -1 o ponteiro de verdade
 //   follow      o ponto acompanha o ponteiro do mouse no palco (padrão: não, para os prints saírem fixos)
@@ -153,6 +155,29 @@ Item {
             GradientStop { position: 1; color: "#F4A846" }
           }
         }
+      }
+    }
+
+    // O ponteiro fictício do quadro com cursor: uma seta branca de contorno preto, num ponto qualquer do palco. Dado de exemplo, como as
+    // janelas; só aparece com "mostrar o cursor" ligado.
+    Shape {
+      visible: demoService.showCursor
+      x: 520
+      y: 190
+
+      ShapePath {
+        fillColor: "white"
+        strokeColor: "black"
+        strokeWidth: 1
+        startX: 0
+        startY: 0
+        PathLine { x: 0; y: 16 }
+        PathLine { x: 4; y: 12 }
+        PathLine { x: 7; y: 18 }
+        PathLine { x: 9; y: 17 }
+        PathLine { x: 6; y: 11 }
+        PathLine { x: 11; y: 11 }
+        PathLine { x: 0; y: 0 }
       }
     }
   }

@@ -1,4 +1,7 @@
-"""Transfer Niri's completed PNG to/from the screenshot preview."""
+"""Transfer a completed screenshot PNG to/from the clipboard and the screenshot preview.
+
+Actions: `read [path]` prints the PNG as base64, `copy` takes base64 on stdin, and `copy-file <path>` copies a PNG file.
+"""
 
 import base64
 from pathlib import Path
@@ -16,6 +19,11 @@ def main():
         ).stdout
     elif action == "copy":
         png = base64.b64decode(sys.stdin.buffer.read(), validate=True)
+    elif action == "copy-file":
+        path = sys.argv[2] if len(sys.argv) > 2 else ""
+        if not path:
+            raise ValueError("Missing screenshot path")
+        png = Path(path).read_bytes()
     else:
         raise ValueError("Unknown clipboard action")
 

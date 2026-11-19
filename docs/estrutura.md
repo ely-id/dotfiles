@@ -9,7 +9,8 @@ dotfiles/
 ├── .agents/                Ferramental de agente comum ao Claude Code e ao Antigravity
 │   ├── skills/             Skills do projeto (/retomar, /encerrar-sessao, /qa-fase, /ciclo), a fonte
 │   ├── hooks/              Aviso de início de sessão, adaptadores do Antigravity e o hook dos subagentes
-│   ├── scripts/            Ciclo, bancada, lint, sincronização das skills e skills externas
+│   ├── scripts/            Ciclo, bancada, lint, testes das bibliotecas, sincronização das skills e skills externas
+│   ├── testes/             Testes das bibliotecas puras da shell (um `<biblioteca>.test.js` cada), o apoio e o runner
 │   ├── bancada/            shell.qml de teste que a bancada põe numa cópia da shell
 │   ├── rules/              Regra específica do Antigravity
 │   ├── hooks.json          Hooks do Antigravity

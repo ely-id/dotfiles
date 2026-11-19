@@ -32,6 +32,7 @@ Definidos em `.claude/agents/`. Quem os chama é a sessão principal do `/ciclo`
 | `.agents/scripts/ciclo.sh` | Portão do ciclo (`estado`), trava, pausa e o modo pelo terminal (`rodar`) |
 | `.agents/scripts/bancada.sh` | Prints de uma peça nas três variações, fora do Niri |
 | `.agents/scripts/lint-proveniencia.sh` | Cor e fonte literais nas linhas alteradas |
+| `.agents/scripts/testar.sh` | Roda os testes das bibliotecas puras de `.agents/testes/` pelo `qs`, na tela de teste. Tarefa que cria ou muda uma biblioteca pura entrega o teste, e o script passa antes de devolver (`docs/fluxo-de-trabalho.md`) |
 
 ## Por momento do trabalho
 

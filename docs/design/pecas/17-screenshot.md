@@ -89,7 +89,7 @@ O board desenha esse estado só. O resto é composição minha (ajuste A-05), se
 - **Teclas:** Enter vale o "Capture"; Esc fecha a captura, com ou sem seleção; Espaço troca o modo e apaga a seleção.
 - **Sempre do zero:** a seleção mora no estado da captura e é apagada ao abrir e ao fechar.
 - **Vários monitores:** a seleção é uma só; começar outra num monitor apaga a anterior.
-- **As quatro ações:** capturar e copiar funcionam desde a `F6-T13` (ver "Capturar e copiar"); salvar (`F6-T03`) e anotar (`F6-T14`) ainda só avisam no log.
+- **As quatro ações:** capturar e copiar funcionam desde a `F6-T13` (ver "Capturar e copiar"), e anotar desde a `F6-T14` (ver "Editor de anotação"); salvar (`F6-T03`) ainda só avisa no log.
 
 ## Modo janela e modo tela: conferido no Figma e como funcionam (`F6-T12`)
 
@@ -112,7 +112,7 @@ Nada muda no desenho. O que muda é que as escolhas passam a produzir uma imagem
 - **Mostrar o cursor:** a captura tira dois quadros por monitor ao abrir, um sem o cursor e um com; o botão da barra troca o que fica à mostra, e a imagem sai do que está à mostra.
 - **"Capture"** (o botão e o Enter, no modo Area), a janela escolhida e o monitor escolhido: gravam o PNG, copiam para a área de transferência, entregam à prévia da barra e fecham a captura, nessa ordem.
 - **O botão de copiar** da pílula de ações: grava, copia e fecha, sem a prévia.
-- **Salvar e anotar** ainda só avisam no log, com a janela aberta.
+- **Anotar** abre o editor com o recorte, desde a `F6-T14`. **Salvar** ainda só avisa no log, com a janela aberta.
 - **Arquivo temporário:** `$XDG_RUNTIME_DIR/wintermute-shell/capture-….png`. Cada captura apaga o arquivo da anterior. Se gravar falhar, fica um aviso no log, a captura fecha e nada é copiado.
 - **Copiar** é o `wl-copy --type image/png`, pela ação `copy-file` do `screenshot/clipboard.py`.
 - **Atalhos:** o Super+Shift+1 ("Screenshot a region") abre a captura da shell. O Super+Shift+2 (tela) e o Super+Shift+3 (janela) continuam com as ações do Niri, que capturam na hora e sem interface; a imagem delas chega à prévia pelo evento do Niri. No Niri isso só vale depois de eu aplicar o `keybinds.kdl` gerado.
@@ -128,12 +128,42 @@ Li os três estados da prévia: em repouso (`13:19531`), em hover (`13:19557`) e
 - **Barra recolhida:** 48×48, raio 12, borda `borderStrong`, sem sombra, 6 acima do controle recolhido. O board não desenha o hover recolhido; compus (ajuste A-05) com o véu e um botão só, o de copiar, centrado, porque é o que cabe.
 - **Some em 6 s** (`capturePreviewDuration`), e não nos 30 s da origem. Com o ponteiro em cima o tempo para, e recomeça do zero quando o ponteiro sai; uma captura nova também recomeça. Durante um arraste ele já parava.
 - **Copiar:** o botão chama o `wl-copy` e mostra o `check` em `successText` por 1,5 s (`launcherCopiedDuration`), o mesmo sinal do launcher ao copiar uma cor. A etiqueta "Copy’d" roxa da origem saiu. O sinal só aparece com o ponteiro em cima, porque os botões só existem no hover.
-- **Fechar** apaga a prévia. **Salvar e anotar** ainda só avisam no log (`F6-T03` e `F6-T14`).
+- **Fechar** apaga a prévia. **Anotar** abre o editor com a imagem da prévia, desde a `F6-T14`. **Salvar** ainda só avisa no log (`F6-T03`).
 - **O clique na miniatura recolhida** não copia mais: quem copia é o botão.
 - **Arrastar** para outro aplicativo continua desligado até a `F6-T15`.
 - Os botões aparecem e somem em `hoverDuration` (120 ms).
 - **Diferença para o board:** o anel de 1 px de cada botão redondo se mistura com a imagem escurecida, e não com o fundo do botão, então sai um pouco mais claro que no Figma e varia com a imagem. Deixei assim; vejo ao vivo se incomoda.
 - A peça lê `service` (decisão 0011), com `demo/ScreenshotService.qml` e `demo/ScreenshotPreviewSpecimen.qml`, que usam um desenho inventado.
+
+## Editor de anotação: conferido no Figma e como funciona (`F6-T14`)
+
+Li o editor (`13:19481`) pelo `get_design_context`. As coordenadas são do quadro de 720×480.
+
+- **Vidro:** 720×480, raio 24, o vidro do launcher, sem o brilho do acento.
+- **Ferramentas:** seis botões de ícone de 32 em y 12 e x 12, 48, 84, 120, 156 e 192: lápis (`pencil`), marca-texto (`highlighter`), retângulo (`square`), seta (`arrow-up-right`), texto (`type`) e recorte (`crop`). A selecionada tem o fundo `accent` e o ícone em `onAccent`.
+- **Divisores** `border` de 1×16 em (236,20) e (436,20).
+- **Cores:** cinco caixas de 32 em x 248, 284, 320, 356 e 392, cada uma com um círculo de 16 na cor: `attentionText`, `warning`, `accentText`, `successText` e `text`. A escolhida tem o anel `text` de 2 no círculo de 32.
+- **Desfazer:** botão de ícone de 32 em (448,12), `undo-2`.
+- **"Copy":** 88×32 em (524,12), o botão de texto secundário pequeno. **"Save":** 88×32 em (620,12), o primário pequeno.
+- **Área da imagem:** 688×408 em (16,56), raio 12, com borda `border` de 1.
+- **As marcas de exemplo do board:** o contorno do retângulo e a haste da seta têm 3 de espessura; o retângulo tem raio 8; a faixa do marca-texto tem 20 de espessura, a 35%, com raio 2; a haste também tem raio 2; a ponta da seta é um glifo de 20; o texto é Geist SemiBold 17.
+
+O board desenha um estado só. O comportamento é composição minha (ajuste A-05), sem valor novo:
+
+- **Janela:** em camada de sobreposição, no monitor da captura, centrada nos dois eixos, sobre o véu do launcher, com o teclado exclusivo. Abrir o editor fecha o launcher, os Ajustes e a captura, e o contrário.
+- **Abrir:** o botão do lápis da pílula de ações da seleção grava o recorte, fecha a captura e abre o editor com ele, sem copiar nem mostrar a prévia; o botão do lápis da prévia abre o editor com a imagem dela e fecha a prévia.
+- **A imagem** cabe inteira na área, sem deformar, centrada. Menor que a área, aparece no tamanho natural, que é um pixel da imagem para um pixel do monitor: num monitor com escala, a captura aparece do tamanho que tinha na tela.
+- **Lápis:** traço livre de 3, pontas redondas; um clique sem arrastar vira um ponto. **Marca-texto:** faixa reta de 20, do aperto ao soltar, na cor a 35%. **Retângulo:** contorno de 3, raio 8, do canto onde apertei ao canto onde soltei. **Seta:** haste de 3 e o `chevron-right` de 20 na ponta, girado na direção dela. Arrastar menos de 4 não cria marca-texto, retângulo nem seta.
+- **Texto:** um clique põe o cursor; Enter confirma, Esc cancela só o texto; clicar em outro ponto confirma e começa outro; texto vazio não vira marca.
+- **Recorte:** arrasto um retângulo, com a borda e o escurecimento da seleção de área, sem as alças; Enter aplica e Esc cancela. Aplicado, a imagem passa a ser só aquele pedaço, e as marcas que ficaram fora somem com ele. Trocar de ferramenta abandona o recorte em andamento. Um recorte com menos de 8 num eixo é descartado, como na seleção de área.
+- **Cor:** vale para as próximas marcas; as que já existem não mudam.
+- **Desfazer** (o botão e Ctrl+Z): tira a última marca ou desfaz o último recorte, um por vez. Com um texto em andamento, cancela o texto. Sem nada para desfazer, o botão fica desativado.
+- **O que eu vejo é o que sai:** as marcas ficam guardadas em pixels da imagem, e o mesmo desenho serve para a tela e para o arquivo. As espessuras valem na tela; numa imagem reduzida para caber, o traço do arquivo é proporcionalmente mais grosso (numa imagem de 1600×1000, o contorno de 3 sai com 7 px).
+- **"Copy":** grava a imagem com as marcas num PNG temporário, copia, entrega à prévia da barra e fecha. Com um texto em andamento, confirma o texto antes. Se gravar falhar, o editor continua aberto.
+- **"Save"** ainda só avisa no log (`F6-T03`).
+- **Fechar:** Esc, quando não há texto nem recorte em andamento, fecha e descarta as marcas. Clicar no véu **não** fecha, para um clique errado não jogar o desenho fora.
+- **Sempre do zero:** cada abertura começa com o lápis, a primeira cor e nenhuma marca.
+- **Fora desta versão:** mover, redimensionar ou apagar uma marca já feita; refazer; escolher espessura e fonte.
 
 ## Textos em inglês (decisão 0012)
 
@@ -142,6 +172,8 @@ Li os três estados da prévia: em repouso (`13:19531`), em hover (`13:19557`) e
 | Arraste para selecionar · Espaço · muda o modo · Esc | Drag to select · Space · switches mode · Esc |
 | Área · Janela · Tela | Area · Window · Screen |
 | Capturar | Capture |
+| Copiar · Salvar (editor) | Copy · Save |
+| Olhe aqui (exemplo) | Look here |
 
 ## A CONFIRMAR
 

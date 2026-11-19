@@ -12,7 +12,8 @@ import Quickshell.Wayland
 // O teclado é exclusivo só na janela do monitor em que o ponteiro está (`CaptureState.pointerOutput`); com vários
 // monitores o foco acompanha o ponteiro. A mira, as coordenadas, a dica e a barra só aparecem nesse mesmo monitor. A seleção
 // de área (F6-T11) é um estado só, no CaptureState, preso ao monitor em que começou: a peça de cada janela só a desenha se
-// o nome do monitor for o dela.
+// o nome do monitor for o dela. Os modos Window e Screen (F6-T12) também dependem do nome do monitor (o da pílula do modo Screen e o
+// das janelas da foto do CaptureState) e do tamanho do quadro (os pixels do monitor que a pílula mostra), que a peça já recebe.
 PanelWindow {
   id: root
 
@@ -84,8 +85,9 @@ PanelWindow {
         frameHeight: frame.sourceSize.height
       }
 
-      // O ponteiro: sem seleção o do sistema fica invisível sobre a área de captura (a mira faz o papel dele) e volta ao normal
-      // sobre a dica e a barra; com seleção a peça escolhe a seta de mover, as de redimensionar ou a cruz (Capture.cursorShape).
+      // O ponteiro: no modo Area, sem seleção, o do sistema fica invisível sobre a área de captura (a mira faz o papel dele) e volta ao
+      // normal sobre a dica e a barra; com seleção a peça escolhe a seta de mover, as de redimensionar ou a cruz; nos modos Window e
+      // Screen ele é a seta normal em toda parte (Capture.cursorShape).
       // É um HoverHandler, e não uma MouseArea, para a barra por cima continuar recebendo os cliques.
       HoverHandler {
         id: pointer

@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import ".."
+import "Windows.js" as Win
 import Quickshell
 
 // O estado da janela de captura de tela (ficha 17, F6-T01 e T02). As janelas (CaptureWindow.qml, uma por tela) leem
@@ -11,6 +12,10 @@ import Quickshell
 // A seleção de área (F6-T11) mora aqui, e não na peça, para as janelas de todos os monitores a verem: `selection` é um
 // retângulo { x, y, width, height } em pixels lógicos do monitor `selectionOutput` (ou null), e `selecting` diz que ele
 // ainda está sendo arrastado. Quem desenha e quem arrasta é a peça (Capture.qml); as contas são do Selection.js.
+//
+// Os modos Window e Screen (F6-T12) escolhem uma janela ou um monitor, e a escolha chama `captureWindow(id)` ou `captureScreen(nome)`. A
+// lista das janelas é uma foto tirada quando a captura abre (`windowSnapshot`, por monitor), porque o quadro de fundo também está congelado:
+// se as janelas mexerem depois, o destaque tem de continuar batendo com a imagem. As contas são do Windows.js.
 //
 // A regra de ouro da ficha: a captura sempre começa do zero. Nenhuma propriedade abaixo é lida de arquivo nem guardada
 // entre uma abertura e outra: `reset()` devolve tudo ao padrão na abertura e de novo no fechamento, para a próxima vez
@@ -39,6 +44,10 @@ Singleton {
   property var selection: null
   property string selectionOutput: ""
   property bool selecting: false
+  // A foto das janelas de cada monitor, tirada quando a captura abre: { nomeDoMonitor: [ { id, appId, title, entryName, isFloating,
+  // layout } ] }, com as janelas do workspace ativo do monitor (NiriMsg.activeWorkspaceWindows) e o `entryName` (o Name da entrada
+  // .desktop, ou ""). Vazia ao abrir e ao fechar, como o resto.
+  property var windowSnapshot: ({})
   // O monitor em que o ponteiro está agora. Só a janela dele mostra a mira, a dica e a barra, e recebe o teclado.
   property string pointerOutput: ""
   // Os monitores cujo quadro já chegou.
@@ -65,8 +74,10 @@ Singleton {
     onTriggered: root.fail()
   }
 
-  // Volta ao padrão de toda abertura (F6-T02): modo Area, cursor desligado, atraso 0 s, nenhum quadro recebido, nenhuma seleção.
+  // Volta ao padrão de toda abertura (F6-T02): modo Area, cursor desligado, atraso 0 s, nenhum quadro recebido, nenhuma seleção,
+  // nenhuma janela na foto.
   function reset() {
+    windowSnapshot = ({});
     mode = "area";
     showCursor = false;
     delaySeconds = 0;
@@ -94,8 +105,27 @@ Singleton {
     if (phase === "open")
       return;
     pointerOutput = pendingOutput;
+    // A foto das janelas sai junto com o pedido do quadro: a janela da captura só aparece (e só então o quadro é capturado) depois disto.
+    takeWindowSnapshot();
     phase = "open";
     giveUpTimer.restart();
+  }
+
+  // Tira a foto das janelas de cada monitor, agora. O nome do aplicativo é o da entrada .desktop da janela, achada pelo appId como a
+  // lupa do seletor de cor faz; o Windows.js escolhe entre ele, o título e o appId.
+  function takeWindowSnapshot() {
+    const snapshot = {};
+    for (const screen of Quickshell.screens) {
+      const windows = NiriMsg.activeWorkspaceWindows(screen.name).map(window => {
+        const entry = window.appId !== "" ? DesktopEntries.heuristicLookup(window.appId) : null;
+        return Object.assign({}, window, { entryName: entry && entry.name ? String(entry.name) : "" });
+      });
+      snapshot[screen.name] = windows;
+      // Para o QA ao vivo: quantas janelas o Niri deu com posição e quantas ficaram de fora.
+      const placed = Win.rects(windows).length;
+      console.log("screenshot: " + windows.length + " janela(s) no workspace ativo de " + screen.name + ", " + placed + " com posição");
+    }
+    windowSnapshot = snapshot;
   }
 
   // Fecha a captura (Esc, o botão de fechar, o IPC, abrir o launcher ou os Ajustes) e zera tudo.
@@ -150,15 +180,17 @@ Singleton {
     selecting = false;
   }
 
-  // As quatro ações da pílula de ações. Capturar e copiar são a F6-T13, salvar a F6-T03 (esperando a P-15 e a P-16) e anotar
-  // a F6-T14: até lá elas só dizem no log que ainda não têm destino, e a janela continua aberta.
-  function copySelection() { pending("copiar"); }
-  function saveSelection() { pending("salvar"); }
-  function annotateSelection() { pending("anotar"); }
-  function capture() { pending("capturar"); }
+  // As quatro ações da pílula de ações e as escolhas dos modos Window e Screen. Capturar e copiar são a F6-T13, salvar a F6-T03
+  // (esperando a P-15 e a P-16) e anotar a F6-T14: até lá elas só dizem no log que ainda não têm destino, e a janela continua aberta.
+  function copySelection() { pending("copiar a área"); }
+  function saveSelection() { pending("salvar a área"); }
+  function annotateSelection() { pending("anotar a área"); }
+  function capture() { pending("capturar a área"); }
+  function captureWindow(id) { pending("capturar a janela " + id); }
+  function captureScreen(outputName) { pending("capturar a tela " + outputName); }
 
   function pending(action) {
-    console.log("screenshot: " + action + " a área ainda não tem destino (F6-T03, T13 e T14); nada foi feito");
+    console.log("screenshot: " + action + " ainda não tem destino (F6-T03, T13 e T14); nada foi feito");
   }
 
   function toggleCursor() {

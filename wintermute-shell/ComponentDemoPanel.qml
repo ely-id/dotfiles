@@ -1166,15 +1166,46 @@ PanelWindow {
                   stageWidth: 720; stageHeight: 450
                   Demo.CaptureSpecimen { pointX: 420; pointY: 396 }
                 }
+              }
+
+              SectionBlock {
+                title: "Modos Window e Screen (ficha 17, board 13:19344, estado \"Modo janela\" 13:19441; o modo Screen não tem board, é composição A-05) · peça real com serviço fictício · com o palco em foco, Espaço troca o modo e Enter escolhe"
+                itemGap: 40
+
                 Specimen {
-                  caption: "Modo Window (13:19441) · só o botão selecionado muda; a dica, a mira e as coordenadas não aparecem (o que o modo mostra é a F6-T12)"
+                  caption: "Modo Window (13:19441) · a tela a 45% · o ponteiro (500,200) sobre a janela de 320×300 em (360,56) · anel de 2 no acento, raio 14, 324×304 em (358,54) · pílula de 152×24 em (360,22) com `Browser · 320 × 300` · sem mira, coordenadas nem dica"
                   stageWidth: 720; stageHeight: 450
-                  Demo.CaptureSpecimen { mode: "window" }
+                  Demo.CaptureSpecimen { mode: "window"; pointX: 500; pointY: 200 }
                 }
                 Specimen {
-                  caption: "Modo Screen · o mesmo, com Screen selecionado"
+                  caption: "Modo Window, sem janela sob o ponteiro (700,120) · só o escurecimento e a barra, nada destacado"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { mode: "window"; pointX: 700; pointY: 120 }
+                }
+                Specimen {
+                  caption: "Modo Window, janela encostada no topo (360,0) · sem lugar em cima, a pílula vai para dentro, a 8 do canto de cima à esquerda"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { mode: "window"; scene: "top"; pointX: 500; pointY: 200 }
+                }
+                Specimen {
+                  caption: "Modo Window, duas janelas sobrepostas · o ponteiro (400,200) está nas duas e vale a flutuante, que fica acima das lado a lado"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { mode: "window"; scene: "overlap"; pointX: 400; pointY: 200 }
+                }
+                Specimen {
+                  caption: "Modo Window, com escala 2 (quadro de 1440×900) · a pílula mostra pixels do monitor: `Browser · 640 × 600`"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { mode: "window"; pointX: 500; pointY: 200; frameWidth: 1440; frameHeight: 900 }
+                }
+                Specimen {
+                  caption: "Modo Screen (sem board, A-05) · o monitor do ponteiro sem escurecimento · anel de 2 no acento por dentro da borda, sem raio · pílula a 8 do canto com `eDP-1 · 720 × 450` · Screen selecionado"
                   stageWidth: 720; stageHeight: 450
                   Demo.CaptureSpecimen { mode: "screen" }
+                }
+                Specimen {
+                  caption: "Modo Screen, com escala 2 (quadro de 1440×900) · a pílula mostra os pixels do monitor: `eDP-1 · 1440 × 900`"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { mode: "screen"; frameWidth: 1440; frameHeight: 900 }
                 }
               }
 

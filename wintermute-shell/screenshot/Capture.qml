@@ -3,12 +3,13 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import "." as Screenshot
 import "Selection.js" as Sel
+import "Windows.js" as Win
 import ".."
 
 // A peça da janela de captura (ficha 17, board 13:19344, estado "Início (modo área)" 13:19354): o véu de 30% sobre a tela
 // inteira, a mira em cruz com a pílula de coordenadas, a dica no alto e a barra de modos embaixo. Ocupa a área do
 // monitor (ou do palco, na vitrine) e não captura nada nem tem janela: o quadro congelado fica atrás dela, na
-// CaptureWindow.qml. Só o modo Area tem o que desenhar além da barra (o que Window e Screen mostram é a F6-T12).
+// CaptureWindow.qml. Os modos Window e Screen (F6-T12) têm outro desenho, descrito abaixo.
 //
 // A seleção de área (F6-T11, estado "Selecionando uma área", nó 13:19401): no modo Area, apertar e arrastar cria a seleção;
 // arrastar por dentro a move, arrastar uma alça a redimensiona e arrastar por fora começa outra no lugar dela. Com ela,
@@ -17,9 +18,18 @@ import ".."
 // por alça, onde cada pílula cai) são do Selection.js; aqui só ligo o ponteiro a elas. A seleção mora no serviço, e esta peça
 // só a desenha se ela nasceu neste monitor (`outputName`).
 //
-// `service` é a fonte do estado (`mode`, `showCursor`, `delaySeconds`, `selection`, `selectionOutput`, `selecting`) e das
+// Os modos Window e Screen (F6-T12): a tela inteira escurece a 45%, sem mira, coordenadas nem dica, e o ponteiro do sistema é a seta.
+// No modo Window a janela sob o ponteiro ganha o anel no acento e a pílula com o nome e o tamanho (estado "Modo janela", nó 13:19441;
+// a janela destacada não fica mais clara que o resto, só o anel a marca); clicar nela, ou Enter, chama `captureWindow(id)`. As janelas
+// são as da foto que o serviço tirou quando a captura abriu (`windowSnapshot`), e a conta de qual está sob o ponteiro é do Windows.js.
+// No modo Screen (sem board, composição A-05) o monitor do ponteiro fica sem escurecimento, com o anel por dentro da borda e a mesma
+// pílula com o nome do monitor e o tamanho dele; os outros monitores ficam escurecidos. Clicar em qualquer ponto, ou Enter, chama
+// `captureScreen(nome)`. Por enquanto o serviço só registra a escolha no log (F6-T13).
+//
+// `service` é a fonte do estado (`mode`, `showCursor`, `delaySeconds`, `selection`, `selectionOutput`, `selecting`, `windowSnapshot`) e das
 // ações (`setMode`, `nextMode`, `toggleCursor`, `close`, `setSelection`, `clearSelection`, `copySelection`, `saveSelection`,
-// `annotateSelection`, `capture`): CaptureState.qml na shell, demo/CaptureService.qml na vitrine (decisão 0011).
+// `annotateSelection`, `capture`, `captureWindow`, `captureScreen`): CaptureState.qml na shell, demo/CaptureService.qml na vitrine
+// (decisão 0011).
 //
 // O ponto (`pointX`, `pointY`) é o do ponteiro em pixels lógicos da peça. A mira e as coordenadas só aparecem no modo Area,
 // no monitor do ponteiro (`active`) e enquanto o ponteiro não está sobre a dica ou a barra (`overUi`): ali o ponteiro do
@@ -49,6 +59,8 @@ Item {
   property string hoverAction: ""
 
   readonly property bool areaMode: service ? service.mode === "area" : true
+  readonly property bool windowMode: service ? service.mode === "window" : false
+  readonly property bool screenMode: service ? service.mode === "screen" : false
   readonly property real ratioX: frameWidth > 0 && width > 0 ? frameWidth / width : 1
   readonly property real ratioY: frameHeight > 0 && height > 0 ? frameHeight / height : 1
   readonly property int cellX: Math.floor(pointX)
@@ -59,6 +71,14 @@ Item {
   readonly property bool hasSelection: selection !== null
   // O ponteiro ainda está arrastando a seleção (criando, movendo ou redimensionando): sem alças nem ações até soltar.
   readonly property bool selecting: hasSelection && !!service.selecting
+
+  // As janelas deste monitor na foto da abertura, como retângulos em pixels lógicos, de cima para baixo (Windows.rects), e a que está
+  // sob o ponteiro: só no modo Window, no monitor do ponteiro e fora da barra. Sem janela sob o ponteiro, nada fica destacado.
+  readonly property var windowRects: service && service.windowSnapshot ? Win.rects(service.windowSnapshot[outputName]) : []
+  readonly property var hoveredWindow: windowMode && active && pointerSeen && !overUi ? Win.windowAt(windowRects, pointX, pointY) : null
+  // O alvo que ganha o anel e a pílula: a janela sob o ponteiro (modo Window) ou o monitor inteiro, no monitor do ponteiro (modo Screen).
+  readonly property var target: windowMode ? hoveredWindow
+      : screenMode && active ? ({ x: 0, y: 0, width: width, height: height, name: outputName }) : null
 
   // O ponteiro está sobre a dica (some com a seleção), sobre a barra ou sobre a pílula de ações.
   readonly property bool overUi: active && (insideItem(bar) || (hint.visible && insideItem(hint)) || (actions.visible && insideItem(actions)))
@@ -90,9 +110,9 @@ Item {
       return handleCursor(dragHandle);
     if (dragMode === "new")
       return Qt.CrossCursor;
-    if (overUi)
+    if (overUi || !areaMode)
       return Qt.ArrowCursor;
-    if (!hasSelection || !areaMode)
+    if (!hasSelection)
       return Qt.BlankCursor;
     const hit = Sel.hitTest(selection, pointX, pointY, Theme.captureHandleHit);
     return hit === "move" ? Qt.SizeAllCursor : hit === "" ? Qt.CrossCursor : handleCursor(hit);
@@ -113,8 +133,9 @@ Item {
     return Qt.SizeHorCursor;
   }
 
-  // As teclas da captura: Espaço troca o modo, Esc fecha (sempre, com ou sem seleção) e Enter vale o botão "Capture". Ctrl,
-  // Alt e Meta passam. Devolve se tratou a tecla.
+  // As teclas da captura: Espaço troca o modo, Esc fecha (sempre, com ou sem seleção) e Enter escolhe: o botão "Capture" da seleção
+  // no modo Area, a janela destacada no modo Window e o monitor do ponteiro no modo Screen. Ctrl, Alt e Meta passam. Devolve se
+  // tratou a tecla.
   function handleKey(key, modifiers) {
     if (modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))
       return false;
@@ -129,6 +150,16 @@ Item {
       return true;
     case Qt.Key_Return:
     case Qt.Key_Enter:
+      if (windowMode) {
+        if (!hoveredWindow)
+          return false;
+        service.captureWindow(hoveredWindow.id);
+        return true;
+      }
+      if (screenMode) {
+        service.captureScreen(outputName);
+        return true;
+      }
       // A seleção pode estar em outro monitor: o teclado fica na janela do ponteiro, e o serviço é um só.
       if (!service.selection || service.selecting)
         return false;
@@ -188,16 +219,38 @@ Item {
       service.setSelection(outputName, rect, false);
   }
 
+  // Cliquei em (x, y), em pixels da peça, nos modos Window e Screen: a janela sob o ponto (clicar fora de todas não faz nada) ou o
+  // monitor. O clique na barra e na dica não chega aqui: eles engolem o próprio.
+  function clickAt(x, y) {
+    if (!service || areaMode)
+      return;
+    if (screenMode) {
+      service.captureScreen(outputName);
+      return;
+    }
+    const hit = Win.windowAt(windowRects, x, y);
+    if (hit)
+      service.captureWindow(hit.id);
+  }
+
   function insideItem(item) {
     return pointX >= item.x && pointX < item.x + item.width && pointY >= item.y && pointY < item.y + item.height;
   }
 
-  // Véu: preto a 30% na tela inteira. Com seleção ele dá lugar ao escurecimento de 45% só por fora dela (quatro retângulos
-  // em volta, sem se cobrirem); dentro da seleção a imagem aparece limpa.
+  // Véu do modo Area: preto a 30% na tela inteira. Com seleção ele dá lugar ao escurecimento de 45% só por fora dela (quatro
+  // retângulos em volta, sem se cobrirem); dentro da seleção a imagem aparece limpa.
   Rectangle {
-    visible: !root.hasSelection
+    visible: root.areaMode && !root.hasSelection
     anchors.fill: parent
     color: Theme.captureScrim
+  }
+
+  // O escurecimento dos modos Window e Screen: a tela inteira a 45%. No modo Screen o monitor do ponteiro fica sem ele (é a imagem
+  // que vai ser capturada) e os outros ficam escurecidos.
+  Rectangle {
+    visible: root.windowMode || (root.screenMode && !root.active)
+    anchors.fill: parent
+    color: Theme.captureDim
   }
 
   Item {
@@ -211,28 +264,28 @@ Item {
       y: 0
       width: parent.width
       height: parent.sel.y
-      color: Theme.captureSelectionScrim
+      color: Theme.captureDim
     }
     Rectangle {
       x: 0
       y: parent.sel.y + parent.sel.height
       width: parent.width
       height: parent.height - y
-      color: Theme.captureSelectionScrim
+      color: Theme.captureDim
     }
     Rectangle {
       x: 0
       y: parent.sel.y
       width: parent.sel.x
       height: parent.sel.height
-      color: Theme.captureSelectionScrim
+      color: Theme.captureDim
     }
     Rectangle {
       x: parent.sel.x + parent.sel.width
       y: parent.sel.y
       width: parent.width - x
       height: parent.sel.height
-      color: Theme.captureSelectionScrim
+      color: Theme.captureDim
     }
   }
 
@@ -256,6 +309,25 @@ Item {
       root.endDrag();
     }
     onCanceled: root.endDrag()
+  }
+
+  // Clicar nos modos Window e Screen. Fica embaixo da barra e das ações, que engolem o próprio clique.
+  MouseArea {
+    anchors.fill: parent
+    enabled: !root.areaMode
+    acceptedButtons: Qt.LeftButton
+    onClicked: mouse => root.clickAt(mouse.x, mouse.y)
+  }
+
+  // O anel e a pílula do alvo: a janela sob o ponteiro ou o monitor.
+  Screenshot.CaptureTarget {
+    visible: root.target !== null
+    rect: root.target || ({ x: 0, y: 0, width: 0, height: 0 })
+    name: root.target ? root.target.name : ""
+    kind: root.windowMode ? "window" : "screen"
+    monitorWidth: root.width
+    ratioX: root.ratioX
+    ratioY: root.ratioY
   }
 
   // A mira: duas linhas de 1 px de ponta a ponta do monitor, cruzando no pixel do ponteiro.

@@ -550,7 +550,9 @@ Singleton {
   readonly property int captureButtonSize: 40
 
   // Seleção de área (F6-T11, estado "Selecionando uma área", nó 13:19401). A seleção do board tem 320×200 em (200,104) no palco de 720×450.
-  readonly property color captureSelectionScrim: Qt.rgba(0, 0, 0, 0.45)  // escurecimento por fora: preto a 45% nos quatro lados da seleção (13:19417 a 13:19420); dentro, a imagem limpa
+  // O escurecimento de 45% da captura: por fora da seleção, nos quatro lados (13:19417 a 13:19420; dentro, a imagem limpa), sobre a tela inteira no modo
+  // Window (13:19457) e sobre os monitores sem o ponteiro no modo Screen (composição, A-05). Os três usos são o mesmo preto a 45%, por isso o nome não fala de seleção.
+  readonly property color captureDim: Qt.rgba(0, 0, 0, 0.45)
   readonly property int captureSelectionBorder: 1                   // borda de 1 px `accent`, por dentro do retângulo (13:19421)
   readonly property int captureHandleSize: 8                        // oito alças de 8×8, raio 2, `knob` com borda `accent` de 1 (13:19422 a 13:19429)
   readonly property int captureHandleRadius: 2
@@ -576,6 +578,21 @@ Singleton {
   readonly property int captureActionsButtonStep: 36                // 32 de botão e 4 de folga
   readonly property int captureActionsPrimaryX: 116                 // "Capture": ActionButton primário pequeno de 84×32 em (116,8), raio 8, fundo `accent`, texto Geist Medium 13 `textOnAccent`
   readonly property int captureActionsPrimaryWidth: 84
+
+  // Modos Window e Screen (F6-T12). A janela sob o ponteiro (estado "Modo janela", nó 13:19441): o anel (13:19458), 2 px `accent`, raio 14, com o retângulo
+  // 2 para fora da janela em cada lado (a janela de 320×300 em (360,56) tem o anel de 324×304 em (358,54)), e a pílula (13:19459). O modo Screen não tem
+  // board: é composição (A-05) com os mesmos valores, o anel de 2 por dentro da borda do monitor e sem raio (o monitor não tem cantos arredondados).
+  readonly property int captureTargetRingWidth: 2                   // espessura do anel, nos dois modos; na janela ela fica toda por fora (o retângulo cresce 2 para cada lado)
+  readonly property int captureWindowRingRadius: 14                 // o anel da janela: raio 14 ao redor de uma janela de raio 12
+  readonly property int captureScreenRingRadius: 0                  // o anel do monitor: sem raio
+  readonly property int captureTargetPillHeight: 24                 // pílula (13:19459): o vidro pequeno das pílulas de coordenadas e de tamanho, 24 de altura, raio 8, Geist Mono Medium 11 `text`
+  readonly property int captureTargetPillRadius: 8
+  readonly property int captureTargetPillGap: 8                     // a pílula termina 8 acima do anel (termina em y 46 e o anel começa em 54); sem lugar em cima, por dentro, a 8 do canto de cima à esquerda
+  // Recuo de cada lado do texto. No board a pílula tem 152 com "Firefox · 320 × 300", que avança 125,28 em Geist Mono Medium 11 (TextMetrics.advanceWidth; 19 caracteres
+  // de 6,59). Recuo = (152 − ⌈125,28⌉) / 2 = (152 − 126) / 2 = 13, com a largura da pílula sendo ⌈avanço⌉ + 2 × 13. Medi pelo avanço e não pela `TextMetrics.width`
+  // das outras duas pílulas porque a `width` é a do desenho: o "F" tem folga à esquerda e o "Firefox" mede 125, os outros nomes de sete letras medem 126, e a
+  // pílula mudaria 1 px com a primeira letra do nome. Numa fonte mono o avanço só depende de quantos caracteres há. Com a `width` o recuo seria 13,5.
+  readonly property int captureTargetPillPaddingX: 13
 
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.

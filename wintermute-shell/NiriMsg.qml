@@ -88,6 +88,17 @@ Singleton {
 
   function windowExists(id) { return _windows[id] !== undefined; }
 
+  // As janelas do workspace ativo do monitor `outputName`, como dados simples: { id, appId, title, isFloating, layout }, com o
+  // `layout` cru do IPC do Niri. A captura de tela (screenshot/CaptureState.qml) tira uma foto disto quando abre.
+  function activeWorkspaceWindows(outputName) {
+    const workspace = workspaces.find(w => w.output === outputName && w.isActive);
+    if (!workspace)
+      return [];
+    return Object.values(_windows).filter(w => w.workspaceId === workspace.id).map(w => ({
+      id: w.id, appId: w.appId, title: w.title, isFloating: !!w.isFloating, layout: w.layout
+    }));
+  }
+
   function showWindowOverview(id, done) {
     const window = _windows[id];
     const workspace = workspaces.find(w => w.id === window?.workspaceId);

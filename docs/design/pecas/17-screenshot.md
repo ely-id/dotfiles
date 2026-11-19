@@ -58,8 +58,8 @@ Li o estado "Início (modo área)" (`13:19354`) pelo `get_design_context`. O qua
 
 ## Janela de captura: como funciona (`F6-T01` e `F6-T02`)
 
-- **Uma janela por tela,** em camada de sobreposição, com o quadro congelado do monitor no fundo (uma captura só, sem o cursor, tirada quando a captura abre) e a peça por cima, no padrão da lupa do seletor de cor. O teclado é exclusivo no monitor em que o ponteiro está, e é nele que aparecem a mira, as coordenadas, a dica e a barra. Onde não há captura de tela (GNOME, tela de teste), a janela desiste em 2 s e deixa um aviso no log.
-- **Abrir:** o IPC `screenshot` (`open`, `close`, `toggle`) e o chip "Screenshot" do launcher, que espera o launcher sumir antes de capturar o quadro, para ele não sair na imagem. Abrir a captura fecha o launcher, os Ajustes e a lupa, e o contrário. As binds Super+Shift+1, 2 e 3 continuam chamando a captura do Niri até a `F6-T13`.
+- **Uma janela por tela,** em camada de sobreposição, com o quadro congelado do monitor no fundo (tirado quando a captura abre; desde a `F6-T13` são dois, um sem o cursor e um com) e a peça por cima, no padrão da lupa do seletor de cor. O teclado é exclusivo no monitor em que o ponteiro está, e é nele que aparecem a mira, as coordenadas, a dica e a barra. Onde não há captura de tela (GNOME, tela de teste), a janela desiste em 2 s e deixa um aviso no log.
+- **Abrir:** o IPC `screenshot` (`open`, `close`, `toggle`) e o chip "Screenshot" do launcher, que espera o launcher sumir antes de capturar o quadro, para ele não sair na imagem. Abrir a captura fecha o launcher, os Ajustes e a lupa, e o contrário. Desde a `F6-T13`, o Super+Shift+1 abre a captura da shell; o Super+Shift+2 e o 3 continuam com a captura do Niri (ver "Capturar e copiar").
 - **Sempre do zero:** toda abertura começa no modo Area, com "mostrar o cursor" desligado, o atraso em 0 s e nenhuma seleção. Nada é guardado entre uma abertura e outra, nem em arquivo.
 - **Teclas:** Espaço troca o modo em ciclo (Area, Window, Screen); Esc fecha, sempre.
 - **Ponteiro:** fica invisível sobre a área de captura, onde a mira faz o papel dele, e volta ao normal sobre a dica e a barra, onde a mira e as coordenadas somem.
@@ -89,7 +89,7 @@ O board desenha esse estado só. O resto é composição minha (ajuste A-05), se
 - **Teclas:** Enter vale o "Capture"; Esc fecha a captura, com ou sem seleção; Espaço troca o modo e apaga a seleção.
 - **Sempre do zero:** a seleção mora no estado da captura e é apagada ao abrir e ao fechar.
 - **Vários monitores:** a seleção é uma só; começar outra num monitor apaga a anterior.
-- **As quatro ações** ainda não fazem nada além de avisar no log: capturar e copiar são a `F6-T13`, salvar a `F6-T03` e anotar a `F6-T14`.
+- **As quatro ações:** capturar e copiar funcionam desde a `F6-T13` (ver "Capturar e copiar"); salvar (`F6-T03`) e anotar (`F6-T14`) ainda só avisam no log.
 
 ## Modo janela e modo tela: conferido no Figma e como funcionam (`F6-T12`)
 
@@ -102,7 +102,22 @@ Li o estado "Modo janela" (`13:19441`): o escurecimento (`13:19457`), o anel (`1
 - **De onde vem a posição:** do `layout` que o Niri informa de cada janela. A conta, que mora num lugar só (`screenshot/Windows.js`, `place`): posição = `tile_pos_in_workspace_view` + `window_offset_in_tile`; tamanho = `window_size`. Janela sem posição fica de fora. **Esta conta nunca rodou com janelas de verdade**: a origem da "vista do workspace" e se as janelas lado a lado trazem posição só dá para conferir na sessão do Niri. Ao abrir, a captura escreve no log quantas janelas achou e quantas têm posição.
 - **Escolher:** clicar na janela destacada, ou Enter, escolhe a janela; sem janela sob o ponteiro, o clique não faz nada.
 - **Modo tela:** o monitor do ponteiro fica sem escurecimento (é a imagem que vai ser capturada), com o anel de 2 no acento por dentro da borda, sem raio, e a pílula com o nome e o tamanho do monitor (`eDP-1 · 1920 × 1080`) a 8 do canto de cima à esquerda. Os outros monitores ficam escurecidos a 45%. Clicar em qualquer ponto, ou Enter, escolhe o monitor.
-- **As duas escolhas** ainda só avisam no log: tirar a imagem é a `F6-T13`.
+- **As duas escolhas** tiram a imagem desde a `F6-T13` (ver "Capturar e copiar").
+
+## Capturar e copiar: como funciona (`F6-T13`, decisão 0017)
+
+Nada muda no desenho. O que muda é que as escolhas passam a produzir uma imagem.
+
+- **De onde sai a imagem:** do quadro congelado que a janela mostra, recortado em pixels do quadro (decisão 0017). A área é o retângulo da seleção; a janela é o retângulo dela, cortado no que cabe no monitor, com os cantos arredondados saindo com o que estava atrás; a tela é o quadro inteiro. O PNG tem os pixels do recorte: a seleção de 320×200 num monitor de escala 2 dá 640×400, o mesmo número que a pílula de tamanho mostra.
+- **Mostrar o cursor:** a captura tira dois quadros por monitor ao abrir, um sem o cursor e um com; o botão da barra troca o que fica à mostra, e a imagem sai do que está à mostra.
+- **"Capture"** (o botão e o Enter, no modo Area), a janela escolhida e o monitor escolhido: gravam o PNG, copiam para a área de transferência, entregam à prévia da barra e fecham a captura, nessa ordem.
+- **O botão de copiar** da pílula de ações: grava, copia e fecha, sem a prévia.
+- **Salvar e anotar** ainda só avisam no log, com a janela aberta.
+- **Arquivo temporário:** `$XDG_RUNTIME_DIR/wintermute-shell/capture-….png`. Cada captura apaga o arquivo da anterior. Se gravar falhar, fica um aviso no log, a captura fecha e nada é copiado.
+- **Copiar** é o `wl-copy --type image/png`, pela ação `copy-file` do `screenshot/clipboard.py`.
+- **Atalhos:** o Super+Shift+1 ("Screenshot a region") abre a captura da shell. O Super+Shift+2 (tela) e o Super+Shift+3 (janela) continuam com as ações do Niri, que capturam na hora e sem interface; a imagem delas chega à prévia pelo evento do Niri. No Niri isso só vale depois de eu aplicar o `keybinds.kdl` gerado.
+- **Limites conhecidos:** num monitor com escala fracionária, o PNG pode sair com 1 px a mais ou a menos; o recorte da janela herda a conta da posição, que só dá para conferir na sessão do Niri.
+- **Nunca rodou de verdade:** a captura do quadro não existe fora do Niri. O recorte foi testado sobre imagens fictícias de pixels conhecidos, e a cópia com um `wl-copy` de mentira.
 
 ## Textos em inglês (decisão 0012)
 

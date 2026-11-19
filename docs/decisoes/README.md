@@ -20,6 +20,7 @@ Cada arquivo registra uma decisão: o contexto em que ela foi tomada, o que esco
 | [0014](0014-ciclo-de-agentes.md) | Ciclo de agentes: o Fable orquestra, o Sonnet implementa e verifica, um script decide quando parar | Aceita |
 | [0015](0015-um-arquivo-so-para-os-atalhos.md) | Um arquivo só para os atalhos: o Manual e as binds do Niri saem da mesma lista | Aceita |
 | [0016](0016-dados-de-emoji-do-unicode-no-repositorio.md) | Os dados de emoji vêm do Unicode e entram no repositório já gerados | Aceita |
+| [0017](0017-a-captura-recorta-o-quadro-congelado.md) | A captura de tela recorta o quadro congelado, em vez de chamar a captura do Niri | Aceita |
 
 ## Modelo
 

@@ -93,6 +93,7 @@ ShellRoot {
       Launcher.State.close();
       Launcher.LoupeState.abort();
       Screenshot.CaptureState.abort();
+      Screenshot.AnnotateState.close();
     }
   }
   // O "+" do organizador pede o launcher pelo NiriMsg (que fica na raiz e não importa launcher/): abre no monitor
@@ -110,10 +111,11 @@ ShellRoot {
       Settings.State.close();
       Launcher.LoupeState.abort();
       Screenshot.CaptureState.abort();
+      Screenshot.AnnotateState.close();
     }
   }
 
-  // A captura de tela (ficha 17) também pede teclado exclusivo, então abrir a captura fecha o launcher, os Ajustes e a lupa.
+  // A captura de tela (ficha 17) também pede teclado exclusivo, então abrir a captura fecha o launcher, os Ajustes, a lupa e o editor de anotação.
   // Quem já estava aberto saiu agora: a captura espera ele sumir da tela antes de pegar o quadro (CaptureState.open).
   Connections {
     target: Screenshot.CaptureState
@@ -123,14 +125,29 @@ ShellRoot {
       Launcher.State.close();
       Settings.State.close();
       Launcher.LoupeState.abort();
+      Screenshot.AnnotateState.close();
     }
   }
 
-  // A captura abre no monitor em foco, como o launcher.
+  // O editor de anotação (ficha 17, estado 5) pede teclado exclusivo também: abrir o editor fecha o launcher, os Ajustes, a lupa e a captura.
+  Connections {
+    target: Screenshot.AnnotateState
+    function onOpenedChanged() {
+      if (!Screenshot.AnnotateState.opened) return;
+      Launcher.State.close();
+      Settings.State.close();
+      Launcher.LoupeState.abort();
+      Screenshot.CaptureState.abort();
+    }
+  }
+
+  // A captura abre no monitor em foco, como o launcher. Com o launcher, os Ajustes ou o editor abertos ela espera eles sumirem da tela antes de
+  // pegar o quadro, para não saírem na imagem.
   IpcHandler {
     target: "screenshot"
     function open() {
-      Screenshot.CaptureState.open(Settings.State.focusedOutputName(), Launcher.State.opened || Settings.State.opened);
+      Screenshot.CaptureState.open(Settings.State.focusedOutputName(),
+          Launcher.State.opened || Settings.State.opened || Screenshot.AnnotateState.opened);
     }
     function close() { Screenshot.CaptureState.close(); }
     function toggle() {
@@ -186,6 +203,7 @@ ShellRoot {
       Launcher.Window { menuScreen: modelData }
       Launcher.LoupeWindow { menuScreen: modelData }
       Screenshot.CaptureWindow { menuScreen: modelData }
+      Screenshot.AnnotateWindow { menuScreen: modelData }
       FontTestPanel {
         panelScreen: modelData
         opened: root.testPanelOpen

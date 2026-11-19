@@ -2,6 +2,7 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 import QtQuick
 import ".."
+import "." as Screenshot
 import Quickshell
 import Quickshell.Io
 
@@ -35,14 +36,20 @@ Singleton {
     copied = false;
   }
 
-  // Salvar e anotar ainda não têm destino: salvar é a F6-T03 e anotar a F6-T14. Até lá só registro o pedido no log, e a
-  // prévia continua onde está.
+  // Salvar ainda não tem destino (F6-T03): até lá só registro o pedido no log, e a prévia continua onde está.
   function save() {
     console.log("Screenshot preview: save is not available yet (F6-T03).");
   }
 
+  // Anotar abre o editor (F6-T14) com a imagem que a prévia mostra, no monitor dela, e fecha a prévia. A imagem vai como o `data:` que a
+  // prévia já guarda: o arquivo de onde ela veio pode já não existir (a captura seguinte apaga o anterior).
   function annotate() {
-    console.log("Screenshot preview: annotate is not available yet (F6-T14).");
+    if (!imageSource)
+      return;
+    const source = imageSource;
+    const output = outputName;
+    dismiss();
+    Screenshot.AnnotateState.open(source, output);
   }
 
   function copy() {

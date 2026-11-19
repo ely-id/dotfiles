@@ -613,6 +613,43 @@ Singleton {
   readonly property color capturePreviewButtonHover: Qt.rgba(242 / 255, 243 / 255, 245 / 255, 0.20) // sob o ponteiro: #F2F3F5 (o `text`) a 20%
   readonly property int capturePreviewDuration: 6000                 // a prévia some sozinha em 6 s (ficha 17: "some em 6 s"); com o ponteiro em cima o relógio para (composição, A-05)
 
+  // Editor de anotação (F6-T14, ficha 17, estado 5; board 13:19344, nó 13:19481 "Anotação · editor"). Vidro do launcher (raio radiusLauncher) de 720×480, sem o brilho do
+  // acento. As coordenadas são as do quadro do editor, com o 1 da borda somado onde o nó tem borda. As ferramentas, o desfazer e a cor de cada marca são do board; o comportamento
+  // de cada ferramenta, o texto sendo digitado, o recorte e a janela em volta são composição (A-05).
+  readonly property int captureAnnotateWidth: 720
+  readonly property int captureAnnotateHeight: 480
+  readonly property int captureAnnotatePadding: 12                   // a barra começa em y 12 e o primeiro botão em x 12 (13:19482)
+  readonly property int captureAnnotateToolStep: 36                  // seis IconButton de 32 em x 12, 48, 84, 120, 156 e 192 (13:19482 a 13:19487): 32 de botão e 4 de folga
+  readonly property int captureAnnotateDividerY: 20                  // divisores `border` de 1×16 em (236,20) e (436,20) (13:19488, 13:19499)
+  readonly property int captureAnnotateDividerHeight: 16
+  readonly property int captureAnnotateDividerLeftX: 236
+  readonly property int captureAnnotateDividerRightX: 436
+  readonly property int captureAnnotateColorX: 248                   // cinco caixas de 32 em x 248, 284, 320, 356 e 392 (13:19489 a 13:19497), y 12
+  readonly property int captureAnnotateColorStep: 36
+  readonly property int captureAnnotateColorSize: 32                 // o círculo do anel da escolhida (raio 16)
+  readonly property int captureAnnotateSwatchSize: 16                // a amostra: círculo de 16 na cor, centrado na caixa
+  readonly property int captureAnnotateRingWidth: 2                  // anel `text` de 2 na cor escolhida (ficha 17: "amostra 16 no círculo 32; selecionada com anel text 2")
+  readonly property int captureAnnotateUndoX: 448                    // IconButton de 32 com `undo-2` em (448,12) (13:19500)
+  readonly property int captureAnnotateCopyX: 524                    // "Copy": ActionButton secundário pequeno, 88×32 em (524,12) (13:19501)
+  readonly property int captureAnnotateSaveX: 620                    // "Save": ActionButton primário pequeno, 88×32 em (620,12) (13:19503)
+  readonly property int captureAnnotateButtonWidth: 88
+  readonly property int captureAnnotateAreaX: 16                     // a área da imagem (13:19505): 688×408 em (16,56), raio radiusRow, borda `border` de 1; atrás da imagem, o próprio vidro
+  readonly property int captureAnnotateAreaY: 56
+  readonly property int captureAnnotateAreaWidth: 688
+  readonly property int captureAnnotateAreaHeight: 408
+  readonly property int captureAnnotateAreaBorder: 1
+  // As marcas, na tela (em pixels da imagem elas valem estes números divididos pela escala da imagem na tela; ver screenshot/Annotate.js).
+  readonly property int captureAnnotatePencilWidth: 3                // lápis: traço livre de 3, pontas redondas; o board não desenha o lápis, e a espessura é a do contorno e da haste (composição, A-05)
+  readonly property int captureAnnotateStrokeWidth: 3                // contorno do retângulo (13:19522) e haste da seta (13:19523)
+  readonly property int captureAnnotateRectRadius: 8                 // raio do retângulo desenhado (13:19522)
+  readonly property int captureAnnotateThickness: 20                 // marca-texto: faixa de 20 de espessura (13:19521)
+  readonly property real captureAnnotateHighlightOpacity: 0.35       // marca-texto a 35% (13:19521)
+  readonly property int captureAnnotateStripRadius: 2                // raio de 2 da faixa do marca-texto (13:19521) e da haste da seta (13:19523): na haste de 3 as pontas ficam redondas
+  readonly property int captureAnnotateHeadSize: 20                  // ponta da seta: o `chevron-right` de 20, centrado na ponta e girado (13:19524)
+  readonly property int captureAnnotateFontSize: 17                  // texto anotado: Geist SemiBold 17 (13:19525)
+  // As cinco cores, na ordem do board: laranja, amarelo, o acento, verde e branco. Cada marca guarda a cor do momento em que foi feita.
+  readonly property var captureAnnotateColors: [attentionText, warning, accentText, successText, text]
+
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.
   // Números e atalhos: Geist Mono.

@@ -1285,6 +1285,47 @@ PanelWindow {
                   Demo.ScreenshotPreviewSpecimen { x: 32; y: 24; mouse: true }
                 }
               }
+
+              SectionBlock {
+                title: "Editor de anotação (ficha 17, estado 5, board 13:19344, nó 13:19481) · peça real com serviço fictício e uma imagem inventada · com o mouse: escolha a ferramenta e a cor e arraste na imagem; Enter e Esc valem com o campo de texto ou o recorte em andamento"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Estado do board (13:19481) · vidro de 720×480, raio 24 · seis ferramentas de 32 em x 12 a 192 (o retângulo selecionado) · divisores em x 236 e 436 · cinco cores em x 248 a 392 (a primeira com o anel) · desfazer em x 448 · \"Copy\" e \"Save\" de 88×32 em x 524 e 620 · área da imagem de 688×408 em (16,56) · as quatro marcas de exemplo: faixa de 20 a 35%, contorno de 3 com raio 8, haste de 3 com a ponta de 20 e o texto SemiBold 17"
+                  stageWidth: 720; stageHeight: 480
+                  Demo.AnnotateSpecimen {}
+                }
+                Specimen {
+                  caption: "Vazio · o lápis e a primeira cor, sem marcas (o desfazer fica no estado desativado)"
+                  stageWidth: 720; stageHeight: 480
+                  Demo.AnnotateSpecimen { scene: "empty" }
+                }
+                Specimen {
+                  caption: "Um traço de lápis (3, pontas redondas) na cor do acento"
+                  stageWidth: 720; stageHeight: 480
+                  Demo.AnnotateSpecimen { scene: "pencil" }
+                }
+                Specimen {
+                  caption: "Texto sendo digitado (composição, A-05) · o campo no tamanho da tela, Geist SemiBold 17 na cor escolhida, com o cursor · Enter confirma, Esc cancela só o texto"
+                  stageWidth: 720; stageHeight: 480
+                  Demo.AnnotateSpecimen { scene: "empty"; tool: "text"; colorIndex: 3; typing: "Look here"; typingX: 420; typingY: 150 }
+                }
+                Specimen {
+                  caption: "Recorte em andamento (composição, A-05) · a borda e o escurecimento por fora da seleção de área da captura, sem as alças · Enter aplica, Esc cancela"
+                  stageWidth: 720; stageHeight: 480
+                  Demo.AnnotateSpecimen { tool: "crop"; cropX: 120; cropY: 90; cropW: 380; cropH: 220 }
+                }
+                Specimen {
+                  caption: "Imagem menor que a área (400×260) · no tamanho natural e centrada, sem ampliar"
+                  stageWidth: 720; stageHeight: 480
+                  Demo.AnnotateSpecimen { scene: "small" }
+                }
+                Specimen {
+                  caption: "Imagem maior que a área (1376×816) · reduzida à metade para caber, sem deformar · as marcas estão em pixels da imagem, com o traço de 3 da tela guardado como 6: o desenho sai igual ao do board"
+                  stageWidth: 720; stageHeight: 480
+                  Demo.AnnotateSpecimen { scene: "large" }
+                }
+              }
             }
 
             // =================================================================

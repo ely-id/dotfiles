@@ -25,7 +25,8 @@ import Quickshell.Io
 // eu vejo congelado é exatamente o que sai, nos três modos. Cada janela registra aqui o recortador do quadro dela (FrameCropper.qml,
 // `registerFrame`), e `grab` faz a conta do recorte em pixels do quadro (Crop.js), grava um PNG num arquivo temporário, copia para a
 // área de transferência (clipboard.py copy-file) e, quando a escolha é a de capturar, entrega o arquivo à prévia (State.qml). A janela
-// só fecha depois de o PNG estar gravado, porque o recorte precisa do quadro vivo. Salvar e anotar continuam sem destino.
+// só fecha depois de o PNG estar gravado, porque o recorte precisa do quadro vivo. Anotar (F6-T14) grava o recorte e abre o editor com ele, sem copiar
+// e sem prévia (AnnotateState.qml); salvar continua sem destino.
 //
 // A regra de ouro da ficha: a captura sempre começa do zero. Nenhuma propriedade abaixo é lida de arquivo nem guardada
 // entre uma abertura e outra: `reset()` devolve tudo ao padrão na abertura e de novo no fechamento, para a próxima vez
@@ -84,12 +85,14 @@ Singleton {
 
   // Os comandos e a entrega à prévia saem por funções que o teste troca. `exec` roda sem esperar (a cópia e a remoção do arquivo
   // antigo; o wl-copy fica vivo em segundo plano servindo a área de transferência), `makeDir` cria a pasta do arquivo e chama
-  // `done(true)` ou `done(false)`, e `deliver` mostra o arquivo na prévia da barra.
+  // `done(true)` ou `done(false)`, `deliver` mostra o arquivo na prévia da barra e `openEditor` o abre no editor de anotação.
   property var exec: argv => Quickshell.execDetached(argv)
   property var makeDir: (dir, done) => {
     makeDirComponent.createObject(root, { command: ["mkdir", "-p", "--", dir], done: done }).running = true;
   }
   property var deliver: (path, outputName) => Screenshot.State.receive(path, outputName)
+  // Abre o editor de anotação com o PNG do recorte (F6-T14).
+  property var openEditor: (path, outputName) => Screenshot.AnnotateState.openFile(path, outputName)
 
   readonly property string helper: decodeURIComponent(Qt.resolvedUrl("clipboard.py").toString().replace(/^file:\/\//, ""))
 
@@ -227,12 +230,13 @@ Singleton {
   }
 
   // As quatro ações da pílula de ações e as escolhas dos modos Window e Screen. Capturar (`capture`, `captureWindow`, `captureScreen`)
-  // grava, copia, mostra na prévia e fecha; copiar (`copySelection`) grava, copia e fecha, sem a prévia. Salvar é a F6-T03 (esperando a
-  // P-15 e a P-16) e anotar a F6-T14: até lá elas só dizem no log que ainda não têm destino, e a janela continua aberta.
-  function copySelection() { grabSelection(false); }
+  // grava, copia, mostra na prévia e fecha; copiar (`copySelection`) grava, copia e fecha, sem a prévia. Anotar (`annotateSelection`, F6-T14) grava o
+  // recorte, fecha a captura e abre o editor com ele, sem copiar e sem a prévia. Salvar é a F6-T03 (esperando a P-15 e a P-16): até lá só diz
+  // no log que ainda não tem destino, e a janela continua aberta.
+  function copySelection() { grabSelection("copy"); }
   function saveSelection() { pending("salvar a área"); }
-  function annotateSelection() { pending("anotar a área"); }
-  function capture() { grabSelection(true); }
+  function annotateSelection() { grabSelection("annotate"); }
+  function capture() { grabSelection("capture"); }
 
   function captureWindow(id) {
     const found = Crop.findWindow(windowSnapshot, id);
@@ -240,21 +244,21 @@ Singleton {
       console.warn("screenshot: a janela " + id + " não está na foto das janelas, ou não tem posição; nada foi capturado");
       return;
     }
-    grab(found.output, found.rect, true);
+    grab(found.output, found.rect, "capture");
   }
 
-  function captureScreen(outputName) { grab(outputName, null, true); }
+  function captureScreen(outputName) { grab(outputName, null, "capture"); }
 
   function pending(action) {
-    console.log("screenshot: " + action + " ainda não tem destino (F6-T03 e T14); nada foi feito");
+    console.log("screenshot: " + action + " ainda não tem destino (F6-T03); nada foi feito");
   }
 
-  function grabSelection(withPreview) {
+  function grabSelection(kind) {
     if (!selection || selecting) {
       console.warn("screenshot: não há área selecionada; nada foi capturado");
       return;
     }
-    grab(selectionOutput, selection, withPreview);
+    grab(selectionOutput, selection, kind);
   }
 
   function registerFrame(outputName, cropper) {
@@ -286,9 +290,10 @@ Singleton {
   }
 
   // Grava o PNG do recorte e entrega. `rect` é um retângulo em pixels lógicos do monitor `outputName`, ou null para o monitor inteiro.
-  // A ordem é: pasta, recorte gravado, cópia, prévia (se `withPreview`), fechar. Se a gravação falhar, fica um aviso no log, a janela
-  // fecha e nada vai para a área de transferência nem para a prévia.
-  function grab(outputName, rect, withPreview) {
+  // `kind` diz o que fazer com o PNG: "capture" grava, copia, mostra na prévia e fecha; "copy" grava, copia e fecha; "annotate" grava, fecha e abre
+  // o editor de anotação com o arquivo, sem copiar e sem a prévia (F6-T14). Se a gravação falhar, fica um aviso no log, a janela fecha e
+  // nada vai para a área de transferência, para a prévia nem para o editor.
+  function grab(outputName, rect, kind) {
     if (phase !== "open" || saving)
       return;
     const cropper = frames[outputName];
@@ -311,15 +316,15 @@ Singleton {
       if (token !== grabToken)
         return;
       if (!made) {
-        finishGrab(token, false, "", outputName, withPreview);
+        finishGrab(token, false, "", outputName, kind);
         return;
       }
       const path = nextFile(dir);
-      cropper.save(pixels, path, ok => finishGrab(token, ok, path, outputName, withPreview));
+      cropper.save(pixels, path, ok => finishGrab(token, ok, path, outputName, kind));
     });
   }
 
-  function finishGrab(token, ok, path, outputName, withPreview) {
+  function finishGrab(token, ok, path, outputName, kind) {
     if (token !== grabToken) {
       // Fechei a captura enquanto ela gravava: o arquivo ficou pronto e sem uso. Apago, para não sobrar na pasta.
       if (ok && path !== "")
@@ -331,14 +336,32 @@ Singleton {
       close();
       return;
     }
-    // Cada captura nova apaga o arquivo da anterior, para não acumular.
+    if (kind === "annotate") {
+      keepFile(path);
+      // Fecho a captura antes de abrir o editor: os dois pedem teclado exclusivo, e o editor não pode nascer com a captura ainda aberta.
+      close();
+      openEditor(path, outputName);
+      return;
+    }
+    deliverFile(path, outputName, kind === "capture");
+    close();
+  }
+
+  // O arquivo `path` é o da captura de agora: cada captura nova apaga o arquivo da anterior, para não acumular. É o único estado que passa de
+  // uma abertura para a outra, e não é de interface.
+  function keepFile(path) {
     if (lastFile !== "" && lastFile !== path)
       exec(["rm", "-f", "--", lastFile]);
     lastFile = path;
+  }
+
+  // Entrega um PNG já gravado: guarda como o arquivo de agora, copia para a área de transferência e, com `withPreview`, mostra na prévia da barra.
+  // O editor de anotação usa o mesmo caminho para entregar a imagem com as marcas.
+  function deliverFile(path, outputName, withPreview) {
+    keepFile(path);
     exec(["python3", helper, "copy-file", path]);
     if (withPreview)
       deliver(path, outputName);
-    close();
   }
 
   function toggleCursor() {

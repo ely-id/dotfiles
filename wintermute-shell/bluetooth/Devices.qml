@@ -34,7 +34,7 @@ Shell.DeviceList {
   footer: root.service.enabled ? footerComponent : null
 
   Component { id: footerComponent; Item {
-    width: Shell.PanelStyle.rowWidth
+    width: Shell.Theme.panelRowWidth
     height: 58
 
     Rectangle {
@@ -44,7 +44,7 @@ Shell.DeviceList {
     }
     Bluetooth.Row {
       y: 14
-      width: Shell.PanelStyle.rowWidth
+      width: Shell.Theme.panelRowWidth
       label: "Search for nearby devices"
       iconName: "bluetooth-searching"
       labelSize: Shell.Theme.fontLabel

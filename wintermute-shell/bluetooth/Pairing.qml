@@ -18,7 +18,7 @@ Item {
   readonly property string codeText: String(prompt.code || "").replace(/^(\d{3})(\d{3})$/, "$1 $2")
   readonly property bool canSubmit: prompt.kind === "pin" ? code.text.length > 0 && code.text.length <= 16
       : prompt.kind === "passkey" ? /^\d{1,6}$/.test(code.text) : true
-  implicitWidth: Shell.PanelStyle.width
+  implicitWidth: Shell.Theme.panelWidth
   implicitHeight: 236
   Shell.PanelBackground {
     anchors.fill: parent

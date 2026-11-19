@@ -18,7 +18,7 @@ DeviceList {
   } }
   deviceDelegate: Component { NetworkRow {
     required property var modelData
-    width: PanelStyle.rowWidth
+    width: Theme.panelRowWidth
     network: modelData
     interactive: root.interactive && !modelData.wired
     onDisconnectClicked: root.service.disconnect()
@@ -36,7 +36,7 @@ DeviceList {
     }
   } }
   footer: Component { Item {
-    width: PanelStyle.rowWidth
+    width: Theme.panelRowWidth
     height: 58
 
     Rectangle {
@@ -46,7 +46,7 @@ DeviceList {
     }
     ListRow {
       y: 14
-      width: PanelStyle.rowWidth
+      width: Theme.panelRowWidth
       title: "Add network"
       iconName: "plus"
       labelSize: Theme.fontLabel

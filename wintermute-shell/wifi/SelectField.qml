@@ -7,8 +7,8 @@ import ".."
 // texto 13 Medium e chevron-down 16 à direita.
 Controls.Button {
   id: root
-  implicitWidth: PanelStyle.fieldWidth
-  implicitHeight: PanelStyle.fieldHeight
+  implicitWidth: Theme.panelFieldWidth
+  implicitHeight: Theme.panelFieldHeight
   hoverEnabled: true
   focusPolicy: Qt.StrongFocus
   leftPadding: 16

@@ -11,6 +11,6 @@ Rectangle {
     GradientStop { position: 1; color: "transparent" }
   }
   Behavior on opacity {
-    NumberAnimation { duration: PanelStyle.controlDuration; easing.type: easingType }
+    NumberAnimation { duration: Theme.controlDuration; easing.type: easingType }
   }
 }

@@ -29,7 +29,7 @@ PanelWindow {
   screen: menuScreen
   visible: presented && !Appearance.State.pickingWallpaper
   color: "transparent"
-  BackgroundEffect.blurRegion: Shell.Theme.translucent ? cardBlur : null
+  BackgroundEffect.blurRegion: cardBlur
   onWidthChanged: cardBlur.changed()
   onHeightChanged: cardBlur.changed()
   Region {

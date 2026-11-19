@@ -14,7 +14,7 @@ Item {
   property bool interactive: true
   signal clicked
 
-  implicitWidth: PanelStyle.rowWidth
+  implicitWidth: Theme.panelRowWidth
   implicitHeight: Theme.audioRowHeight
 
   Rectangle {

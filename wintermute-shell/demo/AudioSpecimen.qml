@@ -6,7 +6,7 @@ import "../audio" as Audio
 Item {
   id: root
   property string tab: "output"
-  implicitWidth: PanelStyle.stackWidth
+  implicitWidth: Theme.cardStackWidth
   implicitHeight: 258
 
   AudioService { id: demoService }

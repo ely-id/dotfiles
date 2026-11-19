@@ -15,7 +15,7 @@ PanelWindow {
   implicitWidth: card.width + 68
   implicitHeight: card.height + 145
   mask: Region { item: card }
-  BackgroundEffect.blurRegion: Shell.Theme.translucent ? card.blurRegion : null
+  BackgroundEffect.blurRegion: card.blurRegion
 
   anchors { left: true; top: true }
   margins {

@@ -81,7 +81,7 @@ wintermute-shell/settings/manual/keybinds.py generate --output ~/.config/niri/cf
 | Caminho | O que guarda |
 |---|---|
 | `shell.qml` | Raiz da shell: instancia o papel de parede, a barra lateral, os pop-ups, a tela de Ajustes e os receptores IPC por monitor |
-| `Theme.qml`, `LegacyColors.qml`, `PanelStyle.qml` | Tokens Armitage, variações de acento, tipografia Geist e camada de compatibilidade com o código de partida |
+| `Theme.qml`, `LegacyColors.qml`, `PanelStyle.qml` | Tokens Armitage, variações de acento e tipografia Geist (inclusive as medidas da pilha de cartões e dos painéis). `LegacyColors.qml`, `PanelStyle.qml` e o bloco de compatibilidade do `Theme.qml` só existem para o menu suspenso dos Ajustes e saem com ele (F6-T17) |
 | `Sidebar.qml`, `BottomControls.qml` | Janela da barra lateral (`WlrLayershell`) e cartão inferior de controles (Wi-Fi, som, ajustes e recolher) |
 | `NiriMsg.qml` | Integração com o Niri (`niri msg event-stream` e soquete IPC): workspaces, janelas, foco e o pedido do launcher pelo "+" do organizador |
 | `Shortcuts.qml` | Receptores IPC de volume, mídia e brilho |

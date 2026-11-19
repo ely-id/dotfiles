@@ -10,7 +10,7 @@ Item {
   property var selection: ({})
   property string phase: "idle"
   property string statusText: ""
-  implicitWidth: PanelStyle.stackWidth
+  implicitWidth: Theme.cardStackWidth
   implicitHeight: 468
 
   WifiService {

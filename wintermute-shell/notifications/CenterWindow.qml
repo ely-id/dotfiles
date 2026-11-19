@@ -29,10 +29,10 @@ PanelWindow {
   screen: bar.screen
   visible: requested || reveal > 0.001
   color: "transparent"
-  BackgroundEffect.blurRegion: Shell.Theme.translucent ? panelBlur : null
+  BackgroundEffect.blurRegion: panelBlur
   Region {
     id: panelBlur
-    item: root.requested && root.reveal > Shell.PanelStyle.blurRevealOpacity ? panel.background : null
+    item: root.requested && root.reveal > Shell.Theme.blurRevealOpacity ? panel.background : null
     radius: panel.background.radius
   }
 

@@ -27,11 +27,11 @@ PanelWindow {
   screen: bar.screen
   visible: requested || reveal > 0.001
   color: "transparent"
-  BackgroundEffect.blurRegion: Shell.Theme.translucent ? toastBlur : null
+  BackgroundEffect.blurRegion: toastBlur
   onRevealChanged: toastBlur.changed()
   Region {
     id: toastBlur
-    item: root.requested && root.reveal > Shell.PanelStyle.blurRevealOpacity ? toastCard.surface : null
+    item: root.requested && root.reveal > Shell.Theme.blurRevealOpacity ? toastCard.surface : null
     radius: toastCard.surface.radius
   }
   implicitWidth: Notifications.Style.interactiveWidth + shadowPadding * 2
@@ -82,7 +82,7 @@ PanelWindow {
     Shell.Shadow {
       anchors.fill: toastCard.surface
       cornerRadius: toastCard.surface.radius
-      shadows: Shell.PanelStyle.frontShadows
+      shadows: Shell.Theme.glassShadows
       z: -1
     }
   }

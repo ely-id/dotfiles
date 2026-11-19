@@ -32,7 +32,7 @@ Rectangle {
   radius: 32
   color: "transparent"
   readonly property Region blurRegion: Region {
-    item: root.enabled && root.parent?.opacity > Shell.PanelStyle.blurRevealOpacity
+    item: root.enabled && root.parent?.opacity > Shell.Theme.blurRevealOpacity
         && root.color.a < 1 ? root : null
     radius: root.radius
   }
@@ -84,7 +84,7 @@ Rectangle {
   }
   Shell.PanelBorder {
     radius: root.radius
-    visible: Shell.Theme.translucent && root.showOutline
+    visible: root.showOutline
     z: 4
   }
   Item { id: overlays; anchors.fill: parent; z: 6 }

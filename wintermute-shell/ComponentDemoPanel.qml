@@ -268,7 +268,7 @@ PanelWindow {
     property var stackController: null
     property bool interactive: false
     property var selection: ({})
-    implicitWidth: PanelStyle.width
+    implicitWidth: Theme.panelWidth
     implicitHeight: 306
 
     Text {
@@ -321,7 +321,7 @@ PanelWindow {
     property var stackController: null
     property bool interactive: false
     property var selection: ({})
-    implicitWidth: PanelStyle.width
+    implicitWidth: Theme.panelWidth
     implicitHeight: 228
 
     Text {
@@ -358,8 +358,8 @@ PanelWindow {
   component StackSpecimen: Item {
     id: stackSpec
     property bool startStacked: false
-    width: PanelStyle.stackWidth
-    height: PanelStyle.frontInsetSingle + 306
+    width: Theme.cardStackWidth
+    height: Theme.cardStackFrontInsetSingle + 306
 
     Component { id: listComponent; StackDemoList {} }
     Component { id: joinComponent; StackDemoJoin {} }
@@ -1616,12 +1616,12 @@ PanelWindow {
 
                 Specimen {
                   caption: "Frente 316 · folga 22 · clique em Casa_Lima para empilhar"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: PanelStyle.frontInsetSingle + 306
+                  stageWidth: Theme.cardStackWidth; stageHeight: Theme.cardStackFrontInsetSingle + 306
                   StackSpecimen {}
                 }
                 Specimen {
                   caption: "Frente 316 sobre verso 284 em (16, 0) · folga 32 · o X volta"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: PanelStyle.frontInsetSingle + 306
+                  stageWidth: Theme.cardStackWidth; stageHeight: Theme.cardStackFrontInsetSingle + 306
                   StackSpecimen { startStacked: true }
                 }
               }
@@ -1632,12 +1632,12 @@ PanelWindow {
 
                 Specimen {
                   caption: "Lista 316×306 · rede conectada, cadeados e rodapé"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 328
+                  stageWidth: Theme.cardStackWidth; stageHeight: 328
                   Demo.WifiSpecimen { page: "drawer"; height: 328 }
                 }
                 Specimen {
                   caption: "Entrar 316×228 · “Conectar” desativado sem senha"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 260
+                  stageWidth: Theme.cardStackWidth; stageHeight: 260
                   Demo.WifiSpecimen {
                     page: "join"; height: 260
                     selection: ({ ssid: "Casa_Lima", locked: true })
@@ -1645,12 +1645,12 @@ PanelWindow {
                 }
                 Specimen {
                   caption: "Adicionar rede 316×436 · SSID em foco"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 468
+                  stageWidth: Theme.cardStackWidth; stageHeight: 468
                   Demo.WifiSpecimen { page: "add"; height: 468 }
                 }
                 Specimen {
                   caption: "Detalhes 316×424 · 6 linhas de 48 com divisor"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 456
+                  stageWidth: Theme.cardStackWidth; stageHeight: 456
                   Demo.WifiSpecimen {
                     page: "details"; height: 456
                     selection: ({ ssid: "Wintermute-5G", bars: 3, uuids: ["demo-1"] })
@@ -1658,7 +1658,7 @@ PanelWindow {
                 }
                 Specimen {
                   caption: "Status 316×112 · conectando"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 144
+                  stageWidth: Theme.cardStackWidth; stageHeight: 144
                   Demo.WifiSpecimen {
                     page: "status"; height: 144
                     phase: "connecting"; statusText: "Connecting to Casa_Lima…"
@@ -1666,7 +1666,7 @@ PanelWindow {
                 }
                 Specimen {
                   caption: "Status · conectado (fecha sozinho em 1,5 s no painel real)"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 144
+                  stageWidth: Theme.cardStackWidth; stageHeight: 144
                   Demo.WifiSpecimen {
                     page: "status"; height: 144
                     phase: "complete"; statusText: "Connected"
@@ -1674,7 +1674,7 @@ PanelWindow {
                 }
                 Specimen {
                   caption: "Status · senha incorreta"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 144
+                  stageWidth: Theme.cardStackWidth; stageHeight: 144
                   Demo.WifiSpecimen {
                     page: "status"; height: 144
                     phase: "failed"; statusText: "Incorrect password"
@@ -1688,34 +1688,34 @@ PanelWindow {
 
                 Specimen {
                   caption: "Lista 316×306 · conectado, bateria, conectando e rodapé"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 328
+                  stageWidth: Theme.cardStackWidth; stageHeight: 328
                   Demo.BluetoothSpecimen { page: "drawer"; height: 328 }
                 }
                 Specimen {
                   caption: "Próximos 316×236 · procurando"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 268
+                  stageWidth: Theme.cardStackWidth; stageHeight: 268
                   Demo.BluetoothSpecimen { page: "nearby"; searching: true; height: 268 }
                 }
                 Specimen {
                   caption: "Pareamento 316×236 · código em Serif 32 accentText"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 268
+                  stageWidth: Theme.cardStackWidth; stageHeight: 268
                   Demo.BluetoothSpecimen { page: "pair"; height: 268 }
                 }
                 Specimen {
                   caption: "Desligado 316×156"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 178
+                  stageWidth: Theme.cardStackWidth; stageHeight: 178
                   Demo.BluetoothSpecimen { page: "drawer"; bluetoothEnabled: false; height: 178 }
                 }
                 Specimen {
                   caption: "Rádio bloqueado 316×156 · a chave desbloqueia ao ligar"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 178
+                  stageWidth: Theme.cardStackWidth; stageHeight: 178
                   Demo.BluetoothSpecimen {
                     page: "drawer"; bluetoothEnabled: false; bluetoothBlocked: true; height: 178
                   }
                 }
                 Specimen {
                   caption: "Rádio bloqueado · erro ao desbloquear (rfkill indisponível)"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 222
+                  stageWidth: Theme.cardStackWidth; stageHeight: 222
                   Demo.BluetoothSpecimen {
                     page: "drawer"; bluetoothEnabled: false; bluetoothBlocked: true; height: 222
                     errorMessage: "Could not unblock Bluetooth: rfkill is not installed"
@@ -1723,7 +1723,7 @@ PanelWindow {
                 }
                 Specimen {
                   caption: "Detalhes · mesmo layout do Wi-Fi"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 380
+                  stageWidth: Theme.cardStackWidth; stageHeight: 380
                   Demo.BluetoothSpecimen { page: "details"; height: 380 }
                 }
               }
@@ -1734,12 +1734,12 @@ PanelWindow {
 
                 Specimen {
                   caption: "Saída 316×236 · slider com o valor na alça"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 258
+                  stageWidth: Theme.cardStackWidth; stageHeight: 258
                   Demo.AudioSpecimen { tab: "output"; height: 258 }
                 }
                 Specimen {
                   caption: "Entrada 316×236"
-                  stageWidth: PanelStyle.stackWidth; stageHeight: 258
+                  stageWidth: Theme.cardStackWidth; stageHeight: 258
                   Demo.AudioSpecimen { tab: "input"; height: 258 }
                 }
               }

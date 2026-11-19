@@ -26,7 +26,7 @@ Item {
   readonly property bool selectedAudioAvailable: selectedTab === "output"
       ? service.hasOutput : service.hasInput
 
-  implicitWidth: PanelStyle.width
+  implicitWidth: Theme.panelWidth
   implicitHeight: 116 + visibleDeviceRows * Theme.audioRowHeight
 
   PanelBackground {
@@ -72,7 +72,7 @@ Item {
       id: volumeSlider
       x: 20
       y: 56
-      width: PanelStyle.fieldWidth
+      width: Theme.panelFieldWidth
       height: 32
       externalValue: root.selectedVolume
       muted: root.selectedTab === "output" && root.service.outputMuted
@@ -101,7 +101,7 @@ Item {
       ScrollWheel { view: deviceList }
       x: 8
       y: 108
-      width: PanelStyle.rowWidth
+      width: Theme.panelRowWidth
       height: parent.height - y - 8
       interactive: root.deviceCount > 4
       model: ScriptModel { values: root.devices }

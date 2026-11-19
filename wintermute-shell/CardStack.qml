@@ -14,8 +14,8 @@ Item {
   signal pagePopping(string page)
   readonly property Region blurRegion: Region {
     Region {
-      item: root.opened && root.opacity > PanelStyle.blurRevealOpacity ? frontBounds : null
-      radius: PanelStyle.radius
+      item: root.opened && root.opacity > Theme.blurRevealOpacity ? frontBounds : null
+      radius: Theme.radiusPanel
     }
     Region {
       item: root.opened && root.depth > 1 ? backBounds : null
@@ -32,8 +32,8 @@ Item {
   property real transitionProgress: 1
   property real transitionFromHeight: 0
   property real transitionToHeight: 0
-  property real transitionFromInset: PanelStyle.frontInsetSingle
-  property real transitionToInset: PanelStyle.frontInsetSingle
+  property real transitionFromInset: Theme.cardStackFrontInsetSingle
+  property real transitionToInset: Theme.cardStackFrontInsetSingle
 
   readonly property int collapseAllDuration: 200
   readonly property int depth: stackModel.count
@@ -53,7 +53,7 @@ Item {
       ? 0.92 + 0.08 * transitionProgress
       : transitionOperation === "pop" ? Math.max(0, 1 - 2 * transitionProgress) : 1
 
-  width: PanelStyle.stackWidth
+  width: Theme.cardStackWidth
   height: transitionRunning
       ? Theme.lerp(transitionFromHeight, transitionToHeight,
                    transitionProgress)
@@ -65,7 +65,7 @@ Item {
 
   Behavior on opacity {
     NumberAnimation {
-      duration: root.opened ? PanelStyle.openDuration
+      duration: root.opened ? Theme.panelOpenDuration
                             : root.collapseAllDuration
       easing.type: root.opened ? Easing.InOutCubic : Easing.Bezier
       easing.bezierCurve: [0.19, 1, 0.22, 1, 1, 1]
@@ -73,7 +73,7 @@ Item {
   }
   Behavior on scale {
     NumberAnimation {
-      duration: root.opened ? PanelStyle.openDuration
+      duration: root.opened ? Theme.panelOpenDuration
                             : root.collapseAllDuration
       easing.type: root.opened ? Easing.InOutCubic : Easing.Bezier
       easing.bezierCurve: [0.19, 1, 0.22, 1, 1, 1]
@@ -86,7 +86,7 @@ Item {
   }
 
   function insetForDepth(cardDepth) {
-    return cardDepth > 1 ? PanelStyle.frontInsetStacked : PanelStyle.frontInsetSingle;
+    return cardDepth > 1 ? Theme.cardStackFrontInsetStacked : Theme.cardStackFrontInsetSingle;
   }
 
   function open() {
@@ -193,16 +193,16 @@ Item {
   Item {
     id: frontBounds
     y: root.frontInset
-    width: PanelStyle.width
+    width: Theme.panelWidth
     height: root.height - y
   }
   Item {
     id: backBounds
     readonly property var card: root.depth > 1 ? layerRepeater.itemAt(root.depth - 2) : null
-    readonly property real radius: PanelStyle.radius
-    x: card ? card.x : PanelStyle.backOffsetX
-    y: card ? card.y : PanelStyle.backOffsetY
-    width: card ? card.width : PanelStyle.backWidth
+    readonly property real radius: Theme.radiusPanel
+    x: card ? card.x : Theme.panelBackOffset
+    y: card ? card.y : Theme.cardStackBackOffsetY
+    width: card ? card.width : Theme.panelBackWidth
     height: card ? card.height : 0
   }
 
@@ -231,11 +231,11 @@ Item {
       stackController: root
       interactive: !root.transitionRunning && relativeIndex === 0
 
-      x: PanelStyle.backOffsetX * backingAmount
+      x: Theme.panelBackOffset * backingAmount
       y: Theme.lerp(pushBack ? root.transitionFromInset
           : popBack ? root.transitionToInset : root.frontInset,
-          PanelStyle.backOffsetY, backingAmount)
-      width: Theme.lerp(PanelStyle.width, PanelStyle.backWidth, backingAmount)
+          Theme.cardStackBackOffsetY, backingAmount)
+      width: Theme.lerp(Theme.panelWidth, Theme.panelBackWidth, backingAmount)
       // A carta de trás fica rente à base do cartão da frente (como na origem); o
       // conteúdo que passa disso é cortado. No Figma ela mantém a altura natural e
       // aparece abaixo da frente: pendência P-40.
@@ -255,8 +255,8 @@ Item {
 
   PanelCloseButton {
     z: 100
-    x: PanelStyle.closeButtonX
-    y: root.frontInset - PanelStyle.closeButtonOverhang
+    x: Theme.cardStackCloseButtonX
+    y: root.frontInset - Theme.cardStackCloseButtonOverhang
     enabled: !root.transitionRunning
     onClicked: root.pop()
   }
@@ -267,7 +267,7 @@ Item {
     property: "transitionProgress"
     from: 0
     to: 1
-    duration: PanelStyle.pageDuration
+    duration: Theme.pageDuration
     easing.type: Easing.Bezier
     easing.bezierCurve: [0.19, 1, 0.22, 1, 1, 1]
     onFinished: root.finishTransition()

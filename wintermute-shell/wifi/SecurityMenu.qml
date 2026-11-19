@@ -38,7 +38,7 @@ Item {
     });
   }
 
-  implicitWidth: PanelStyle.fieldWidth
+  implicitWidth: Theme.panelFieldWidth
   implicitHeight: Math.min(272, options.length * 40 + 16)
   visible: root.open || root.opacity > 0.001
   enabled: root.open

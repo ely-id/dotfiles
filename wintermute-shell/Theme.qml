@@ -183,6 +183,24 @@ Singleton {
       + workspaceGridMinimumRows * workspaceControlSize
       + (workspaceGridMinimumRows - 1) * workspaceRowGap
 
+  // Pilha de cartões e painéis (ficha 05, board 13:13604; vale também para Bluetooth e Som).
+  // Cartão da frente 316 (panelWidth); carta de trás 284 (panelBackWidth) em (16, 0)
+  // (panelBackOffset, cardStackBackOffsetY), raio radiusPanel, conteúdo a 50% com blur 8.
+  // A folga acima da frente é 22 sem verso e 32 com verso; o botão fechar de 40×40 fica
+  // pendurado em (296, folga − 20), então a pilha inteira tem 336 de largura.
+  readonly property int cardStackWidth: 336
+  readonly property int cardStackFrontInsetSingle: 22
+  readonly property int cardStackFrontInsetStacked: 32
+  readonly property int cardStackBackOffsetY: 0
+  readonly property real cardStackBackContentOpacity: 0.5
+  readonly property real cardStackBackContentBlur: 8
+  readonly property int cardStackCloseButtonX: 296
+  readonly property int cardStackCloseButtonOverhang: 20
+  // Divisor do cabeçalho do cartão: (20, 60), 276×1.
+  readonly property real cardStackHeaderDividerX: 20
+  readonly property real cardStackHeaderDividerY: 60
+  readonly property real cardStackHeaderDividerWidth: 276
+
   // Painéis (Pond PanelStyle.qml:41-47, com o vidro Armitage)
   readonly property int panelWidth: 316
   readonly property int panelBackWidth: 284

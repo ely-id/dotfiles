@@ -13,15 +13,15 @@ Item {
   property alias selectedTab: soundCard.selectedTab
   readonly property int closeAllDuration: 200
   readonly property Region blurRegion: Region {
-    item: root.opened && root.opacity > PanelStyle.blurRevealOpacity ? soundCard : null
-    radius: PanelStyle.radius
+    item: root.opened && root.opacity > Theme.blurRevealOpacity ? soundCard : null
+    radius: Theme.radiusPanel
   }
   onXChanged: blurRegion.changed()
   onYChanged: blurRegion.changed()
   onScaleChanged: blurRegion.changed()
 
-  width: PanelStyle.stackWidth
-  height: soundCard.implicitHeight + PanelStyle.frontInsetSingle
+  width: Theme.cardStackWidth
+  height: soundCard.implicitHeight + Theme.cardStackFrontInsetSingle
   visible: opened || closeCleanup.running
   opacity: opened ? 1 : 0
   scale: opened ? 1 : 0.9
@@ -37,7 +37,7 @@ Item {
 
   Behavior on opacity {
     NumberAnimation {
-      duration: root.opened ? PanelStyle.openDuration
+      duration: root.opened ? Theme.panelOpenDuration
                             : root.closeAllDuration
       easing.type: root.opened ? Easing.InOutCubic : Easing.Bezier
       easing.bezierCurve: [0.19, 1, 0.22, 1, 1, 1]
@@ -46,7 +46,7 @@ Item {
 
   Behavior on scale {
     NumberAnimation {
-      duration: root.opened ? PanelStyle.openDuration
+      duration: root.opened ? Theme.panelOpenDuration
                             : root.closeAllDuration
       easing.type: root.opened ? Easing.InOutCubic : Easing.Bezier
       easing.bezierCurve: [0.19, 1, 0.22, 1, 1, 1]
@@ -61,16 +61,16 @@ Item {
 
   Devices {
     id: soundCard
-    y: PanelStyle.frontInsetSingle
-    width: PanelStyle.width
+    y: Theme.cardStackFrontInsetSingle
+    width: Theme.panelWidth
     height: root.height - y
     service: root.service
     interactive: root.opened
   }
 
   PanelCloseButton {
-    x: PanelStyle.closeButtonX
-    y: PanelStyle.frontInsetSingle - PanelStyle.closeButtonOverhang
+    x: Theme.cardStackCloseButtonX
+    y: Theme.cardStackFrontInsetSingle - Theme.cardStackCloseButtonOverhang
     enabled: root.opened
     onClicked: root.closeAll()
   }

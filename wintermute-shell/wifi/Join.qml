@@ -6,7 +6,7 @@ import ".."
 // Redes empresariais usam o formulário rolável, a partir de y 72.
 Item {
   id: root
-  readonly property bool headerDividerVisible: !optionsMenu.visible || optionsMenu.y > PanelStyle.headerDividerY
+  readonly property bool headerDividerVisible: !optionsMenu.visible || optionsMenu.y > Theme.cardStackHeaderDividerY
   property var stackController
   property var selection: ({})
   property bool interactive: true
@@ -15,7 +15,7 @@ Item {
   readonly property bool isEnterprise: selection.enterprise === true
   readonly property bool canConnect: isEnterprise ? enterprise.complete : password.text.length > 0
 
-  implicitWidth: PanelStyle.width
+  implicitWidth: Theme.panelWidth
   implicitHeight: isEnterprise ? connectButton.y + connectButton.height + 20 : 228
 
   function focusEditor() {
@@ -40,7 +40,7 @@ Item {
     enabled: root.interactive && !root.dropdownOpen
     opacity: root.dropdownOpen ? 0.2 : 1
     Behavior on opacity {
-      NumberAnimation { duration: PanelStyle.controlDuration }
+      NumberAnimation { duration: Theme.controlDuration }
     }
 
     Text {

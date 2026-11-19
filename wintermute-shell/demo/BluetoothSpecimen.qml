@@ -14,7 +14,7 @@ Item {
   // ao abrir, então escrevo depois da abertura em vez de ligar a propriedade.
   property string errorMessage: ""
   property bool searching: false
-  implicitWidth: PanelStyle.stackWidth
+  implicitWidth: Theme.cardStackWidth
   implicitHeight: 400
 
   BluetoothService {

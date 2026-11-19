@@ -16,7 +16,7 @@ Item {
   readonly property bool failed: service.phase === "failed"
   readonly property color statusColor: failed ? Theme.dangerText
       : connecting ? Theme.text : Theme.successText
-  implicitWidth: PanelStyle.width
+  implicitWidth: Theme.panelWidth
   implicitHeight: 112
 
   PanelBackground {

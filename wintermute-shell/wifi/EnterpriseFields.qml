@@ -29,7 +29,7 @@ Column {
   signal accepted()
   signal fieldFocused(var field)
 
-  width: PanelStyle.fieldWidth
+  width: Theme.panelFieldWidth
   spacing: 12
 
   function select(setting, mode) {
@@ -48,7 +48,7 @@ Column {
 
   component FormRow: Column {
     property string label
-    width: PanelStyle.fieldWidth
+    width: Theme.panelFieldWidth
     spacing: 8
     Text {
       text: parent.label

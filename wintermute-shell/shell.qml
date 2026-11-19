@@ -195,7 +195,7 @@ ShellRoot {
       Wallpaper.Window {
         screen: modelData
         custom: placed.custom
-        dimmed: Theme.translucent
+        dimmed: true
         imageSource: placed.url
       }
       Sidebar {

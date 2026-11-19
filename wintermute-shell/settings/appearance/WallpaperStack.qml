@@ -8,17 +8,17 @@ import ".." as Settings
 import "../.." as Shell
 
 // O seletor de papel de parede e o cartão Customize, empilhados como as páginas do Wi-Fi (F4-T24, P-67;
-// ficha 05, seção "Pilha", e CardStack.qml). Não tem board: composição pela regra A-05, com os tokens do
-// PanelStyle e nada novo. É a página `wallpaper` e a página `customize` dos Ajustes ao mesmo tempo (a
+// ficha 05, seção "Pilha", e CardStack.qml). Não tem board: composição pela regra A-05, com os tokens
+// `Theme.cardStack*` e `Theme.panel*` e nada novo. É a página `wallpaper` e a página `customize` dos Ajustes ao mesmo tempo (a
 // Window carrega este componente nas duas), para o seletor ficar vivo atrás do cartão e a rolagem não se
 // perder; `customizing` diz se o cartão está na frente.
 //
 // Sem o cartão, o seletor ocupa tudo e é idêntico ao WallpaperPicker sozinho. Com ele, o cartão (580) entra
-// na frente e o seletor vira a carta de trás: na escala original, cortado em 548 (580 − 2 × backOffsetX, a
+// na frente e o seletor vira a carta de trás: na escala original, cortado em 548 (580 − 2 × panelBackOffset, a
 // 16 de cada lado da frente), com o conteúdo a 50% e desfocado em 8 (inclusive no trecho de 32 acima da
 // frente), e o raio, o vidro e o contorno do modal. A carta de trás tem a altura do conjunto, então a base
 // dela fica rente à da frente. O conteúdo fica à esquerda, como no CardLayer, e o que passa da carta é cortado.
-// A transição é a do CardStack: PanelStyle.pageDuration e a mesma curva; a frente entra de escala 0,92 para 1
+// A transição é a do CardStack: Theme.pageDuration e a mesma curva; a frente entra de escala 0,92 para 1
 // com a opacidade de 0 a 1 e sai com a escala max(0, 1 − 2 × progresso); a carta de trás interpola a
 // largura (624 a 548), a posição, a opacidade do conteúdo, o desfoque e a altura do conjunto.
 FocusScope {
@@ -36,10 +36,10 @@ FocusScope {
   // 0 com o seletor sozinho, 1 com o cartão na frente.
   property real progress: customizing ? 1 : 0
   readonly property bool sliding: slide.running
-  readonly property real frontInset: Shell.PanelStyle.frontInsetStacked
+  readonly property real frontInset: Shell.Theme.cardStackFrontInsetStacked
   readonly property real frontX: (width - Shell.Theme.settingsModalWidth) / 2
   // A carta de trás encolhe até 548: a frente menos o recuo de 16 de cada lado.
-  readonly property real backWidthStacked: Shell.Theme.settingsModalWidth - 2 * Shell.PanelStyle.backOffsetX
+  readonly property real backWidthStacked: Shell.Theme.settingsModalWidth - 2 * Shell.Theme.panelBackOffset
   // As duas páginas, para quem hospeda a pilha (a vitrine e a bancada).
   readonly property Item pickerPage: picker
   readonly property Item customizePage: card
@@ -51,7 +51,7 @@ FocusScope {
   Behavior on progress {
     NumberAnimation {
       id: slide
-      duration: Shell.PanelStyle.pageDuration
+      duration: Shell.Theme.pageDuration
       easing.type: Easing.Bezier
       easing.bezierCurve: [0.19, 1, 0.22, 1, 1, 1]
     }
@@ -59,7 +59,7 @@ FocusScope {
 
   // A área de blur cobre a frente e a carta de trás, como o `Region` do CardStack. O Window lê esta
   // propriedade do item carregado.
-  readonly property bool blurReady: root.enabled && (root.parent?.opacity ?? 1) > Shell.PanelStyle.blurRevealOpacity
+  readonly property bool blurReady: root.enabled && (root.parent?.opacity ?? 1) > Shell.Theme.blurRevealOpacity
   readonly property Region blurRegion: Region {
     Region {
       item: root.blurReady && root.progress > 0.001 ? frontBounds : null
@@ -99,7 +99,7 @@ FocusScope {
   // fechar) é cortado no raio, apagado e desfocado conforme o progresso.
   Item {
     id: back
-    x: Shell.Theme.lerp(0, root.frontX + Shell.PanelStyle.backOffsetX, root.progress)
+    x: Shell.Theme.lerp(0, root.frontX + Shell.Theme.panelBackOffset, root.progress)
     y: 0
     width: Shell.Theme.lerp(root.width, root.backWidthStacked, root.progress)
     height: root.height
@@ -113,12 +113,12 @@ FocusScope {
       Item {
         id: backContent
         anchors.fill: parent
-        opacity: Shell.Theme.lerp(1, Shell.PanelStyle.backContentOpacity, root.progress)
+        opacity: Shell.Theme.lerp(1, Shell.Theme.cardStackBackContentOpacity, root.progress)
         layer.enabled: root.progress > 0
         layer.effect: MultiEffect {
           autoPaddingEnabled: false
           blurEnabled: true
-          blurMax: Shell.PanelStyle.backContentBlur
+          blurMax: Shell.Theme.cardStackBackContentBlur
           blur: root.progress
         }
 
@@ -136,7 +136,6 @@ FocusScope {
     }
     Shell.PanelBorder {
       radius: Shell.Theme.radiusModal
-      visible: Shell.Theme.translucent
       z: 4
     }
     // Com o cartão na frente, clique na carta de trás não chega ao fundo que fecha os Ajustes.

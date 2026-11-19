@@ -24,7 +24,7 @@ Item {
   property real listTop: 64
   property real listBottomPadding: 0
   readonly property alias contentY: deviceList.contentY
-  implicitWidth: PanelStyle.width
+  implicitWidth: Theme.panelWidth
   implicitHeight: viewportHeight + (message !== "" ? 44 : 0)
 
   PanelBackground {
@@ -72,7 +72,7 @@ Item {
       clip: true
       boundsBehavior: Flickable.StopAtBounds
       ScrollWheel { view: deviceList }
-      x: 8; y: root.listTop; width: PanelStyle.rowWidth
+      x: 8; y: root.listTop; width: Theme.panelRowWidth
       height: root.viewportHeight - y - root.listBottomPadding
       model: ScriptModel { values: root.devices; objectProp: root.deviceKey }
       delegate: root.deviceDelegate

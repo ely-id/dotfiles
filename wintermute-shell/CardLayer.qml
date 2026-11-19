@@ -17,7 +17,7 @@ Item {
   readonly property real naturalHeight: cardLoader.item
       ? cardLoader.item.implicitHeight : 0
   readonly property bool ready: cardLoader.status === Loader.Ready
-  readonly property real dividerY: cardLoader.item?.headerDividerY ?? PanelStyle.headerDividerY
+  readonly property real dividerY: cardLoader.item?.headerDividerY ?? Theme.cardStackHeaderDividerY
   readonly property bool hasHeaderDivider: cardLoader.item?.headerDividerVisible ?? true
 
   clip: false
@@ -45,18 +45,18 @@ Item {
     Item {
       id: content
       anchors.fill: parent
-      opacity: Theme.lerp(1, PanelStyle.backContentOpacity, root.backingAmount)
+      opacity: Theme.lerp(1, Theme.cardStackBackContentOpacity, root.backingAmount)
       layer.enabled: root.backingAmount > 0
       layer.effect: MultiEffect {
         autoPaddingEnabled: false
         blurEnabled: true
-        blurMax: PanelStyle.backContentBlur
+        blurMax: Theme.cardStackBackContentBlur
         blur: root.backingAmount
       }
 
       Loader {
         id: cardLoader
-        width: PanelStyle.width
+        width: Theme.panelWidth
         height: item ? item.implicitHeight : 0
         sourceComponent: root.cardComponent
         enabled: root.interactive
@@ -68,9 +68,9 @@ Item {
 
       // O divisor do cabeçalho: (20, 60), 276×1. Some quando um menu cobre o cabeçalho.
       Rectangle {
-        x: PanelStyle.headerDividerX
+        x: Theme.cardStackHeaderDividerX
         y: root.dividerY
-        width: PanelStyle.headerDividerWidth
+        width: Theme.cardStackHeaderDividerWidth
         height: 1
         z: 2
         visible: root.hasHeaderDivider

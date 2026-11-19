@@ -21,7 +21,7 @@ Item {
   signal primaryClicked
   signal secondaryClicked
   readonly property real buttonsY: height - 56
-  implicitWidth: PanelStyle.width
+  implicitWidth: Theme.panelWidth
   implicitHeight: 130 + detailRows.length * 49 + (message ? 40 : 0)
 
   PanelBackground {

@@ -41,7 +41,7 @@ Item {
     PanelWindow {
       screen: root.screen
       color: "transparent"
-      BackgroundEffect.blurRegion: Theme.translucent ? indicator.blurRegion : null
+      BackgroundEffect.blurRegion: indicator.blurRegion
       implicitWidth: Theme.sidebarCardExpandedWidth + (root.collapsed ? 134 : 0)
       implicitHeight: root.collapsed ? 67 + 36 + 40 : 36
       anchors { left: true; bottom: true }

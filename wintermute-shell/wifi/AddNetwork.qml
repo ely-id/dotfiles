@@ -6,7 +6,7 @@ import ".."
 // desativado até dar para conectar. Redes empresariais usam o formulário rolável.
 Item {
   id: root
-  readonly property bool headerDividerVisible: !securityMenu.visible || securityMenu.y > PanelStyle.headerDividerY
+  readonly property bool headerDividerVisible: !securityMenu.visible || securityMenu.y > Theme.cardStackHeaderDividerY
   property var stackController
   property bool interactive: true
   property var menu: ({})
@@ -20,7 +20,7 @@ Item {
   readonly property bool canConnect: networkName.text.length > 0
       && (isEnterprise ? enterprise.complete : !needsPassword || password.text.length > 0)
 
-  implicitWidth: PanelStyle.width
+  implicitWidth: Theme.panelWidth
   implicitHeight: connectButton.y + connectButton.height + 20
   onSecurityModeChanged: form.contentY = 0
   // A ficha mostra o campo do SSID já em foco.
@@ -44,7 +44,7 @@ Item {
     enabled: root.interactive && !root.dropdownOpen
     opacity: root.dropdownOpen ? 0.2 : 1
     Behavior on opacity {
-      NumberAnimation { duration: PanelStyle.controlDuration }
+      NumberAnimation { duration: Theme.controlDuration }
     }
 
     Text {

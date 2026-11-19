@@ -8,6 +8,10 @@ import Quickshell
 // `opened`, `mode`, `showCursor`, `delaySeconds` e `pointerOutput`; o IPC `screenshot` do shell.qml e o chip "Screenshot" do
 // launcher chamam `open`, `close` e `toggle`. A prévia pós-captura tem outro estado (State.qml) e não passa por aqui.
 //
+// A seleção de área (F6-T11) mora aqui, e não na peça, para as janelas de todos os monitores a verem: `selection` é um
+// retângulo { x, y, width, height } em pixels lógicos do monitor `selectionOutput` (ou null), e `selecting` diz que ele
+// ainda está sendo arrastado. Quem desenha e quem arrasta é a peça (Capture.qml); as contas são do Selection.js.
+//
 // A regra de ouro da ficha: a captura sempre começa do zero. Nenhuma propriedade abaixo é lida de arquivo nem guardada
 // entre uma abertura e outra: `reset()` devolve tudo ao padrão na abertura e de novo no fechamento, para a próxima vez
 // não herdar o modo, o cursor, o atraso nem o monitor da anterior.
@@ -30,6 +34,11 @@ Singleton {
   property bool showCursor: false
   // O atraso antes de capturar, em segundos. Sempre 0 ao abrir; o seletor é a F6-T03.
   property int delaySeconds: 0
+  // A área selecionada no modo Area (null: nenhuma), o monitor em que ela nasceu (ela fica presa a ele) e se o ponteiro
+  // ainda a está arrastando (sem alças nem ações enquanto arrasta). Sempre vazia ao abrir, como o resto.
+  property var selection: null
+  property string selectionOutput: ""
+  property bool selecting: false
   // O monitor em que o ponteiro está agora. Só a janela dele mostra a mira, a dica e a barra, e recebe o teclado.
   property string pointerOutput: ""
   // Os monitores cujo quadro já chegou.
@@ -56,12 +65,13 @@ Singleton {
     onTriggered: root.fail()
   }
 
-  // Volta ao padrão de toda abertura (F6-T02): modo Area, cursor desligado, atraso 0 s, nenhum quadro recebido.
+  // Volta ao padrão de toda abertura (F6-T02): modo Area, cursor desligado, atraso 0 s, nenhum quadro recebido, nenhuma seleção.
   function reset() {
     mode = "area";
     showCursor = false;
     delaySeconds = 0;
     readyOutputs = [];
+    clearSelection();
   }
 
   // Abre a captura no monitor `outputName`. `afterClose` é verdadeiro quando o launcher ou os Ajustes estavam abertos e
@@ -111,6 +121,12 @@ Singleton {
       close();
   }
 
+  // Sair do modo Area apaga a seleção: ela só existe nele.
+  onModeChanged: {
+    if (mode !== "area")
+      clearSelection();
+  }
+
   function setMode(newMode) {
     if (modes.indexOf(newMode) >= 0)
       mode = newMode;
@@ -119,6 +135,30 @@ Singleton {
   // Espaço: Area, Window, Screen e de volta a Area.
   function nextMode() {
     mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+  }
+
+  // A seleção passou a ser `rect` no monitor `outputName`; `dragging` diz que o ponteiro ainda a arrasta.
+  function setSelection(outputName, rect, dragging) {
+    selection = rect;
+    selectionOutput = outputName;
+    selecting = !!dragging;
+  }
+
+  function clearSelection() {
+    selection = null;
+    selectionOutput = "";
+    selecting = false;
+  }
+
+  // As quatro ações da pílula de ações. Capturar e copiar são a F6-T13, salvar a F6-T03 (esperando a P-15 e a P-16) e anotar
+  // a F6-T14: até lá elas só dizem no log que ainda não têm destino, e a janela continua aberta.
+  function copySelection() { pending("copiar"); }
+  function saveSelection() { pending("salvar"); }
+  function annotateSelection() { pending("anotar"); }
+  function capture() { pending("capturar"); }
+
+  function pending(action) {
+    console.log("screenshot: " + action + " a área ainda não tem destino (F6-T03, T13 e T14); nada foi feito");
   }
 
   function toggleCursor() {

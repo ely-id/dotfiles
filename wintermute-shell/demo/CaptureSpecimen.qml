@@ -13,7 +13,12 @@ import "../screenshot" as Screenshot
 //               Com o ponto sobre a barra ou sobre a dica (ex.: 420,396), a mira e as coordenadas somem, como na shell
 //   hoverMode   o modo sob o ponteiro (0 a 2), para fixar o hover; -1 o ponteiro de verdade
 //   follow      o ponto acompanha o ponteiro do mouse no palco (padrão: não, para os prints saírem fixos)
-// As teclas valem com o palco em foco: Espaço troca o modo, Esc só conta o pedido de fechar.
+//   selX, selY, selW, selH  a seleção de área, em pixels do palco (selW 0: sem seleção). A do board é 200, 104, 320, 200
+//   selecting   a seleção ainda está sendo arrastada (sem as alças e sem a pílula de ações)
+//   hoverAction o botão da pílula de ações sob o ponteiro ("copy", "save" ou "annotate"; o board mostra o de anotar)
+//   stageWidth  a largura do palco (padrão 720, a do board); só para mostrar a seleção encostada na direita sem a barra por cima
+// Com o mouse: apertar e arrastar cria a seleção, por dentro a move, uma alça a redimensiona, por fora começa outra.
+// As teclas valem com o palco em foco: Espaço troca o modo, Esc só conta o pedido de fechar, Enter chama capture().
 Item {
   id: root
 
@@ -23,8 +28,15 @@ Item {
   property bool showCursor: false
   property int hoverMode: -1
   property bool follow: false
+  property real selX: 0
+  property real selY: 0
+  property real selW: 0
+  property real selH: 0
+  property bool selecting: false
+  property string hoverAction: ""
+  property int stageWidth: 720
 
-  implicitWidth: 720
+  implicitWidth: stageWidth
   implicitHeight: 450
   // Como no board (overflow clip) e como um monitor: o que passa do palco, a pílula e as sombras, não aparece.
   clip: true
@@ -40,6 +52,8 @@ Item {
     id: demoService
     mode: root.mode
     showCursor: root.showCursor
+    selection: root.selW > 0 ? ({ x: root.selX, y: root.selY, width: root.selW, height: root.selH }) : null
+    selecting: root.selecting
   }
 
   // O fundo fictício: o linear de 155,5° de rgb(7,8,11) a rgb(16,19,28) do board da lupa e duas janelas de aplicativo.
@@ -117,6 +131,7 @@ Item {
     anchors.fill: parent
     service: demoService
     hoverMode: root.hoverMode
+    hoverAction: root.hoverAction
     pointX: root.pointX
     pointY: root.pointY
   }

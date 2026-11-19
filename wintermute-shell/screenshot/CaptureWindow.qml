@@ -7,10 +7,12 @@ import Quickshell.Wayland
 
 // Janela da captura de tela (ficha 17), uma por tela, no padrão da janela da lupa (launcher/LoupeWindow.qml): camada de
 // sobreposição na tela inteira. Enquanto `CaptureState.opened`, mostra o quadro capturado do monitor (o `ScreencopyView`,
-// uma captura só, sem o cursor) e por cima a peça (Capture.qml): o véu de 30%, a mira, a dica e a barra de modos.
+// uma captura só, sem o cursor) e por cima a peça (Capture.qml): o véu, a mira, a dica, a barra de modos e a seleção.
 //
 // O teclado é exclusivo só na janela do monitor em que o ponteiro está (`CaptureState.pointerOutput`); com vários
-// monitores o foco acompanha o ponteiro. A mira, as coordenadas, a dica e a barra só aparecem nesse mesmo monitor.
+// monitores o foco acompanha o ponteiro. A mira, as coordenadas, a dica e a barra só aparecem nesse mesmo monitor. A seleção
+// de área (F6-T11) é um estado só, no CaptureState, preso ao monitor em que começou: a peça de cada janela só a desenha se
+// o nome do monitor for o dela.
 PanelWindow {
   id: root
 
@@ -74,6 +76,7 @@ PanelWindow {
         anchors.fill: parent
         visible: frame.hasContent
         service: Screenshot.CaptureState
+        outputName: root.outputName
         active: root.here
         pointerSeen: false
         // Os pixels do quadro, não os lógicos: com escala no monitor o quadro tem mais pixels que a tela.
@@ -81,11 +84,12 @@ PanelWindow {
         frameHeight: frame.sourceSize.height
       }
 
-      // O ponteiro: o do sistema fica invisível sobre a área de captura (a mira faz o papel dele) e volta ao normal sobre a
-      // dica e a barra. É um HoverHandler, e não uma MouseArea, para a barra por cima continuar recebendo os cliques.
+      // O ponteiro: sem seleção o do sistema fica invisível sobre a área de captura (a mira faz o papel dele) e volta ao normal
+      // sobre a dica e a barra; com seleção a peça escolhe a seta de mover, as de redimensionar ou a cruz (Capture.cursorShape).
+      // É um HoverHandler, e não uma MouseArea, para a barra por cima continuar recebendo os cliques.
       HoverHandler {
         id: pointer
-        cursorShape: capture.overUi ? Qt.ArrowCursor : Qt.BlankCursor
+        cursorShape: capture.cursorShape
 
         onPointChanged: {
           Screenshot.CaptureState.pointerOutput = root.outputName;

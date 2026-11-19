@@ -549,6 +549,34 @@ Singleton {
   readonly property int captureCloseX: 444                          // IconButton de 40 com `x` em (444,8)
   readonly property int captureButtonSize: 40
 
+  // Seleção de área (F6-T11, estado "Selecionando uma área", nó 13:19401). A seleção do board tem 320×200 em (200,104) no palco de 720×450.
+  readonly property color captureSelectionScrim: Qt.rgba(0, 0, 0, 0.45)  // escurecimento por fora: preto a 45% nos quatro lados da seleção (13:19417 a 13:19420); dentro, a imagem limpa
+  readonly property int captureSelectionBorder: 1                   // borda de 1 px `accent`, por dentro do retângulo (13:19421)
+  readonly property int captureHandleSize: 8                        // oito alças de 8×8, raio 2, `knob` com borda `accent` de 1 (13:19422 a 13:19429)
+  readonly property int captureHandleRadius: 2
+  readonly property int captureHandleBorder: 1
+  // Área que responde ao arraste de cada alça: um quadrado de 16 centrado nela, o dobro do desenho de 8 (4 de cada lado, uma casa da grade de 4).
+  // O board só desenha as alças; a área é composição (A-05), porque 8×8 é pequeno demais para o ponteiro. Em seleção pequena ela encolhe (Selection.js).
+  readonly property int captureHandleHit: 16
+  // Menos que isto, num eixo, soltar não cria seleção: o tamanho de uma alça.
+  readonly property int captureSelectionMinSize: captureHandleSize
+  readonly property int captureSizeHeight: 24                       // pílula de tamanho (13:19430): vidro pequeno de 24, raio 8, Geist Mono Medium 11 `text`, centrado
+  readonly property int captureSizeRadius: 8
+  readonly property int captureSizeGap: 8                           // 8 entre a seleção e a pílula (no board ela termina em y 96 e a seleção começa em 104)
+  // Recuo de cada lado do texto. No board a pílula tem 88 com "320 × 200", que mede 60 em Geist Mono Medium 11 (TextMetrics.width, mesma medida da pílula de
+  // coordenadas; o avanço do texto é 59,34). Recuo = (88 − 60) / 2 = 14.
+  readonly property int captureSizePaddingX: 14
+  readonly property int captureActionsWidth: 208                    // pílula de ações (13:19432): vidro de 208×48, raio 14, sem o brilho do acento
+  readonly property int captureActionsHeight: 48
+  readonly property int captureActionsRadius: 14
+  readonly property int captureActionsGap: 8                        // 8 entre a seleção e a pílula (a pílula começa em y 312 e a seleção termina em 304); por dentro, 8 do canto
+  readonly property int captureActionsEdge: 8                       // na horizontal a pílula fica a pelo menos 8 das bordas do monitor (composição, A-05)
+  readonly property int captureActionsPadding: 8                    // tudo na pílula começa em y 8; o primeiro botão, em x 8
+  readonly property int captureActionsButtonSize: 32                // três IconButton de 32 (raio radiusIconButton32, ícone de 16) em x 8, 44 e 80
+  readonly property int captureActionsButtonStep: 36                // 32 de botão e 4 de folga
+  readonly property int captureActionsPrimaryX: 116                 // "Capture": ActionButton primário pequeno de 84×32 em (116,8), raio 8, fundo `accent`, texto Geist Medium 13 `textOnAccent`
+  readonly property int captureActionsPrimaryWidth: 84
+
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.
   // Números e atalhos: Geist Mono.

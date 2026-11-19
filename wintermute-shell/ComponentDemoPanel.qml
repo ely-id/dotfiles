@@ -1177,6 +1177,42 @@ PanelWindow {
                   Demo.CaptureSpecimen { mode: "screen" }
                 }
               }
+
+              SectionBlock {
+                title: "Seleção de área (ficha 17, board 13:19344, estado \"Selecionando uma área\" 13:19401) · peça real com serviço fictício · com o mouse: apertar e arrastar cria, por dentro move, uma alça redimensiona, por fora começa outra, e Enter chama Capture"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Seleção do board, solta · 320×200 em (200,104) · escurecimento de 45% só por fora · borda de 1 no acento · oito alças de 8×8 · pílula de tamanho 88×24 em (200,72) · pílula de ações 208×48 em (312,312) com hover no botão de anotar"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { selX: 200; selY: 104; selW: 320; selH: 200; hoverAction: "annotate" }
+                }
+                Specimen {
+                  caption: "Arrastando · sem as alças e sem a pílula de ações; a pílula de tamanho acompanha"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { selX: 120; selY: 90; selW: 250; selH: 140; selecting: true }
+                }
+                Specimen {
+                  caption: "Perto do topo (a 20) · a pílula de tamanho vai para dentro, a 8 do canto de cima à esquerda"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { selX: 200; selY: 20; selW: 320; selH: 200 }
+                }
+                Specimen {
+                  caption: "Perto da base · embaixo a pílula de ações encostaria na barra e vai para cima, alinhada à direita, a 8"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { selX: 160; selY: 150; selW: 400; selH: 190 }
+                }
+                Specimen {
+                  caption: "Encostada na direita e na base (palco de 1000) · embaixo não cabe e em cima cobriria a pílula de tamanho · a pílula de ações vai para dentro, a 8 do canto de baixo à direita"
+                  stageWidth: 1000; stageHeight: 450
+                  Demo.CaptureSpecimen { stageWidth: 1000; selX: 720; selY: 250; selW: 280; selH: 200 }
+                }
+                Specimen {
+                  caption: "Encostada na direita e na base, no palco de 720 · a pílula de ações por dentro cai sobre a barra (composição, A-05; no monitor real a barra fica longe do canto)"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { selX: 440; selY: 250; selW: 280; selH: 200 }
+                }
+              }
             }
 
             // =================================================================

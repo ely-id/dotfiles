@@ -31,6 +31,7 @@ Settings.Modal {
         : Appearance.State.brightnessAvailable ? "" : Appearance.State.brightnessError
     onThemeSelected: key => Appearance.State.selectTheme(key)
     onWallpaperRequested: Settings.State.openPage("wallpaper")
+    onDisplayRequested: Settings.State.openPage("display")
     onAppsDarkToggled: dark => Appearance.State.setAppsDark(dark)
     onAppsAutomaticToggled: automatic => Appearance.State.setAppsAutomatic(automatic)
     onBrightnessToggled: Appearance.State.toggleSection("brightness")

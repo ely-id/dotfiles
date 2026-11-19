@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import ".."
 import "../settings" as Settings
+import "Actions.js" as Actions
 import "Calculator.js" as Calculator
 import "Colors.js" as Colors
 import "Search.js" as Search
@@ -17,7 +18,9 @@ import Quickshell.Io
 // alvo da linha (`row.target`). O cálculo (F5-T03) depende só do texto, então `calculation`, o modo e o rodapé saem dele.
 // As ferramentas do estado vazio (F5-T04) são fixas. O seletor de cor (F5-T08) abre uma página própria,
 // `page === "color"`, com a cor mais recente do histórico; as outras (F5-T09 e a F6) ainda não existem, então
-// `openTool` só registra no log para elas.
+// `openTool` só registra no log para elas. O menu "Actions" (F5-T05, Ctrl+K) é outra página, `page === "actions"`: as ações do
+// item que estava selecionado (a conta mora em Actions.js) e, para "Open on workspace…", uma segunda camada com os
+// workspaces do monitor.
 Singleton {
   id: root
 
@@ -60,8 +63,8 @@ Singleton {
   // Enquanto não for null, o modo cálculo ocupa o launcher inteiro.
   readonly property var calculation: Calculator.describe(query, decimalSeparator)
 
-  // A página aberta no lugar da busca: "" (a busca) ou "color" (o resultado do seletor de cor). Abrir o launcher
-  // sempre começa na busca.
+  // A página aberta no lugar da busca: "" (a busca), "color" (o resultado do seletor de cor) ou "actions" (o menu de
+  // ações do item selecionado). Abrir o launcher sempre começa na busca.
   property string page: ""
 
   // ---- Fontes de resultado (F5-T02) ----
@@ -110,6 +113,10 @@ Singleton {
   // resposta e a busca as filtra de novo). Se não têm nada, mantenho as seções como estavam até a resposta chegar: o
   // "Nothing found" nunca aparece com a busca de arquivos em andamento e some um instante depois.
   function applySections() {
+    // Com o menu de ações aberto a lista fica como estava, para a seleção de antes valer quando eu voltar (uma resposta
+    // tardia do `fd` não mexe nela); `closeActions` publica o que chegou nesse meio-tempo.
+    if (page === "actions")
+      return;
     const next = candidateSections;
     if (Search.countRows(next) === 0 && searching)
       return;
@@ -126,8 +133,9 @@ Singleton {
       armedKey = "";
   }
 
-  // O texto que vai para o `fd`: só na busca de texto (sem cálculo, sem página).
-  readonly property string filesText: page === "" && !calculation ? String(query).trim() : ""
+  // O texto que vai para o `fd`: só na busca de texto (sem cálculo). O menu de ações mantém o texto, senão a resposta de
+  // arquivos sumiria e a lista de antes não voltaria igual.
+  readonly property string filesText: (page === "" || page === "actions") && !calculation ? String(query).trim() : ""
 
   FileSearch {
     id: files
@@ -164,6 +172,12 @@ Singleton {
     recentsFile.setText(Search.serializeRecents(recentIds));
   }
 
+  // "Remove from recent": tira o app da lista e grava o arquivo.
+  function forgetApp(id) {
+    recentIds = Search.dropRecent(recentIds, id);
+    recentsFile.setText(Search.serializeRecents(recentIds));
+  }
+
   // O comando de cada ação de sessão. Lock, Sleep, Restart e Power off passam pelo settings/session.py, como a tela
   // inicial dos Ajustes (que usa a janela dos Ajustes para fechar, o que não serve aqui); "Log out" sai do Niri, e a
   // confirmação já foi a do launcher.
@@ -188,17 +202,23 @@ Singleton {
     }
   }
 
-  readonly property string mode: page === "color" ? "color" : calculation ? "calculator" : "launcher"
-  readonly property string modeLabel: page === "color" ? "Color picker" : calculation ? "Calculator" : "Launcher"
-  readonly property string modeIcon: page === "color" ? "pipette" : calculation ? "calculator" : "sparkles"
+  // O menu de ações é do launcher, mesmo quando o item é um cálculo: o modo do rodapé não muda.
+  readonly property bool calculating: calculation !== null && page !== "actions"
+  readonly property string mode: page === "color" ? "color" : calculating ? "calculator" : "launcher"
+  readonly property string modeLabel: page === "color" ? "Color picker" : calculating ? "Calculator" : "Launcher"
+  readonly property string modeIcon: page === "color" ? "pipette" : calculating ? "calculator" : "sparkles"
   // Ícone do cabeçalho de busca.
   readonly property string searchIcon: calculation ? "calculator" : "search"
-  // Ações do rodapé: { label, keys, primary }. No cálculo só "Copy"; o "Paste" (Ctrl+↵) ficou de fora (P-71).
+  // Ações do rodapé: { label, keys, primary }. No cálculo "Copy" e "Actions"; o "Paste" (Ctrl+↵) ficou de fora (P-71).
   readonly property var actions: page === "color" ? [
     { label: "Copy HEX", keys: ["↵"], primary: true },
     { label: "Pick another", keys: ["P"], primary: false }
+  ] : page === "actions" ? [
+    { label: "Run", keys: ["↵"], primary: true },
+    { label: "Back", keys: ["Esc"], primary: false }
   ] : calculation ? [
-    { label: "Copy", keys: ["↵"], primary: true }
+    { label: "Copy", keys: ["↵"], primary: true },
+    { label: "Actions", keys: ["Ctrl", "K"], primary: false }
   ] : [
     { label: "Open", keys: ["↵"], primary: true },
     { label: "Actions", keys: ["Ctrl", "K"], primary: false }
@@ -375,6 +395,9 @@ Singleton {
     colorCopied = "";
     colorShown = null;
     page = "";
+    actionsItem = null;
+    actionsLevel = "actions";
+    actionsWorkspaces = [];
     if (query !== "")
       setQuery("");
   }
@@ -401,6 +424,13 @@ Singleton {
   // página no monitor do launcher; um comando roda (o perigoso só no segundo Enter). Tudo fecha o launcher, menos
   // o primeiro Enter do comando perigoso.
   function activate(row) {
+    if (page === "actions" && row)
+      activateAction(row);
+    else
+      activateTarget(row);
+  }
+
+  function activateTarget(row) {
     if (!row) {
       close();
       return;
@@ -437,5 +467,126 @@ Singleton {
     pendingCommand = commandArgv(row.target.action);
     commandDelay.restart();
     close();
+  }
+
+  // ---- Menu de ações (F5-T05, P-13) ----
+  // O menu é uma subpágina do launcher, como a do seletor de cor, e não um menu por cima dele: o launcher muda de altura
+  // com a lista, e um menu flutuante não teria onde caber. As ações de cada tipo de item são a conta de Actions.js.
+  // Duas camadas: as ações do item e, em "Open on workspace…", os workspaces do monitor do launcher.
+  // A linha que estava selecionada quando apertei Ctrl+K.
+  property var actionsItem: null
+  // "actions" (as ações do item) ou "workspaces" (a escolha do workspace do app).
+  property string actionsLevel: "actions"
+  // As linhas da segunda camada, tiradas do organizador quando ela abre.
+  property var actionsWorkspaces: []
+  // 0 fora do menu, 1 nas ações, 2 na escolha do workspace. O Panel guarda a seleção de cada camada por aqui.
+  readonly property int actionsDepth: page !== "actions" ? 0 : actionsLevel === "workspaces" ? 2 : 1
+  readonly property string actionsTitle: Actions.itemTitle(actionsItem, calculation)
+  // Uma seção só, no formato de `sections`. A linha do comando perigoso armado mostra a confirmação no detalhe.
+  readonly property var actionSections: page !== "actions" ? [] : decorate([{
+    label: actionsLevel === "workspaces" ? "Open on workspace" : "Actions",
+    rows: actionsLevel === "workspaces" ? actionsWorkspaces : Actions.rowsFor(actionsItem, recentIds, calculation)
+  }], armedKey)
+
+  // As linhas do organizador (NiriMsg.workspaceRows) como lista simples. O teste troca por dados fictícios.
+  property var workspaceEntries: () => {
+    const entries = [];
+    const model = NiriMsg.workspaceRows;
+    for (let i = 0; i < model.count; i++) {
+      const row = model.get(i);
+      entries.push({
+        outputName: row.outputName,
+        workspaceId: row.workspaceId,
+        sidebarWorkspaceNumber: row.sidebarWorkspaceNumber,
+        sidebarRowOrdinal: row.sidebarRowOrdinal
+      });
+    }
+    return entries;
+  }
+
+  // Foca o workspace pelo id e chama `done(true)` quando o Niri aceitou, ou `done(false)`. É o mesmo foco que o "+" do
+  // organizador faz, sem pedir o launcher de novo no fim. O teste troca por uma função que só anota.
+  property var focusWorkspace: (workspaceId, done) => NiriMsg.focusWorkspaceId(workspaceId, done)
+  // Há um pedido de foco no ar: um segundo Enter não manda outro.
+  property bool focusPending: false
+
+  // Ctrl+K numa linha da lista: abre as ações dela. Só vale na lista e com a linha tendo ação; devolve se abriu. O comando
+  // perigoso armado desarma, porque a página recomeça do zero.
+  function openActions(row) {
+    if (page !== "" || Actions.rowsFor(row, recentIds, calculation).length === 0)
+      return false;
+    armedKey = "";
+    actionsItem = row;
+    actionsLevel = "actions";
+    actionsWorkspaces = [];
+    page = "actions";
+    return true;
+  }
+
+  // Volta à lista, com o texto de antes. A seleção de antes é do Panel, que a guardou ao entrar.
+  function closeActions() {
+    if (page !== "actions")
+      return;
+    armedKey = "";
+    page = "";
+    actionsItem = null;
+    actionsLevel = "actions";
+    actionsWorkspaces = [];
+    applySections();
+  }
+
+  // Esc, Backspace e o botão de voltar: um passo. Na escolha do workspace volta às ações do app; nas ações, à lista.
+  function backActions() {
+    if (page !== "actions")
+      return;
+    if (actionsLevel === "workspaces") {
+      actionsLevel = "actions";
+      actionsWorkspaces = [];
+      return;
+    }
+    closeActions();
+  }
+
+  // Enter ou clique numa linha do menu. "Open" e "Run" valem o Enter na linha original (a linha carrega o alvo dela), e as
+  // de copiar valem a linha do cálculo (a linha carrega o texto): `activateTarget` cuida das duas.
+  function activateAction(row) {
+    if (row.act === "workspaces") {
+      actionsWorkspaces = Actions.workspaceRows(workspaceEntries(), outputName);
+      actionsLevel = "workspaces";
+    } else if (row.act === "remove-recent") {
+      forgetApp(actionsItem.target.id);
+      // O launcher continua aberto, na lista de antes.
+      closeActions();
+    } else if (row.act === "show-folder") {
+      exec(["xdg-open", Actions.parentDirectory(actionsItem.target.path)]);
+      close();
+    } else if (row.act === "pick-workspace") {
+      pickWorkspace(row.workspaceId);
+    } else {
+      activateTarget(row);
+    }
+  }
+
+  // Foca o workspace e, dando certo, executa o app, grava nos recentes e fecha. Se o Niri recusar, o menu fica como está.
+  // O pedido só vale enquanto eu continuo na camada dos workspaces em que o fiz: se voltei para as ações, voltei para a lista
+  // ou fechei o launcher antes da resposta, o pedido perdeu o sentido e o app não é executado (o foco que o Niri já deu
+  // fica, porque eu não desfaço). `actionsWorkspaces` é uma lista nova a cada vez que a camada abre, então compará-la
+  // também recusa a resposta de um pedido antigo se eu saí e entrei de novo na camada.
+  function pickWorkspace(workspaceId) {
+    const item = actionsItem;
+    if (!item || focusPending)
+      return;
+    const layer = actionsWorkspaces;
+    focusPending = true;
+    focusWorkspace(workspaceId, success => {
+      focusPending = false;
+      if (!success) {
+        console.warn("launcher: não consegui focar o workspace", workspaceId);
+        return;
+      }
+      if (opened && page === "actions" && actionsLevel === "workspaces" && actionsWorkspaces === layer
+          && actionsItem === item)
+        activateTarget(item);
+    });
   }
 }

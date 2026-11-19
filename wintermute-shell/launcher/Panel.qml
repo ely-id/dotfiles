@@ -11,10 +11,14 @@ import ".."
 // Medidas no quadro do launcher: o primeiro rótulo em y 64, cada linha de 44 logo abaixo do rótulo, o rótulo
 // seguinte 8 abaixo da última linha do grupo e o divisor do rodapé 4 abaixo da última linha (P-68).
 //
-// Cinco formas. A página do seletor de cor (`service.page`, F5-T08) tira a busca e a lista de cena e vale por si; as
-// outras quatro são escolhidas pelo texto da busca (`plan.kind`):
+// Seis formas. A página do seletor de cor (`service.page`, F5-T08) tira a busca e a lista de cena e vale por si; a do
+// menu de ações (F5-T05) tira só a busca; as outras quatro são escolhidas pelo texto da busca (`plan.kind`):
 //   color  `service.page === "color"`: o cabeçalho de busca vira voltar e título, o corpo é o resultado do seletor de cor
 //          (ColorPage.qml) e o divisor do rodapé fica fixo em y 432, com 476 de altura no total, sem rolar.
+//   actions `service.page === "actions"` (Ctrl+K numa linha): o cabeçalho de busca vira voltar e o nome do item
+//          (ActionsHeader.qml) e a lista é a de `service.actionSections`, com o rótulo em y 64, uma linha por ação a partir
+//          de y 88 e o divisor do rodapé 4 abaixo da última, como em toda lista. ↑↓ andam, Enter roda, Esc, Backspace, o
+//          botão de voltar e Ctrl+K voltam à busca com o texto e a seleção de antes (guardados em `savedSelection`).
 //   calc   `service.calculation` não nulo: o launcher inteiro é o cálculo, com o rótulo "Calculator" em y 64, o
 //          cartão de 128 logo abaixo e, 16 depois dele, as linhas de ação sem rótulo. As seções não aparecem.
 //   empty  busca vazia: "Recent" (as linhas de `service.recents`) e "Tools" (a fila de chips de `service.tools`),
@@ -48,7 +52,8 @@ Item {
 
   // Posições absolutas (no quadro) de cada rótulo e de cada linha, e do divisor do rodapé.
   readonly property var plan: buildPlan(service.page, service.sections, service.calculation,
-      String(service.query).trim(), service.recents, service.tools, service.fallbackRows, service.searching)
+      String(service.query).trim(), service.recents, service.tools, service.fallbackRows, service.searching,
+      service.actionSections)
   readonly property int rowCount: plan.rows.length
   readonly property int chipCount: plan.chips ? plan.chips.items.length : 0
   readonly property real listTop: Theme.launcherSearchHeight + Theme.launcherDividerHeight
@@ -62,7 +67,7 @@ Item {
   width: implicitWidth
   height: implicitHeight
 
-  function buildPlan(page, sections, calculation, query, recents, tools, fallbackRows, searching) {
+  function buildPlan(page, sections, calculation, query, recents, tools, fallbackRows, searching, actionSections) {
     if (page === "color") {
       return { kind: "color", labels: [], rows: [], card: null, chips: null, notice: null,
           footerY: Theme.launcherColorFooterY };
@@ -76,7 +81,11 @@ Item {
     let notice = null;
     let kind = "list";
     let footerY = -1;
-    if (calculation) {
+    if (page === "actions") {
+      // As ações do item entram como uma seção comum: rótulo em y 64 e as linhas a partir de y 88.
+      kind = "actions";
+      sections = actionSections;
+    } else if (calculation) {
       kind = "calc";
       labels.push({ text: "Calculator", y: y });
       y += Theme.launcherLabelHeight;
@@ -140,10 +149,12 @@ Item {
     };
   }
 
-  // O foco do teclado: no campo de busca, ou, na página do seletor de cor (que não tem campo), na própria página.
+  // O foco do teclado: no campo de busca, ou, nas páginas sem campo (seletor de cor e ações), na própria página.
   function focusCurrent() {
     if (plan.kind === "color")
       colorPage.forceActiveFocus(Qt.OtherFocusReason);
+    else if (plan.kind === "actions")
+      actionsHeader.forceActiveFocus(Qt.OtherFocusReason);
     else
       search.focusEditor();
   }
@@ -183,10 +194,100 @@ Item {
     chipIndex = Math.max(0, Math.min(chipCount - 1, chipIndex + delta));
   }
 
+  // Ctrl+K: as ações da linha selecionada. Com um chip em foco ou sem linha (a lista vazia, o "sem resultado" sem
+  // ações) não faz nada, e o serviço também recusa a linha que não tem ação.
+  function openActions() {
+    if (chipIndex >= 0)
+      return;
+    const entry = plan.rows[selected];
+    if (!entry)
+      return;
+    savedSelection[0] = { index: selected, key: rowIdentity(entry.row) };
+    service.openActions(entry.row);
+  }
+
+  // A camada do menu que a seleção atual vale (0 a lista, 1 as ações, 2 os workspaces) e a seleção de cada camada que
+  // deixei para trás: { index, key }, o índice e a identidade da linha (`rowIdentity`). Ao descer uma camada a primeira
+  // ação entra selecionada; ao voltar, a linha de antes. Guardo a linha na hora do pedido (Ctrl+K, Enter ou clique), e
+  // não quando a camada muda, porque o plano novo pode encolher a lista e empurrar a seleção antes de eu olhar.
+  // `shownDepth` não é uma ligação com o serviço: ele só muda em `followDepth`, para eu ver a diferença.
+  property int shownDepth: 0
+  property var savedSelection: []
+  // A camada cuja seleção ainda estou repondo, ou -1. Ver `followDepth`.
+  property int restoreDepth: -1
+  Component.onCompleted: shownDepth = service.actionsDepth || 0
+
+  // O que identifica uma linha de um plano para o outro: o alvo dela (tipo mais id, caminho, página ou ação), o texto de
+  // `copy` na linha do cálculo, ou a ação do menu (mais o workspace, na segunda camada). "" se a linha não tem nada disso.
+  function rowIdentity(row) {
+    if (!row)
+      return "";
+    if (row.act)
+      return "act:" + row.act + ":" + (row.workspaceId !== undefined ? row.workspaceId : "");
+    if (row.copy !== undefined)
+      return "copy:" + row.copy;
+    const target = row.target;
+    if (!target)
+      return "";
+    if (target.type === "app")
+      return "app:" + target.id;
+    if (target.type === "file")
+      return "file:" + target.path;
+    if (target.type === "setting")
+      return "setting:" + target.page;
+    if (target.type === "command")
+      return "command:" + target.action;
+    return "";
+  }
+
+  // Seleciona a linha guardada da camada que estou repondo. A seleção segue a linha, e não o índice: se a lista mudou
+  // enquanto o menu estava aberto (a resposta do `fd` que chegou nesse meio-tempo, um recente que removi), procuro a
+  // linha onde ela está agora. Se ela não existe mais, vale o índice de antes, limitado à última linha.
+  function applyRestore() {
+    if (restoreDepth < 0)
+      return;
+    // Ao voltar para a lista o plano pode ainda ser o do menu; o `onPlanChanged` repõe quando ele chegar.
+    if (restoreDepth === 0 && plan.kind === "actions")
+      return;
+    const saved = savedSelection[restoreDepth] || { index: 0, key: "" };
+    const found = saved.key === "" ? -1 : plan.rows.findIndex(entry => rowIdentity(entry.row) === saved.key);
+    selected = found >= 0 ? found : Math.max(0, Math.min(saved.index, rowCount - 1));
+  }
+
+  // A volta de uma camada acontece em passos seguidos (o serviço troca a página, depois publica a lista, que pode ter
+  // outro tamanho), e o plano se refaz entre eles. Por isso repor a seleção não é um ajuste único: aplico agora, de novo a
+  // cada plano novo e uma última vez no turno seguinte, quando tudo já assentou.
+  function followDepth() {
+    const depth = service.actionsDepth || 0;
+    if (depth === shownDepth)
+      return;
+    const descending = depth > shownDepth;
+    shownDepth = depth;
+    if (descending) {
+      restoreDepth = -1;
+      selected = 0;
+    } else {
+      restoreDepth = depth;
+      applyRestore();
+      Qt.callLater(finishRestore);
+    }
+    // O plano novo ainda não tem a altura nova; o ajuste de rolagem espera o turno seguinte.
+    Qt.callLater(ensureVisible);
+  }
+
+  function finishRestore() {
+    applyRestore();
+    restoreDepth = -1;
+  }
+
   function activateIndex(index) {
     const entry = plan.rows[index];
-    if (entry)
-      service.activate(entry.row);
+    if (!entry)
+      return;
+    // Dentro do menu, "Open on workspace…" desce uma camada: a volta cai na linha que o pedi.
+    if (shownDepth > 0)
+      savedSelection[shownDepth] = { index: index, key: rowIdentity(entry.row) };
+    service.activate(entry.row);
   }
 
   function openChip(index) {
@@ -249,7 +350,10 @@ Item {
     ensureVisible();
     reportSelection();
   }
-  onPlanChanged: reportSelection()
+  onPlanChanged: {
+    applyRestore();
+    reportSelection();
+  }
   onRowCountChanged: {
     if (selected > rowCount - 1)
       selected = Math.max(0, rowCount - 1);
@@ -272,6 +376,10 @@ Item {
     function onPageChanged() {
       Qt.callLater(root.focusCurrent);
     }
+    // Entrar no menu, descer para os workspaces ou voltar: a seleção acompanha.
+    function onActionsDepthChanged() {
+      root.followDepth();
+    }
   }
 
   GlassSurface {
@@ -286,7 +394,7 @@ Item {
 
     Launcher.SearchField {
       id: search
-      visible: root.plan.kind !== "color"
+      visible: root.plan.kind !== "color" && root.plan.kind !== "actions"
       width: parent.width
       text: root.service.query
       // Sem sugestão fantasma no modo cálculo.
@@ -302,10 +410,23 @@ Item {
       onRightPressed: root.moveChip(1)
       onAccepted: root.activateCurrent()
       onEscapePressed: root.service.close()
+      onActionsPressed: root.openActions()
       onTabPressed: {
         root.service.acceptGhost();
         search.moveCursorToEnd();
       }
+    }
+
+    Launcher.ActionsHeader {
+      id: actionsHeader
+      visible: root.plan.kind === "actions"
+      width: parent.width
+      title: root.service.actionsTitle || ""
+      onUpPressed: root.moveUp()
+      onDownPressed: root.moveDown()
+      onAccepted: root.activateCurrent()
+      onBackRequested: root.service.backActions()
+      onMenuRequested: root.service.closeActions()
     }
 
     Rectangle {

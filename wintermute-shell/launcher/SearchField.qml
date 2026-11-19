@@ -29,6 +29,7 @@ Item {
   signal rightPressed
   signal tabPressed
   signal escapePressed
+  signal actionsPressed
 
   readonly property bool cursorShown: editor.activeFocus || forceCursor
   readonly property bool cursorAtEnd: editor.cursorPosition === editor.length
@@ -131,10 +132,12 @@ Item {
       }
       Keys.onTabPressed: event => { root.tabPressed(); event.accepted = true; }
       Keys.onEscapePressed: event => { root.escapePressed(); event.accepted = true; }
-      // Ctrl+K abre o menu de ações na F5-T05; por enquanto só impeço o Qt de apagar até o fim da linha.
+      // Ctrl+K abre o menu de ações (F5-T05). Aceito o evento também para o Qt não apagar até o fim da linha.
       Keys.onPressed: event => {
-        if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_K)
+        if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_K) {
+          root.actionsPressed();
           event.accepted = true;
+        }
       }
     }
 

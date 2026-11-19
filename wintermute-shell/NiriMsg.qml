@@ -54,6 +54,15 @@ Singleton {
     });
   }
 
+  // Foca um workspace pelo id e avisa quando o Niri respondeu: `done(true)` se aceitou, `done(false)` se recusou, se o
+  // workspace não existe ou se já há um movimento em andamento. É o foco do "+", sem pedir o launcher no fim; o menu
+  // de ações do launcher usa em "Open on workspace…".
+  function focusWorkspaceId(workspaceId, done) {
+    const workspace = workspaces.find(workspace => workspace.id === workspaceId);
+    if (!workspace || !_move(workspace.isFocused ? [] : [{ FocusWorkspace: { reference: { Id: workspaceId } } }], done))
+      done(false);
+  }
+
   function moveWindow(id, workspaceId, slot, done) {
     const actions = _windowMoveActions(id, workspaceId, slot);
     return actions !== null && _move(actions, done);

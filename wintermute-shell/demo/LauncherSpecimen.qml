@@ -8,7 +8,10 @@ import "../launcher" as Launcher
 //            linhas), "typing" (busca "ter" com a sugestão "minal"), "grouped" (busca "no", quatro
 //            seções), "confirm" (o mesmo, com o comando perigoso armado: selecione a linha 5), "calc" (a busca é
 //            `expression`; o cálculo ocupa o launcher) ou "color" (a página de resultado do seletor de cor: #3FA9D9
-//            "pega agora" no Firefox e o histórico do board)
+//            "pega agora" no Firefox e o histórico do board), "actions-app", "actions-file", "actions-command",
+//            "actions-command-armed", "actions-workspaces" ou "actions-calc" (o menu de ações, Ctrl+K: as ações do app
+//            "Notes", do arquivo "meeting-notes.md", do comando "Power off now" sem e com a confirmação armada, a escolha
+//            do workspace do "Notes" e o cálculo; a busca é a do "grouped", ou `expression` no cálculo)
 //   selected índice da linha selecionada, contando as linhas de todas as seções
 //   hovered  índice da linha sob o ponteiro, ou -1
 //   chip     chip das ferramentas com o foco do teclado, ou -1 (com um chip em foco nenhuma linha fica selecionada)

@@ -939,7 +939,7 @@ PanelWindow {
                   Demo.LauncherSpecimen { state: "confirm"; selected: 5 }
                 }
                 Specimen {
-                  caption: "Cálculo 640×368 · busca 128*3.5+12 · cartão 624×128 em (8,88) · Copy result selecionada e In hexadecimal · rodapé só com Copy ↵"
+                  caption: "Cálculo 640×368 · busca 128*3.5+12 · cartão 624×128 em (8,88) · Copy result selecionada e In hexadecimal · rodapé com Copy ↵ e Actions Ctrl K"
                   stageWidth: 640; stageHeight: 368
                   Demo.LauncherSpecimen { state: "calc"; selected: 0 }
                 }
@@ -982,6 +982,42 @@ PanelWindow {
                   caption: "Sem resultado sem as linhas de ação (o que o serviço de verdade oferece por enquanto, P-73) 640×240 · divisor em 196"
                   stageWidth: 640; stageHeight: 240
                   Demo.LauncherSpecimen { state: "no-result-bare" }
+                }
+              }
+
+              SectionBlock {
+                title: "Menu de ações (Ctrl+K, ficha 14, F5-T05; P-13) · composição sem board (A-05) · peça real com serviço fictício"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Ações do app 640×268 · voltar de 32 em (12,12) · nome do item em Geist Regular 17 na caixa do campo · \"Actions\" em y 64 · Open, Open on workspace… e Remove from recent em 88, 132 e 176 · divisor do rodapé em 224 · Run ↵ e Back Esc"
+                  stageWidth: 640; stageHeight: 268
+                  Demo.LauncherSpecimen { state: "actions-app"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Ações do arquivo 640×268 · Open, Show in folder e Copy path · segunda ação selecionada, terceira em hover"
+                  stageWidth: 640; stageHeight: 268
+                  Demo.LauncherSpecimen { state: "actions-file"; selected: 1; hovered: 2 }
+                }
+                Specimen {
+                  caption: "Ação do comando perigoso 640×180 · uma linha só, Run, com o ícone em dangerText · o primeiro Enter arma"
+                  stageWidth: 640; stageHeight: 180
+                  Demo.LauncherSpecimen { state: "actions-command"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Run armado 640×180 · depois do primeiro Enter o detalhe vira \"Press ↵ again to confirm\" · o segundo roda; voltar desarma"
+                  stageWidth: 640; stageHeight: 180
+                  Demo.LauncherSpecimen { state: "actions-command-armed"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Open on workspace… 640×312 · o cabeçalho continua com o nome do app · uma linha por workspace do monitor, com o número do organizador (a quarta, a linha de criação, vale pela posição) · Esc volta às ações do app"
+                  stageWidth: 640; stageHeight: 312
+                  Demo.LauncherSpecimen { state: "actions-workspaces"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Ações do cálculo 640×224 · o cabeçalho traz a expressão formatada · Copy result e Copy hexadecimal"
+                  stageWidth: 640; stageHeight: 224
+                  Demo.LauncherSpecimen { state: "actions-calc"; selected: 0 }
                 }
               }
 

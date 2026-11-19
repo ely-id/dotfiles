@@ -195,6 +195,11 @@ function pushRecent(ids, id, max) {
   return [id].concat((ids || []).filter(other => other !== id)).slice(0, max || RECENTS_KEPT);
 }
 
+// O id sai da lista ("Remove from recent"); os outros ficam na mesma ordem.
+function dropRecent(ids, id) {
+  return (ids || []).filter(other => other !== id);
+}
+
 // Os apps do estado vazio: os `shown` primeiros ids que ainda existem como app instalado. `appsById` mapeia id para linha.
 function recentRows(ids, appsById, shown) {
   const rows = [];

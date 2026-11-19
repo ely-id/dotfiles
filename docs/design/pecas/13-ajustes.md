@@ -118,7 +118,7 @@ Linhas com seta: Mouse e touchpad, Bloqueio e suspensão, Idioma do teclado. O F
   - Super+Shift+/: lista de atalhos do Niri (`show-hotkey-overlay`), que sai do Super+Shift+Escape para dar lugar ao atalho de emergência (P-45, 2026-11-16). No `keybinds.kdl` a tecla se escreve `Mod+Shift+Slash`.
   - Super+L: tela de bloqueio.
   - Capturas: Super+Shift+1, 2 e 3, como anotei no arquivo (hoje Ctrl+Shift+1, 2 e 3).
-  - A área de transferência ainda não tem atalho; entra na lista quando a F6 definir.
+  - Super+V: histórico da área de transferência (F6-T16, 2026-11-19). Abre o launcher direto na página do histórico, e com ela aberta fecha.
 - Os textos da lista ficam em inglês (decisão 0012). Posso trocar os binds depois, então eles ficam num único arquivo (`F4-T07`). Desde a `F4-T07` (2026-11-17, decisão 0015) esse arquivo é o `wintermute-shell/settings/manual/shortcuts.json`: cada atalho tem a tecla do Niri, a descrição e a ação; o Manual deriva dele as teclas que mostra e o `keybinds.py`, ao lado, gera o bloco `binds { }` do Niri.
 - Abre sozinho na primeira vez (`shell.qml:55-65`). Botão “Entendi” primário 440×40.
 - Conferido no Figma em 2026-11-17 (`F4-T05`, board `13:16155`, modal `13:16158`), o que esta ficha não dizia:

@@ -30,8 +30,8 @@
 
 ## A CONFIRMAR
 
-- ~~Política de retenção (quantos itens, quanto tempo).~~ Respondida na P-17 (2026-11-19): 50 itens, só na sessão, sem gravar em disco; os itens que o gerenciador de senhas marca como sigilosos não entram. O **teto de memória das imagens** continua em aberto: a `F6-T16` implementa uma proposta e a anota numa pendência que não trava.
-- ~~Onde fica “Limpar tudo” na UI.~~ Respondida na P-17: “Clear history” fica no menu de ações (Ctrl+K). O menu e a ação são da `F6-T16`; esta página ainda não tem o Ctrl+K.
+- ~~Política de retenção (quantos itens, quanto tempo).~~ Respondida na P-17 (2026-11-19): 50 itens, só na sessão, sem gravar em disco; os itens que o gerenciador de senhas marca como sigilosos não entram. O **teto de memória das imagens** continua em aberto: a `F6-T16` implementou uma proposta (texto até 1 MB, PNG até 16 MB, imagens guardadas somando até 64 MB; ver “O serviço”, abaixo) e a pendência que pede a minha confirmação não trava nada.
+- ~~Onde fica “Limpar tudo” na UI.~~ Respondida na P-17: “Clear history” fica no menu de ações (Ctrl+K). Feito na `F6-T16`: o Ctrl+K desta página abre o menu de ações do launcher, com Copy, Pin ou Unpin, Delete e Clear history.
 - ~~Se cores copiadas pelo seletor (ficha 15) entram automaticamente neste histórico.~~ Respondida na P-17: entram, com a origem “Color picker”.
 - ~~O que o Enter faz.~~ Respondida na P-80: devolve o item à área de transferência e fecha o launcher.
 
@@ -54,7 +54,7 @@ Li os cinco estados pelo `get_design_context`: texto (`13:19621`), imagem (`13:1
 
 ### Como funciona
 
-- **Abrir e sair:** o chip “Clipboard” do launcher abre a página, com o campo de busca em foco e o primeiro item selecionado (o primeiro fixado, se houver). Esc e Backspace com o campo vazio voltam ao launcher, como no seletor de emoji. O Super+V, que abre o histórico de qualquer lugar, é da `F6-T16`; o rodapé do vazio diz “Close Esc”, como o board.
+- **Abrir e sair:** o chip “Clipboard” do launcher abre a página, com o campo de busca em foco e o primeiro item selecionado (o primeiro fixado, se houver). Esc e Backspace com o campo vazio voltam ao launcher, como no seletor de emoji. O Super+V, que abre o histórico de qualquer lugar, é da `F6-T16` (ver “O serviço”); o rodapé do vazio diz “Close Esc”, como o board.
 - **Seleção:** ↑ e ↓ andam uma linha e atravessam de uma seção à outra, parando nas pontas. A lista rola quando passa de 335 de altura (até 50 itens), com a roda do mouse e com o mesmo padrão do launcher, e a linha selecionada fica sempre à vista; na primeira linha de uma seção o rótulo vem junto. O clique seleciona; o duplo clique e o Enter copiam. A seleção segue o item pelo `id` quando a lista muda: fixar o item o muda de seção e ele continua selecionado; apagar passa a seleção ao vizinho (a linha de baixo, ou a de cima se era a última).
 - **Enter:** devolve o item à área de transferência e fecha o launcher (P-80). Colo com Ctrl+V.
 - **Ctrl+P:** fixa o item, ou solta se já estava fixo. Com o item selecionado fixado, “Pin” vira “Unpin” no rodapé (composição, A-05).
@@ -62,7 +62,7 @@ Li os cinco estados pelo `get_design_context`: texto (`13:19621`), imagem (`13:1
 - **Busca:** filtra por título, texto, URL, título do link, cor e nome do aplicativo de origem, sem diferenciar maiúsculas. Com busca, a divisão em “Pinned” e “Today” some e o rótulo vira “N results” (“1 result” no singular). A seleção volta à primeira linha a cada texto novo.
 - **Seções:** “Pinned” (o fixado mais recente primeiro) e “Today” (o resto, do mais novo para o mais antigo). O rótulo “Today” vale para todos os itens não fixados, mesmo os que entraram de véspera, porque o histórico é só da sessão.
 - **Sem resultado** (sem board, composição, A-05): o mesmo bloco do vazio, com o ícone `search-x` e o título e a dica do launcher para a busca digitada (“Nothing found for “texto””, “Check the spelling or try another search.”); rodapé só com “Close Esc”.
-- **Serviço:** a peça lê `service.items` (do mais novo para o mais antigo, cada item `{ id, kind, title, text, source, time, pinned, pinnedTime, image: { url, width, height, format, bytes }, color, linkTitle }`), `service.now` (o relógio do tempo relativo) e chama `copy(item)`, `togglePin(item)` e `remove(item)`. O serviço de verdade (`clipboard/State.qml`) existe vazio, com essa superfície, até a `F6-T16`; `demo/ClipboardService.qml` é o fictício e `demo/ClipboardSpecimen.qml` a vitrine.
+- **Serviço:** a peça lê `service.items` (do mais novo para o mais antigo, cada item `{ id, kind, title, text, source, time, pinned, pinnedTime, image: { url, width, height, format, bytes }, color, linkTitle }`), `service.now` (o relógio do tempo relativo) e chama `copy(item)`, `togglePin(item)` e `remove(item)`. O serviço de verdade (`clipboard/State.qml`) existia vazio, com essa superfície, até a `F6-T16`, que o encheu (ver “O serviço”); `demo/ClipboardService.qml` é o fictício e `demo/ClipboardSpecimen.qml` a vitrine.
 - **A conta pura** (filtrar, separar em seções, o tempo relativo, o texto de tamanho, o nome do servidor de uma URL e a posição de cada linha) mora em `clipboard/Clipboard.js`, sem QML.
 
 ### O que é composição (A-05) e o que escolhi
@@ -91,3 +91,78 @@ Li os cinco estados pelo `get_design_context`: texto (`13:19621`), imagem (`13:1
 | Rodapé do vazio, só com Esc | Close Esc |
 
 Os textos de exemplo do board (o endereço de repositório, o e-mail e o endereço do design) têm o meu usuário. Nos espécimes e nos prints uso dados inventados: `git clone https://example.org/case/sprawl-tools`, `case@example.org` e `https://www.example.org/design/…`.
+
+## O serviço: como funciona (`F6-T16`)
+
+Enchi o `clipboard/State.qml`, que até a `F6-T05` era vazio. A peça não mudou: ela continua lendo `items`, `now`, `copy`, `togglePin` e `remove`, e ganhou `clear` e `expect` (o fictício, `demo/ClipboardService.qml`, tem os mesmos).
+
+### Como escuto
+
+- Dois processos de vida longa, donos do `State.qml`: `wl-paste --type text --watch python3 clipboard/watch.py text` e `wl-paste --type image/png --watch python3 clipboard/watch.py image`. O `wl-paste --watch` chama o `watch.py` uma vez por mudança, com o conteúdo na entrada padrão e a variável `CLIPBOARD_STATE` (`data`, `nil`, `clear` ou `sensitive`). O `watch.py` escreve **uma linha de JSON por item** e o QML a lê com um `SplitParser` e a entrega a `ingest(event)`, que é pública para o teste entregar eventos sem o `wl-paste`.
+- **Só começam quando a shell de verdade pede**: o `shell.qml` chama `Clipboard.State.start()` no `Component.onCompleted`. Importar o singleton (a vitrine, a bancada, o launcher) não liga processo nenhum, e a bancada não ganha aviso novo.
+- Sem o protocolo de controle de dados do compositor (como no GNOME e na tela de teste) ou sem o `wl-paste`, o histórico fica vazio e sai **uma** linha de aviso no log, sem tentar de novo em laço: o processo que sai em menos de 3 s não é reiniciado; o que cai depois de ter rodado é reiniciado até 3 vezes, 2 s depois, e então avisa e para. Esses números são limites de falha, não de desenho.
+- Só PNG nesta versão. JPEG e outros formatos de imagem não entram.
+
+### O que não entra
+
+- O que o gerenciador de senhas marca como sigiloso (P-17): `CLIPBOARD_STATE=sensitive`, e, como segunda barreira para versões do `wl-clipboard` sem o `sensitive`, o `x-kde-passwordManagerHint` na lista de tipos (`wl-paste --list-types`). Nesses casos o `watch.py` nem lê a entrada padrão: o conteúdo não vai para a memória, para o disco nem para o log. Se ele não consegue perguntar os tipos, também não guarda (na dúvida, trato como sigiloso).
+- Área de transferência vazia ou limpa (`nil`, `clear`), texto vazio ou só de espaços, texto que não é UTF-8, texto acima do teto, PNG inválido ou acima do teto. Do PNG confiro a assinatura, o cabeçalho (IHDR) e o **fim do arquivo**: os últimos 12 bytes têm de ser o chunk IEND. PNG cortado no meio, sem o IEND ou com lixo depois dele não entra: nada é gravado e nada é escrito. Não descomprimo a imagem nem confiro o CRC dos outros chunks.
+- Uma seleção que oferece `image/png` e nenhum texto simples (o “copiar imagem” de um navegador oferece também o HTML dela) é só imagem: o texto dela não vira um segundo item de marcação.
+
+### O limite de 50 e o teto de memória
+
+- No máximo **50 itens não fixados** (P-17). Os fixados não contam e não saem; soltar um fixado que passa dos 50 tira o não fixado mais antigo, e se os 50 já estavam cheios esse pode ser o próprio item que acabei de soltar (quando ele é o não fixado mais antigo). O mesmo conteúdo de novo (texto igual, ou imagem com o mesmo hash) não duplica: o que já existe sobe para o topo com a hora nova, mantendo o fixado, a hora de fixar e a origem.
+- **Teto de memória: é a proposta da `F6-T16`, não decisão minha ainda** (a P-17 não fechou o teto das imagens). Três propriedades com nome no `State.qml`: `maxTextBytes` = 1 MB (texto acima disso não entra), `maxImageBytes` = 16 MB (PNG acima disso não entra) e `maxImagesTotalBytes` = 64 MB (a soma das imagens guardadas, fixadas incluídas; passando disso saem primeiro as imagens não fixadas mais antigas, e se só sobram fixadas a imagem nova que não cabe não entra). Quando um item sai, o arquivo da imagem sai junto, e só se o caminho está direto dentro da pasta do histórico.
+
+### Onde ficam as imagens e o texto
+
+- O histórico vive só na sessão e some ao sair ou reiniciar, **sem gravar em disco**: nada é lido nem gravado entre uma sessão e outra. O texto fica só na memória da shell. Cada PNG fica em `$XDG_RUNTIME_DIR/wintermute-shell/clipboard/<hash>.png` (SHA-256), com permissão só do dono (arquivo 0600, pasta 0700). Essa pasta é da sessão: está em memória e some no logout.
+- **A pasta é limpa quando a shell começa.** Reiniciar a shell apaga a lista, e os PNGs que ficaram na pasta não teriam nenhum item apontando para eles; por isso o `Clipboard.State.start()` roda `python3 clipboard/watch.py sweep --dir <pasta>` e só depois liga as duas escutas (se a limpeza falha, ou passa de 3 s, as escutas ligam do mesmo jeito). Então **reiniciar a shell também apaga as imagens** do histórico. A limpeza apaga só arquivo regular direto dentro da pasta, de nome `<64 dígitos hexadecimais>.png` (e o temporário `<hash>.png.tmp-<pid>` de uma gravação interrompida): não segue link simbólico, não desce em subpasta, não apaga a pasta, e pasta que não existe não é erro. A bancada não chama o `start()`, então não limpa nada.
+- O mesmo PNG de novo dá o mesmo hash e não cria outro arquivo.
+
+### Como classifico
+
+A conta é pura, no `Clipboard.js`. `kind`: `color` se o texto inteiro é uma cor num dos três formatos que o seletor de cor copia (`#RRGGBB`, `rgb(r, g, b)` e `hsl(h, s%, l%)`; o HEX sem o `#` não conta, porque “facade” é uma palavra); `link` se é uma linha só com `http://`, `https://` ou `www.`; `email` se é uma linha só com um endereço; `command` se o aplicativo de origem é um terminal (a categoria `TerminalEmulator` da entrada `.desktop` dele; quem diz isso é o serviço, e a conta recebe um booleano); senão `text`. Nessa ordem: uma URL copiada do terminal é `link`. Imagem é `image`.
+
+`title`: a primeira linha não vazia do texto, sem espaços nas pontas; no link, a URL; na cor, o texto; na imagem, `Screenshot HH:MM` quando veio da captura da shell e `Image HH:MM` nos outros casos (hora local de quando chegou). `color` é a cor em `#RRGGBB` para a amostra (o `hsl` do seletor é arredondado em inteiros, então a amostra dele pode diferir em um ou dois níveis do HEX original). `linkTitle` fica vazio: a prévia cai no nome do servidor. Dois cortes de robustez, que não aparecem na tela: o título guardado tem no máximo 256 caracteres (a linha corta com reticências bem antes, e um texto de 1 MB numa linha só travaria o `Text`), e a prévia mede só os 2000 primeiros caracteres do texto (a caixa de 296×176 mostra umas poucas linhas).
+
+### De onde vem a origem (e o limite dela)
+
+A área de transferência do Wayland **não diz quem copiou**. Uso a janela em foco no instante em que o item chega: o `appId` pelo `NiriMsg.focusedWindow()` e o nome pela entrada `.desktop` (`DesktopEntries.heuristicLookup`), como a captura já faz. **Pode errar**: um aplicativo que copia em segundo plano, ou uma cópia que chega depois de eu trocar de janela, leva o nome da janela que está em foco. Sem janela, a origem fica vazia e os metadados mostram “Unknown”. O nome e a categoria vêm da entrada `.desktop`, que o Quickshell leva um ou dois segundos para ler na primeira vez; por isso o `start()` já pede a leitura, e o primeiro item da sessão não cai no `appId` cru (por exemplo `com.mitchellh.ghostty`), que é o que aparece quando o aplicativo não tem entrada.
+
+Quando quem copia é a própria shell, ela avisa antes com `expect(nome)`, que vale para o próximo item que chegar em até 1 s e só para ele: o seletor de cor avisa “Color picker”, a captura e o editor de anotação (que passam pelo mesmo `deliverFile`) avisam “Screenshot”, e as outras cópias do launcher (emoji, cálculo, caminho de arquivo) avisam “Launcher”. O recopiar do próprio histórico não avisa e cai na regra do item que já existe: a origem não muda. Como o que repete mantém a origem, uma cópia repetida de outro aplicativo também não a troca.
+
+### As ações
+
+- `copy(item)`: o texto vai por `wl-copy -- texto`, como o launcher faz; acima de 100000 bytes (o sistema aceita 131072 por argumento) ou com um byte nulo, pela entrada padrão do `wl-copy`. A imagem vai pelo `screenshot/clipboard.py copy-file`. A cópia gera uma mudança na área de transferência, e o item que já existe sobe: não duplica.
+- `togglePin(item)` guarda o `pinnedTime`; `remove(item)` apaga o arquivo da imagem; `clear()` tira todos os **não fixados** (os fixados são o que escolhi guardar). Nenhuma das três esvazia a área de transferência do sistema.
+
+### O menu Ctrl+K (composição, A-05)
+
+Sem board: é o menu de ações que o launcher já tem (`page === "actions"`, `launcher/Actions.js`), aberto da página do histórico. Cabeçalho com o botão de voltar e o título do item selecionado (“Clipboard” sem item); linhas **Copy**, **Pin** ou **Unpin**, **Delete** e **Clear history** (ícones `copy`, `pin`, `x` e `trash-2`; “Clear history” é a linha de perigo). “Clear history” **só aparece quando há item não fixado para tirar**: com tudo fixado o menu mostra só Copy, Unpin e Delete. Sem item selecionado (a busca não achou nada) só sobra “Clear history”, e sem o que limpar o Ctrl+K não abre. “Clear history” pede a mesma confirmação dos comandos perigosos de sessão: o primeiro Enter arma (“Press ↵ again to confirm”), o segundo limpa e volta à página, que mostra o vazio se não sobrou nada; mudar de linha desarma. Esc, Backspace e o botão de voltar voltam à página do histórico, com a busca e a seleção de antes. O Ctrl+K não está no rodapé da página, porque o board não o tem.
+
+### Super+V
+
+`settings/manual/shortcuts.json` ganhou `{ "bind": "Mod+V", "label": "Clipboard history", "ipc": "launcher clipboard", "overlay": true }` na seção Wintermute, e o `keybinds.py` gera a bind. O alvo `launcher` do IPC ganhou `clipboard()`: abre o launcher direto na página do histórico, no monitor em foco, e com ela já aberta (ou o menu dela) fecha. **Aberta assim o Esc fecha o launcher de vez** e o Backspace no campo vazio não volta à busca, porque não há busca por baixo; aberta pelo chip, continuam voltando à busca, como antes. Aplicar a bind no Niri é da sessão ao vivo: o `keybinds.kdl` de `~/.config/niri/cfg/` é gerado de novo por `keybinds.py generate --output ... --apply`.
+
+### O que nunca rodou de verdade
+
+Testei o `watch.py` com entrada e variáveis fabricadas, o serviço pelo `ingest` e pelos ganchos, a cadeia inteira (`wl-paste` de mentira, `watch.py`, `ingest`) e a página no launcher de verdade. O que só existe no Niri, com o monitor e o teclado de verdade:
+
+- o `wl-paste --watch` contra um compositor com o protocolo de controle de dados (a tela de teste não tem, e o `wl-paste` sai logo, como esperado);
+- o que ele faz com a seleção que já existe quando a shell começa (entra como um item novo, com a janela em foco como origem, que pode errar);
+- uma cópia de verdade de texto e de imagem (Ctrl+C num aplicativo Wayland), e o `copy` devolvendo o item e colando com Ctrl+V (a tela de teste não tem teclado, e o `wl-copy` recusa); o caminho da entrada padrão do `wl-copy` para texto grande foi testado só contra um `cat`;
+- o `x-kde-passwordManagerHint` de um gerenciador de senhas de verdade;
+- a origem pela janela em foco, no Niri, e se o Niri mantém a janela em foco enquanto o launcher tem o teclado;
+- o teclado de verdade (Ctrl+K, Ctrl+P, Del, Esc) na página, o Super+V aplicado e o menu com o desfoque;
+- XWayland (Steam, umu), que é da `F6-T06`.
+
+### Textos em inglês (`F6-T16`)
+
+| Onde | Texto |
+|---|---|
+| Menu Ctrl+K | Copy · Pin · Unpin · Delete · Clear history |
+| Confirmação | Press ↵ again to confirm |
+| Título do menu sem item | Clipboard |
+| Título da imagem | Screenshot HH:MM · Image HH:MM |
+| Manual | Clipboard history (Super+V) |

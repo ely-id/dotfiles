@@ -322,6 +322,9 @@ function commandRows() {
 
 // Identifica a linha para a confirmação do comando perigoso: o primeiro Enter arma, o segundo, na mesma linha, roda.
 function rowKey(row) {
+  // "Clear history" do histórico da área de transferência (Actions.js) confirma como um comando perigoso.
+  if (row && row.act === "clipboard-clear")
+    return "clipboard:clear";
   const target = row ? row.target : null;
   return target && target.type === "command" ? "command:" + target.action : "";
 }

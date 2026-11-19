@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import "battery" as Battery
 import "calendar" as Calendar
+import "clipboard" as Clipboard
 import "launcher" as Launcher
 import "settings" as Settings
 import "settings/appearance" as Appearance
@@ -21,6 +22,10 @@ ShellRoot {
   property bool demoPanelOpen: false
 
   Shortcuts {}
+
+  // A escuta da área de transferência (ficha 18) só liga aqui, na shell de verdade: a vitrine e a bancada importam o serviço e não
+  // ganham processo nenhum. Sem o protocolo de controle de dados do compositor (como no GNOME) o histórico fica vazio, com um aviso.
+  Component.onCompleted: Clipboard.State.start()
 
   // O bloqueio antes de suspender dependia de um plugin compilado que mora na
   // tela de bloqueio da origem. Tirei na F0 para a shell abrir só com QML.
@@ -81,6 +86,8 @@ ShellRoot {
     function toggle() { Launcher.State.toggle(); }
     function open() { Launcher.State.open(); }
     function close() { Launcher.State.close(); }
+    // O Super+V: o histórico da área de transferência direto, no monitor em foco; com ele aberto, fecha.
+    function clipboard() { Launcher.State.toggleClipboard(); }
   }
 
   // O launcher e os Ajustes pedem teclado exclusivo na mesma camada, então abrir um fecha o outro. A lupa do seletor

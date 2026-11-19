@@ -88,6 +88,13 @@ Singleton {
 
   function windowExists(id) { return _windows[id] !== undefined; }
 
+  // A janela em foco agora, como dados simples { id, appId, title }, ou null (nenhuma janela, ou o foco está numa camada da shell).
+  // O histórico da área de transferência (clipboard/State.qml) usa o `appId` como a origem do que foi copiado.
+  function focusedWindow() {
+    const window = Object.values(_windows).find(w => w.isFocused);
+    return window ? { id: window.id, appId: window.appId, title: window.title } : null;
+  }
+
   // As janelas do workspace ativo do monitor `outputName`, como dados simples: { id, appId, title, isFloating, layout }, com o
   // `layout` cru do IPC do Niri. A captura de tela (screenshot/CaptureState.qml) tira uma foto disto quando abre.
   function activeWorkspaceWindows(outputName) {

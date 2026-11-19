@@ -11,6 +11,10 @@
 //   target  nas ações "Open" e "Run", o alvo da linha original: `activate` as trata como o Enter na linha, e a confirmação do
 //           comando perigoso (`armedKey`) reconhece a linha pelo alvo.
 //   copy    nas ações de copiar, o texto que vai para a área de transferência: `activate` copia e fecha, como na linha do cálculo.
+//
+// O histórico da área de transferência (F6-T16) também abre este menu (Ctrl+K na página dele). A "linha" é { title, clipboard: { item,
+// unpinned } }, e as ações usam `act` em "clipboard-copy", "clipboard-pin", "clipboard-delete" e "clipboard-clear" (`danger`: apagar tudo
+// pede a confirmação dos comandos perigosos). Sem item selecionado só sobra "Clear history", e sem nada a limpar o menu fica vazio.
 
 function action(title, icon, extra) {
   return Object.assign({ title: title, detail: "", kind: "Action", icon: icon, danger: false }, extra || {});
@@ -22,6 +26,8 @@ function action(title, icon, extra) {
 function itemType(row) {
   if (!row)
     return "";
+  if (row.clipboard !== undefined)
+    return "clipboard";
   if (row.copy !== undefined)
     return "calc";
   return row.target && row.target.type ? row.target.type : "";
@@ -59,6 +65,18 @@ function rowsFor(row, recentIds, calculation) {
     return [action("Open", "arrow-up-right", { target: row.target })];
   if (type === "command")
     return [action("Run", "play", { target: row.target, danger: !!row.danger })];
+  if (type === "clipboard") {
+    const info = row.clipboard || {};
+    const list = [];
+    if (info.item) {
+      list.push(action("Copy", "copy", { act: "clipboard-copy" }));
+      list.push(action(info.item.pinned ? "Unpin" : "Pin", "pin", { act: "clipboard-pin" }));
+      list.push(action("Delete", "x", { act: "clipboard-delete" }));
+    }
+    if (info.unpinned > 0)
+      list.push(action("Clear history", "trash-2", { act: "clipboard-clear", danger: true }));
+    return list;
+  }
   if (type === "calc" && calculation) {
     const list = [action("Copy result", "copy", { copy: calculation.result })];
     if (calculation.hex)

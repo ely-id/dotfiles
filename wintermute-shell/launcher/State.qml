@@ -9,6 +9,7 @@ import "Colors.js" as Colors
 import "Emoji.js" as Emoji
 import "Search.js" as Search
 import "../screenshot" as Screenshot
+import "../clipboard" as Clipboard
 import Quickshell
 import Quickshell.Io
 
@@ -24,7 +25,8 @@ import Quickshell.Io
 // inventário lido na primeira abertura (EmojiInventory.qml) e os últimos copiados em emoji-recents.json; o histórico da área de transferência (F6-T05) é `page === "clipboard"`, com os dados em
 // clipboard/State.qml; as ferramentas que ainda não existem só são registradas no log por `openTool`. O menu "Actions" (F5-T05, Ctrl+K) é outra página, `page === "actions"`: as ações do
 // item que estava selecionado (a conta mora em Actions.js) e, para "Open on workspace…", uma segunda camada com os
-// workspaces do monitor.
+// workspaces do monitor. A página do histórico também abre esse menu (F6-T16): `actionsFrom === "clipboard"`, com Copy, Pin, Delete e
+// "Clear history", e o Esc volta para a página do histórico, e não para a busca. O Super+V abre o histórico direto (`toggleClipboard`).
 Singleton {
   id: root
 
@@ -73,6 +75,10 @@ Singleton {
   // A página aberta no lugar da busca: "" (a busca), "color" (o resultado do seletor de cor), "emoji" (o seletor de emoji),
   // "clipboard" (o histórico da área de transferência) ou "actions" (o menu de ações do item selecionado). Abrir o launcher sempre começa na busca.
   property string page: ""
+  // O histórico da área de transferência (clipboard/State.qml; o teste troca por um fictício) e se a página dele foi aberta direto,
+  // pelo Super+V: aberta assim o Esc fecha o launcher de vez e o Backspace no campo vazio não volta à busca. Pelo chip, volta.
+  property var clipboardService: Clipboard.State
+  property bool clipboardDirect: false
 
   // ---- Fontes de resultado (F5-T02) ----
   // As entradas de .desktop. O teste troca por entradas fictícias com os mesmos campos (id, name, genericName,
@@ -237,8 +243,10 @@ Singleton {
   // O menu de ações é do launcher, mesmo quando o item é um cálculo: o modo do rodapé não muda.
   readonly property bool calculating: calculation !== null && page !== "actions"
   readonly property string mode: page === "color" ? "color" : page === "emoji" ? "emoji" : page === "clipboard" ? "clipboard" : calculating ? "calculator" : "launcher"
-  readonly property string modeLabel: page === "color" ? "Color picker" : page === "emoji" ? "Emoji" : page === "clipboard" ? "Clipboard" : calculating ? "Calculator" : "Launcher"
-  readonly property string modeIcon: page === "color" ? "pipette" : page === "emoji" ? "smile" : page === "clipboard" ? "clipboard" : calculating ? "calculator" : "sparkles"
+  // O menu de ações aberto da página do histórico mantém o modo "Clipboard" no rodapé (F6-T16); os outros menus são do "Launcher".
+  readonly property bool clipboardMenu: page === "actions" && actionsFrom === "clipboard"
+  readonly property string modeLabel: page === "color" ? "Color picker" : page === "emoji" ? "Emoji" : page === "clipboard" || clipboardMenu ? "Clipboard" : calculating ? "Calculator" : "Launcher"
+  readonly property string modeIcon: page === "color" ? "pipette" : page === "emoji" ? "smile" : page === "clipboard" || clipboardMenu ? "clipboard" : calculating ? "calculator" : "sparkles"
   // Ícone do cabeçalho de busca.
   readonly property string searchIcon: calculation ? "calculator" : "search"
   // Ações do rodapé: { label, keys, primary }. No cálculo "Copy" e "Actions"; o "Paste" (Ctrl+↵) ficou de fora (P-71).
@@ -318,8 +326,12 @@ Singleton {
   }
 
   // O wl-copy fica vivo em segundo plano servindo a área de transferência, por isso `execDetached` (o `exec` de cima,
-  // que o teste troca por uma função que só anota).
-  function copyText(text) {
+  // que o teste troca por uma função que só anota). Antes de copiar aviso o histórico de quem está copiando (`expect`), porque a
+  // área de transferência do Wayland não diz quem copiou: o seletor de cor avisa "Color picker", e o resto do launcher (emoji,
+  // cálculo), "Launcher".
+  function copyText(text, origin) {
+    if (clipboardService && clipboardService.expect)
+      clipboardService.expect(origin || "Launcher");
     exec(copyCommand(text));
   }
 
@@ -409,7 +421,7 @@ Singleton {
     const info = colorInfo;
     if (!info || ["hex", "rgb", "hsl"].indexOf(format) < 0)
       return;
-    copyText(info[format]);
+    copyText(info[format], "Color picker");
     colorCopied = format;
     copiedTimer.restart();
   }
@@ -442,7 +454,9 @@ Singleton {
     colorCopied = "";
     colorShown = null;
     page = "";
+    clipboardDirect = false;
     actionsItem = null;
+    actionsFrom = "";
     actionsLevel = "actions";
     actionsWorkspaces = [];
     emojiQuery = "";
@@ -482,10 +496,24 @@ Singleton {
     console.info("launcher: ferramenta pedida, ainda sem destino:", key);
   }
 
-  // O chip "Clipboard": abre a página do histórico (ficha 18, clipboard/ClipboardPage.qml). O que ela mostra vem do clipboard/State.qml,
-  // que por enquanto é vazio (F6-T16). A busca da página é dela, então aqui só troco a página.
+  // O chip "Clipboard": abre a página do histórico (ficha 18, clipboard/ClipboardPage.qml). O que ela mostra vem do clipboard/State.qml.
+  // A busca da página é dela, então aqui só troco a página. Pelo chip o Esc volta à busca.
   function openClipboard() {
+    clipboardDirect = false;
     page = "clipboard";
+  }
+
+  // O Super+V (IPC `launcher clipboard`): abre o launcher direto na página do histórico, no monitor em foco; com o histórico já
+  // aberto (a página ou o menu de ações dela), fecha. Aberto assim o Esc fecha o launcher de vez (`clipboardDirect`).
+  function toggleClipboard(requestedOutputName) {
+    const targetOutput = requestedOutputName || Settings.State.focusedOutputName();
+    if (opened && outputName === targetOutput && (page === "clipboard" || (page === "actions" && actionsFrom === "clipboard"))) {
+      close();
+      return;
+    }
+    open(targetOutput);
+    page = "clipboard";
+    clipboardDirect = true;
   }
 
   // ---- Seletor de emoji (ficha 16, F5-T09) ----
@@ -624,6 +652,8 @@ Singleton {
   property var actionsItem: null
   // "actions" (as ações do item) ou "workspaces" (a escolha do workspace do app).
   property string actionsLevel: "actions"
+  // De onde o menu abriu: "" (a lista da busca) ou "clipboard" (a página do histórico, para onde o Esc volta).
+  property string actionsFrom: ""
   // As linhas da segunda camada, tiradas do organizador quando ela abre.
   property var actionsWorkspaces: []
   // 0 fora do menu, 1 nas ações, 2 na escolha do workspace. O Panel guarda a seleção de cada camada por aqui.
@@ -664,18 +694,40 @@ Singleton {
       return false;
     armedKey = "";
     actionsItem = row;
+    actionsFrom = "";
     actionsLevel = "actions";
     actionsWorkspaces = [];
     page = "actions";
     return true;
   }
 
-  // Volta à lista, com o texto de antes. A seleção de antes é do Panel, que a guardou ao entrar.
+  // Ctrl+K na página do histórico da área de transferência (F6-T16): o mesmo menu, com as ações do item selecionado (`item`, ou null se
+  // a busca não achou nada) e "Clear history". Sem o que oferecer (nenhum item selecionado e nada a limpar) não abre. Devolve se abriu.
+  function openClipboardActions(item) {
+    if (page !== "clipboard")
+      return false;
+    const unpinned = ((clipboardService ? clipboardService.items : null) || []).filter(entry => !entry.pinned).length;
+    const row = { title: item ? String(item.title || "") : "Clipboard", clipboard: { item: item || null, unpinned: unpinned } };
+    if (Actions.rowsFor(row, recentIds, calculation).length === 0)
+      return false;
+    armedKey = "";
+    actionsItem = row;
+    actionsFrom = "clipboard";
+    actionsLevel = "actions";
+    actionsWorkspaces = [];
+    page = "actions";
+    return true;
+  }
+
+  // Volta à lista, com o texto de antes (ou à página do histórico, se o menu abriu de lá). A seleção de antes é do Panel (da lista) ou da
+  // própria página do histórico.
   function closeActions() {
     if (page !== "actions")
       return;
+    const back = actionsFrom;
     armedKey = "";
-    page = "";
+    actionsFrom = "";
+    page = back;
     actionsItem = null;
     actionsLevel = "actions";
     actionsWorkspaces = [];
@@ -709,6 +761,24 @@ Singleton {
       close();
     } else if (row.act === "pick-workspace") {
       pickWorkspace(row.workspaceId);
+    } else if (row.act === "clipboard-copy") {
+      clipboardService.copy(actionsItem.clipboard.item);
+      close();
+    } else if (row.act === "clipboard-pin") {
+      clipboardService.togglePin(actionsItem.clipboard.item);
+      closeActions();
+    } else if (row.act === "clipboard-delete") {
+      clipboardService.remove(actionsItem.clipboard.item);
+      closeActions();
+    } else if (row.act === "clipboard-clear") {
+      // Apagar tudo pede a mesma confirmação dos comandos perigosos de sessão: o primeiro Enter arma, o segundo roda.
+      const key = Search.rowKey(row);
+      if (armedKey !== key) {
+        armedKey = key;
+        return;
+      }
+      clipboardService.clear();
+      closeActions();
     } else {
       activateTarget(row);
     }

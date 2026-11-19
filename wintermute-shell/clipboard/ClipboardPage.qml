@@ -11,8 +11,9 @@ import "Clipboard.js" as Clipboard
 // são do Panel.qml, que lê daqui as ações (`footerActions`), porque elas mudam com o item selecionado.
 //
 // `service` é o histórico (items, now, copy, togglePin e remove: clipboard/State.qml na shell, demo/ClipboardService.qml na vitrine).
-// `launcher` é o serviço do launcher, de quem esta página só precisa de `closePage()` e `close()`. A busca é desta página: o texto
-// do campo não é o do launcher, e abrir a página de novo o zera.
+// `launcher` é o serviço do launcher, de quem esta página só precisa de `closePage()`, `close()`, `clipboardDirect` e `openClipboardActions()`
+// (o Ctrl+K, F6-T16). A busca é desta página: o texto do campo não é o do launcher, e abrir a página de novo o zera; voltar do menu de ações
+// não zera, porque é a mesma abertura.
 //
 // A seleção anda por `selected`, o índice na lista de linhas (todas as seções em ordem), mas segue o item pelo `id` quando a lista muda:
 // fixar o item o muda de seção e ele continua selecionado; apagar passa a seleção ao vizinho (a linha de baixo, ou a de cima se era a última).
@@ -141,9 +142,26 @@ FocusScope {
       service.remove(item);
   }
 
-  function back() {
-    if (launcher)
+  // Esc: volta à busca do launcher; com a página aberta direto, pelo Super+V, não há busca para onde voltar e o Esc fecha o launcher.
+  function leave() {
+    if (!launcher)
+      return;
+    if (launcher.clipboardDirect)
+      launcher.close();
+    else
       launcher.closePage();
+  }
+
+  // Backspace no campo vazio: volta à busca, mas só quando a página foi aberta pelo chip.
+  function backspaceBack() {
+    if (launcher && !launcher.clipboardDirect)
+      launcher.closePage();
+  }
+
+  // Ctrl+K: o menu de ações do launcher com as ações do item selecionado e o "Clear history" (F6-T16).
+  function openActions() {
+    if (launcher && launcher.openClipboardActions)
+      launcher.openClipboardActions(current);
   }
 
   // Texto novo ou página aberta de novo: seleção na primeira linha e lista no topo.
@@ -157,10 +175,16 @@ FocusScope {
   // A vitrine pode abrir com uma linha selecionada lá embaixo: espero a lista ter altura para mostrá-la.
   Component.onCompleted: Qt.callLater(root.ensureVisible)
 
+  // A página abriu de novo: busca vazia e lista no topo. Voltar do menu de ações (Ctrl+K) é a mesma abertura, e a busca e a seleção ficam.
+  property string lastPage: launcher ? launcher.page : ""
+
   Connections {
     target: root.launcher
     function onPageChanged() {
-      if (root.launcher.page === "clipboard") {
+      const page = root.launcher.page;
+      const from = root.lastPage;
+      root.lastPage = page;
+      if (page === "clipboard" && from !== "actions") {
         root.query = "";
         root.resetView();
       }
@@ -182,8 +206,9 @@ FocusScope {
     onAccepted: root.copySelected()
     onPinPressed: root.togglePinSelected()
     onDeletePressed: root.removeSelected()
-    onEscapePressed: root.back()
-    onBackspaceOnEmpty: root.back()
+    onActionsPressed: root.openActions()
+    onEscapePressed: root.leave()
+    onBackspaceOnEmpty: root.backspaceBack()
   }
 
   // O divisor vertical entre a lista e a prévia: de y 57 até o rodapé. Sem lista ele não existe.

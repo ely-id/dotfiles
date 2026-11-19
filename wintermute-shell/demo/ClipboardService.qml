@@ -1,7 +1,8 @@
 import QtQuick
 
 // O serviço fictício do histórico da área de transferência para a vitrine e a bancada (decisão 0011): a mesma superfície de
-// clipboard/State.qml (`items`, `now`, `copy`, `togglePin` e `remove`), sem escutar a área de transferência de verdade e sem guardar nada.
+// clipboard/State.qml (`items`, `now`, `copy`, `togglePin`, `remove`, `clear` e `expect`), sem escutar a área de transferência de verdade
+// e sem guardar nada. Não liga nenhum processo: não tem `start`, e a bancada não ganha processo nem aviso.
 // Os dados são inventados: nenhum texto, endereço ou aplicativo veio da máquina, e a imagem é um desenho meu. O relógio (`now`) é fixo,
 // para os "2 min" e o "yesterday" dos prints não mudarem com a hora em que o espécime abre.
 // `scenario` escolhe os itens:
@@ -9,8 +10,9 @@ import QtQuick
 //   "pinned"                                  quatro itens, dois deles fixados (o comando e o e-mail)
 //   "empty"                                   nenhum item
 //   "many"                                    cinquenta itens (o teto da sessão), para a rolagem
-// `togglePin` e `remove` mudam `items` de verdade, para a página reagir como reage ao serviço real; `copy` só conta. O teste de
-// comportamento lê o que foi pedido em `lastCopied`, `lastPinned` e `lastRemoved`.
+// `togglePin`, `remove` e `clear` (que deixa os fixados, como o real) mudam `items` de verdade, para a página reagir como reage ao serviço
+// real; `copy` e `expect` só contam. O teste de comportamento lê o que foi pedido em `lastCopied`, `lastPinned`, `lastRemoved`, `clears`
+// e `lastExpected`.
 QtObject {
   id: root
 
@@ -133,6 +135,8 @@ QtObject {
   property int pins: 0
   property var lastRemoved: null
   property int removals: 0
+  property int clears: 0
+  property string lastExpected: ""
 
   function copy(item) {
     lastCopied = item;
@@ -150,5 +154,16 @@ QtObject {
     lastRemoved = item;
     removals += 1;
     items = items.filter(entry => entry.id !== item.id);
+  }
+
+  // "Clear history" (Ctrl+K): tira os não fixados.
+  function clear() {
+    clears += 1;
+    items = items.filter(entry => entry.pinned);
+  }
+
+  // O aviso de quem vai copiar (o launcher avisa "Launcher" ou "Color picker"): o fictício só guarda.
+  function expect(name) {
+    lastExpected = String(name);
   }
 }

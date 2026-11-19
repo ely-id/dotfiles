@@ -23,7 +23,7 @@ import ".."
 //   clipboard `service.page === "clipboard"` (o chip "Clipboard"): o cabeçalho com o ícone `clipboard` e o campo "Search history", a
 //          lista de 280 à esquerda, a prévia e os metadados à direita, ou o vazio (ClipboardPage.qml, com os dados de
 //          `clipboardService`), com o divisor do rodapé fixo em y 392, 436 de altura no total. As ações do rodapé são da página.
-//   actions `service.page === "actions"` (Ctrl+K numa linha): o cabeçalho de busca vira voltar e o nome do item
+//   actions `service.page === "actions"` (Ctrl+K numa linha, ou na página do histórico): o cabeçalho de busca vira voltar e o nome do item
 //          (ActionsHeader.qml) e a lista é a de `service.actionSections`, com o rótulo em y 64, uma linha por ação a partir
 //          de y 88 e o divisor do rodapé 4 abaixo da última, como em toda lista. ↑↓ andam, Enter roda, Esc, Backspace, o
 //          botão de voltar e Ctrl+K voltam à busca com o texto e a seleção de antes (guardados em `savedSelection`).

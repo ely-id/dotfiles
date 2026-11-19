@@ -5,6 +5,7 @@ import ".."
 import "." as Screenshot
 import "Crop.js" as Crop
 import "Windows.js" as Win
+import "../clipboard" as Clipboard
 import QtCore
 import Quickshell
 import Quickshell.Io
@@ -97,6 +98,9 @@ Singleton {
   property var openEditor: (path, outputName) => Screenshot.AnnotateState.openFile(path, outputName)
   // Mostra o aviso "Screenshot saved" para o arquivo salvo `path`, no monitor `outputName` (F6-T03).
   property var notifySaved: (path, outputName) => Screenshot.SavedState.show(path, outputName)
+  // Avisa o histórico da área de transferência (ficha 18) de quem vai copiar, para a origem do item ser "Screenshot": o Wayland não diz quem
+  // copiou. O editor de anotação passa por `deliverFile` também.
+  property var announceCopy: () => Clipboard.State.expect("Screenshot")
 
   readonly property string helper: decodeURIComponent(Qt.resolvedUrl("clipboard.py").toString().replace(/^file:\/\//, ""))
 
@@ -371,6 +375,7 @@ Singleton {
   // O editor de anotação usa o mesmo caminho para entregar a imagem com as marcas.
   function deliverFile(path, outputName, withPreview) {
     keepFile(path);
+    announceCopy();
     exec(["python3", helper, "copy-file", path]);
     if (withPreview)
       deliver(path, outputName);

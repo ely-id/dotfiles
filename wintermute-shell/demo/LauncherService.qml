@@ -13,7 +13,8 @@ import "../launcher" as Launcher
 // colorFreshStamp, colorCopied, colorInfo, colorOrigin, o menu de ações (actionsItem, actionsLevel, actionsWorkspaces,
 // actionsDepth, actionsTitle, actionSections, armedKey) e as funções open, close, toggle, setQuery, acceptGhost,
 // copyCommand, copyText, openTool, activate, selectRow, addColor, showColor, copyColor, pickAnother, closePage, openActions,
-// backActions e closeActions, e o seletor de emoji (emojiData, emojiQuery, emojiRecents, emojiSections, setEmojiQuery e
+// backActions e closeActions, o menu de ações do histórico da área de transferência (F6-T16: clipboardService, clipboardDirect,
+// actionsFrom e openClipboardActions) e o seletor de emoji (emojiData, emojiQuery, emojiRecents, emojiSections, setEmojiQuery e
 // copyEmoji). Os dados são
 // inventados: o histórico de cores é o do board, e nada aqui lê arquivo nem roda processo.
 // `scenario` escolhe o estado:
@@ -104,14 +105,21 @@ QtObject {
   readonly property var calculation: Calculator.describe(query, decimalSeparator)
 
   // A página aberta no lugar da busca: "", "color", "emoji", "clipboard" ou "actions".
+  // O histórico da área de transferência para o menu Ctrl+K da página dele (F6-T16): o espécime liga o serviço fictício dele aqui. Aberta
+  // direto (Super+V), a página fecha o launcher no Esc; `actionsFrom` é de onde o menu abriu ("" ou "clipboard").
+  property var clipboardService: null
+  property bool clipboardDirect: false
+  property string actionsFrom: ""
   readonly property bool isActions: scenario.indexOf("actions-") === 0
   readonly property bool isEmoji: scenario.indexOf("emoji") === 0
   property string page: scenario === "color" ? "color" : isActions ? "actions" : isEmoji ? "emoji" : scenario === "clipboard" ? "clipboard" : ""
 
   readonly property bool calculating: calculation !== null && page !== "actions"
   readonly property string mode: page === "color" ? "color" : page === "emoji" ? "emoji" : page === "clipboard" ? "clipboard" : calculating ? "calculator" : "launcher"
-  readonly property string modeLabel: page === "color" ? "Color picker" : page === "emoji" ? "Emoji" : page === "clipboard" ? "Clipboard" : calculating ? "Calculator" : "Launcher"
-  readonly property string modeIcon: page === "color" ? "pipette" : page === "emoji" ? "smile" : page === "clipboard" ? "clipboard" : calculating ? "calculator" : "sparkles"
+  // O menu de ações aberto da página do histórico mantém o modo "Clipboard" no rodapé (F6-T16); os outros menus são do "Launcher".
+  readonly property bool clipboardMenu: page === "actions" && actionsFrom === "clipboard"
+  readonly property string modeLabel: page === "color" ? "Color picker" : page === "emoji" ? "Emoji" : page === "clipboard" || clipboardMenu ? "Clipboard" : calculating ? "Calculator" : "Launcher"
+  readonly property string modeIcon: page === "color" ? "pipette" : page === "emoji" ? "smile" : page === "clipboard" || clipboardMenu ? "clipboard" : calculating ? "calculator" : "sparkles"
   readonly property string searchIcon: calculation ? "calculator" : "search"
   readonly property var actions: page === "color" ? [
     { label: "Copy HEX", keys: ["↵"], primary: true },
@@ -296,6 +304,22 @@ QtObject {
       return false;
     armedKey = "";
     actionsItem = row;
+    actionsFrom = "";
+    actionsLevel = "actions";
+    actionsWorkspaces = [];
+    page = "actions";
+    return true;
+  }
+  function openClipboardActions(item) {
+    if (page !== "clipboard")
+      return false;
+    const unpinned = ((clipboardService ? clipboardService.items : null) || []).filter(entry => !entry.pinned).length;
+    const row = { title: item ? String(item.title || "") : "Clipboard", clipboard: { item: item || null, unpinned: unpinned } };
+    if (Actions.rowsFor(row, recentIds, calculation).length === 0)
+      return false;
+    armedKey = "";
+    actionsItem = row;
+    actionsFrom = "clipboard";
     actionsLevel = "actions";
     actionsWorkspaces = [];
     page = "actions";
@@ -304,8 +328,10 @@ QtObject {
   function closeActions() {
     if (page !== "actions")
       return;
+    const back = actionsFrom;
     armedKey = "";
-    page = "";
+    actionsFrom = "";
+    page = back;
     actionsItem = null;
     actionsLevel = "actions";
     actionsWorkspaces = [];
@@ -336,6 +362,22 @@ QtObject {
       lastWorkspaceId = row.workspaceId;
       lastActionsEffect = "workspace " + row.workspaceId;
       close();
+    } else if (row.act === "clipboard-copy") {
+      clipboardService.copy(actionsItem.clipboard.item);
+      close();
+    } else if (row.act === "clipboard-pin") {
+      clipboardService.togglePin(actionsItem.clipboard.item);
+      closeActions();
+    } else if (row.act === "clipboard-delete") {
+      clipboardService.remove(actionsItem.clipboard.item);
+      closeActions();
+    } else if (row.act === "clipboard-clear") {
+      if (armedKey !== Search.rowKey(row)) {
+        armedKey = Search.rowKey(row);
+        return;
+      }
+      clipboardService.clear();
+      closeActions();
     } else if (row.copy !== undefined) {
       copyText(String(row.copy));
       close();

@@ -299,13 +299,13 @@ function settingRows(pages) {
 // ---- Comandos de sessão ----
 
 // Os nomes e os ícones dos quatro primeiros são os da tela inicial dos Ajustes (settings/Home.qml). O "Log out" usa
-// o `arrow-up-right`, porque o conjunto de ícones não tem o `log-out`. `danger` pede a confirmação antes de rodar.
+// o `log-out` do Lucide, que trouxe para o conjunto na F6-T19 (P-78). `danger` pede a confirmação antes de rodar.
 var COMMANDS = [
   { action: "lock", title: "Lock screen", icon: "lock", danger: false },
   { action: "suspend", title: "Sleep", icon: "moon", danger: false },
   { action: "reboot", title: "Restart", icon: "rotate-ccw", danger: true },
   { action: "shutdown", title: "Power off", icon: "power", danger: true },
-  { action: "logout", title: "Log out", icon: "arrow-up-right", danger: true }
+  { action: "logout", title: "Log out", icon: "log-out", danger: true }
 ];
 
 function commandRows() {

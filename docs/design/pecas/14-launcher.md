@@ -65,7 +65,7 @@ Li os seis estados pelo `get_design_context`: vazio `13:17130`, aberto pelo "+" 
 - **Cartão:** a expressão aparece formatada, com um espaço de cada lado do operador e `×`, `÷` e `−` no lugar de `*`, `/` e `-`; o que não cabe na caixa de 260 é cortado com reticências, e o valor inteiro fica na linha "Copy result".
 - **Linhas de ação:** "Copy result" (a selecionada ao entrar no modo) e, só quando o resultado é inteiro e não negativo, "In hexadecimal" (`0x1CC`). Enter ou clique copia o texto da linha (o resultado como aparece, ou o hexadecimal) e fecha o launcher. A cópia é o `wl-copy`, com o texto como argumento.
 - **Altura:** 368 com as duas linhas (o board tem 360: P-68) e 324 só com "Copy result".
-- **Rodapé:** ícone `calculator`, "Calculator" e uma ação só, "Copy ↵". O "Colar Ctrl ↵" do board ficou de fora: escrever na janela que estava em foco pede uma ferramenta que a shell não traz (P-71).
+- **Rodapé:** ícone `calculator`, "Calculator", "Copy ↵" e, desde a `F5-T05`, "Actions Ctrl K" no lugar onde o board tinha "Colar Ctrl ↵". O "Colar" ficou de fora de vez (P-71, 2026-11-18): escrever na janela que estava em foco pede o `wtype`, que tem um defeito aberto no Niri e eu não vou usar.
 - **Tokens:** `fontLauncherExpression` (28) e `fontLauncherResult` (40), em Geist Serif, e os `launcherCalc*` do `Theme.qml`, com o nó do Figma no comentário.
 
 ## Vazio e sem resultado: como funcionam (`F5-T04`, proposta da P-72)
@@ -95,6 +95,33 @@ A P-12 (2026-11-18) escolheu as fontes; o board não decide como casar, ordenar 
 - **Clique** numa linha também a seleciona, para o Enter seguinte valer para ela.
 - **Aberto pelo "+":** o workspace já está em foco, então o app escolhido nasce nele sem nada a mais.
 - **O que fica para ver ao vivo:** voltar de uma subpágina dos Ajustes aberta pelo launcher fecha os Ajustes, em vez de ir para a página mãe, porque `Settings.State.open` começa sem histórico; e o `fd` não ignora acentos (o texto "cafe" não traz um arquivo "Café.txt", embora a ordenação ignore).
+
+## Menu de ações: como funciona (`F5-T05`, P-13)
+
+O rodapé mostra "Actions Ctrl K" desde a `F5-T01`, mas o menu não tem board. A P-13 (2026-11-18) escolheu o conteúdo, e a forma é uma composição minha (ajuste A-05), sem valor novo.
+
+- **É uma subpágina do launcher**, como a do seletor de cor, e não um menu flutuante: o launcher muda de altura com a lista, e um menu por cima dele não teria onde caber quando há uma linha só.
+- **Cabeçalho:** o botão de voltar da página de cor (`chevron-left` em (12,12)) e o nome do item na caixa do campo de busca, em Geist Regular 17 `text`, cortado com reticências. No cálculo, o nome é a expressão formatada, como no cartão.
+- **Lista:** o rótulo "Actions" em y 64 e uma linha por ação a partir de y 88, com a linha de resultado de sempre: nome da ação, tipo "Action", ícone, e a tecla ↵ na selecionada. O divisor do rodapé fica 4 abaixo da última. Três ações dão 268 de altura, duas dão 224 e uma dá 180.
+- **Rodapé:** o modo continua "Launcher", com `Run ↵` e `Back Esc`.
+- **Ações por tipo de item:**
+
+  | Item | Ação | Ícone | O que faz |
+  |---|---|---|---|
+  | App | Open | `arrow-up-right` | o Enter na linha: executa, entra nos recentes, fecha |
+  | App | Open on workspace… | `layout-grid` | troca a lista pela dos workspaces |
+  | App | Remove from recent | `trash-2` | só para app que está nos recentes; tira da lista e volta à busca, com o launcher aberto |
+  | File | Open | `arrow-up-right` | `xdg-open` no arquivo |
+  | File | Show in folder | `folder` | `xdg-open` na pasta onde ele está |
+  | File | Copy path | `copy` | copia o caminho absoluto |
+  | Setting | Open | `arrow-up-right` | o Enter na linha |
+  | Command | Run | `play` | o Enter na linha; no perigoso, ícone em `dangerText` e a mesma confirmação de dois Enters |
+  | Cálculo | Copy result | `copy` | copia o resultado |
+  | Cálculo | Copy hexadecimal | `hash` | só quando há hexadecimal |
+
+- **"Open on workspace…":** a lista vira os workspaces do monitor do launcher, sob o rótulo "Open on workspace", cada um como "Workspace N", com o número que o organizador mostra (o mesmo da etiqueta "On workspace N"), inclusive a linha de criação. Enter foca o workspace (`NiriMsg.focusWorkspaceId`, o foco do "+") e, se o Niri aceitar, executa o app, grava nos recentes e fecha; se recusar, o menu fica como está. A lista é o retrato do organizador no momento em que abre.
+- **Teclas:** Ctrl+K na busca abre o menu da linha selecionada; com um chip em foco, sem linha, ou numa linha sem ações (as do "sem resultado"), não faz nada. No menu, ↑↓ andam, Enter e clique rodam, Esc, Backspace e o botão de voltar retornam um passo (dos workspaces para as ações, das ações para a busca) e Ctrl+K fecha o menu de qualquer camada. A busca volta com o mesmo texto e a mesma linha selecionada.
+- **"Show in folder"** abre a pasta-mãe pelo `xdg-open`, sem destacar o arquivo dentro dela.
 
 ## Aberto pelo "+": como funciona (`F5-T06`, proposta da P-74)
 
@@ -136,4 +163,4 @@ A ficha e o board estão em português; a shell mostra o equivalente em inglês.
 ## A CONFIRMAR
 
 - ~~Fontes da busca (apps, arquivos, ajustes, comandos).~~ Respondida na P-12 (2026-11-18): está em "Busca: como funciona". As regras de casar, ordenar e agrupar são a P-78, que não trava.
-- Ctrl+K (“Ações”) aparece no rodapé, mas o menu de ações não tem board próprio. **A CONFIRMAR NO FIGMA (node 13:17120)** o conteúdo desse menu, ou implemente um menu mínimo e pergunte.
+- ~~Ctrl+K (“Ações”): o conteúdo do menu.~~ Respondida na P-13 (2026-11-18): está em "Menu de ações: como funciona".

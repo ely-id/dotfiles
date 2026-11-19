@@ -24,7 +24,7 @@ Com a shell aberta, aciono ações pelo IPC do Quickshell (`qs -p ~/Projects/dot
 | `settings toggle` | Abre ou fecha a tela inicial de Ajustes e sessão |
 | `settings open <página>` | Abre direto uma subpágina (`appearance`, `system`, `display`, `information`, `manual`, `wallpaper`) |
 | `settings close` | Fecha os Ajustes |
-| `launcher toggle` / `open` / `close` | Abre ou fecha o launcher no monitor em foco (F5; ainda sem fonte de resultados) |
+| `launcher toggle` / `open` / `close` | Abre ou fecha o launcher no monitor em foco (F5) |
 | `manual open` | Abre o Manual de atalhos |
 | `volume increase` / `decrease` | Ajusta o volume de saída em passos de 2% |
 | `volume muteOutput` / `muteInput` | Alterna o mudo da saída ou do microfone |
@@ -74,7 +74,7 @@ wintermute-shell/settings/manual/keybinds.py generate --output ~/.config/niri/cf
 | `bluetooth/` | Painel empilhado de Bluetooth: pareados, próximos, pareamento e detalhes (`actions.py` via BlueZ/D-Bus) |
 | `audio/` | Painel de som: abas de saída/entrada, slider de volume e lista de dispositivos PipeWire |
 | `battery/` | Pop-up de bateria e seletor de perfil de energia (`power-profiles-daemon`), indicador e alerta de bateria baixa |
-| `launcher/` | Launcher (ficha 14): janela por tela com o véu, o vidro com busca, lista por seções e rodapé, e o estado `State.qml` que a peça lê. Também o seletor de cor (ficha 15): a página de resultado (`ColorPage.qml`, `Colors.js` com formatos, nome da cor e histórico, e o histórico em `$XDG_STATE_HOME/wintermute-shell/colors.json`) e a lupa sobre a tela congelada (`LoupeWindow.qml` por tela, `LoupeState.qml`, a peça `ColorLoupe.qml` e `PixelReader.qml`, que lê os pixels de qualquer item) |
+| `launcher/` | Launcher (ficha 14): janela por tela com o véu, o vidro com busca, lista por seções e rodapé, e o estado `State.qml` que a peça lê. A busca (`Search.js`, biblioteca pura) casa e ordena apps, arquivos (`FileSearch.qml`, que roda o `fd`), páginas dos Ajustes e comandos de sessão, e os recentes ficam em `$XDG_STATE_HOME/wintermute-shell/launcher-recents.json`. Também o seletor de cor (ficha 15): a página de resultado (`ColorPage.qml`, `Colors.js` com formatos, nome da cor e histórico, e o histórico em `$XDG_STATE_HOME/wintermute-shell/colors.json`) e a lupa sobre a tela congelada (`LoupeWindow.qml` por tela, `LoupeState.qml`, a peça `ColorLoupe.qml` e `PixelReader.qml`, que lê os pixels de qualquer item) |
 | `settings/` | Tela inicial de Ajustes, botões de sessão (`session.py`), bandeja do sistema (`Tray.qml`), leitor KDL (`kdl.py`) e subpáginas em `appearance/`, `display/`, `system/`, `information/` e `manual/` |
 | `screenshot/` | Prévia de captura de tela na barra (`Preview.qml`), cópia para a área de transferência (`clipboard.py`) e código do plugin C++ de arraste (`native/`, desligado até a F6) |
 | `wallpaper/` | Camada de papel de parede por monitor (`desktop/`), shader dinâmico (`daylight/`) e script de seleção (`control.py`) |

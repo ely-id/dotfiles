@@ -6,8 +6,9 @@ import "../launcher" as Launcher
 //   state    "empty" (busca vazia: três recentes e as ferramentas), "empty-tools" (sem recentes),
 //            "no-result" (busca "xyzzy", com as duas linhas de ação), "no-result-bare" (o mesmo sem as
 //            linhas), "typing" (busca "ter" com a sugestão "minal"), "grouped" (busca "no", quatro
-//            seções), "calc" (a busca é `expression`; o cálculo ocupa o launcher) ou "color" (a página de resultado do
-//            seletor de cor: #3FA9D9 "pega agora" no Firefox e o histórico do board)
+//            seções), "confirm" (o mesmo, com o comando perigoso armado: selecione a linha 5), "calc" (a busca é
+//            `expression`; o cálculo ocupa o launcher) ou "color" (a página de resultado do seletor de cor: #3FA9D9
+//            "pega agora" no Firefox e o histórico do board)
 //   selected índice da linha selecionada, contando as linhas de todas as seções
 //   hovered  índice da linha sob o ponteiro, ou -1
 //   chip     chip das ferramentas com o foco do teclado, ou -1 (com um chip em foco nenhuma linha fica selecionada)

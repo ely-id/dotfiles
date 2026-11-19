@@ -5,15 +5,19 @@ import ".."
 import "../settings" as Settings
 import "Calculator.js" as Calculator
 import "Colors.js" as Colors
+import "Search.js" as Search
 import Quickshell
 import Quickshell.Io
 
 // Estado do launcher (ficha 14). É a superfície que a peça lê (decisão 0011); o serviço fictício de
-// demo/LauncherService.qml tem os mesmos nomes. Na F5-T01 ainda não existe fonte de dados: `sections`, `recents`
-// e `ghost` ficam vazios. A fonte de verdade chega na F5-T02. O cálculo (F5-T03) já funciona: depende
-// só do texto, então `calculation`, o modo e o rodapé saem dele. As ferramentas do estado vazio (F5-T04) são
-// fixas. O seletor de cor (F5-T08) abre uma página própria, `page === "color"`, com a cor mais recente do histórico;
-// as outras (F5-T09 e a F6) ainda não existem, então `openTool` só registra no log para elas.
+// demo/LauncherService.qml tem os mesmos nomes. As fontes de resultado (F5-T02) são quatro: os aplicativos
+// (DesktopEntries), os arquivos (FileSearch.qml, que roda o `fd`), as páginas dos Ajustes e os comandos de sessão.
+// A biblioteca Search.js casa e ordena, decide entre "Best match" e os grupos e calcula a sugestão fantasma; aqui ficam
+// as fontes, os recentes (launcher-recents.json), a confirmação do comando perigoso e `activate`, que despacha pelo
+// alvo da linha (`row.target`). O cálculo (F5-T03) depende só do texto, então `calculation`, o modo e o rodapé saem dele.
+// As ferramentas do estado vazio (F5-T04) são fixas. O seletor de cor (F5-T08) abre uma página própria,
+// `page === "color"`, com a cor mais recente do histórico; as outras (F5-T09 e a F6) ainda não existem, então
+// `openTool` só registra no log para elas.
 Singleton {
   id: root
 
@@ -24,14 +28,21 @@ Singleton {
   // abre nesse workspace), null pelo atalho e pelo IPC. `number` é o que o organizador mostra, não o id do Niri.
   property var context: null
   readonly property string contextLabel: context ? "On workspace " + context.number : ""
-  // O resto da palavra sugerida (para "ter", "minal"). Vazio quando não há sugestão.
-  property string ghost: ""
-  // Lista de { label, rows }; cada linha é { title, detail, kind, icon, iconSource, danger }.
-  // `icon` é o nome de um ícone de icons/; `iconSource` é um caminho ou um nome de ícone do tema.
+  // O resto da palavra sugerida (para "ter", "minal"): o que falta do título da primeira linha quando o texto é
+  // prefixo dele. Vazio quando não há sugestão, e no cálculo.
+  readonly property string ghost: calculation ? "" : Search.ghost(query, sections)
+  // Lista de { label, rows }; cada linha é { title, detail, kind, icon, iconSource, danger } e carrega o alvo dela em
+  // `target` (Search.js). `icon` é o nome de um ícone de icons/; `iconSource` é um caminho ou um nome de ícone do tema.
+  // Não é um binding puro: `applySections` decide quando publicar (ver "Sem piscar" abaixo).
   property var sections: []
   // Os apps recentes, mostrados na busca vazia sob "Recent": lista de linhas, no mesmo formato das de `sections`.
-  // Sem recentes, a seção não aparece.
-  property var recents: []
+  // Sem recentes, a seção não aparece. São os `Search.RECENTS_SHOWN` primeiros ids do arquivo que ainda existem
+  // como app instalado.
+  readonly property var recents: Search.recentRows(recentIds, appIndex.byId, Search.RECENTS_SHOWN)
+  // A resposta de arquivos que ainda falta para o texto atual: o `fd` rodando, ou um texto novo que ainda não chegou ao
+  // `fd` (o atraso da busca). Derivado do texto, e não do estado interno do FileSearch, para valer no mesmo instante em
+  // que o texto muda. O launcher nunca mostra "Nothing found" enquanto isto é verdade.
+  readonly property bool searching: filesText.length >= files.minChars && (files.searching || files.outputText !== filesText)
   // As ferramentas da busca vazia, na ordem do board: { key, label, icon }. A chave vai para `openTool`.
   readonly property var tools: [
     { key: "color", label: "Color picker", icon: "pipette" },
@@ -52,6 +63,130 @@ Singleton {
   // A página aberta no lugar da busca: "" (a busca) ou "color" (o resultado do seletor de cor). Abrir o launcher
   // sempre começa na busca.
   property string page: ""
+
+  // ---- Fontes de resultado (F5-T02) ----
+  // As entradas de .desktop. O teste troca por entradas fictícias com os mesmos campos (id, name, genericName,
+  // keywords, noDisplay, icon e o método execute()).
+  property var appEntries: Array.from(DesktopEntries.applications.values)
+  // { rows, byId }: as linhas dos apps que aparecem em menu e o mapa id → linha.
+  readonly property var appIndex: Search.appRows(appEntries)
+  readonly property var settingRows: Search.settingRows(Settings.State.pages)
+  readonly property var commandRows: Search.commandRows()
+  // A pasta pessoal, para escrever "~" no detalhe dos arquivos.
+  property string homeDir: Quickshell.env("HOME") || ""
+  readonly property var fileRows: Search.fileRows(files.output, homeDir)
+  // Onde a busca de arquivos procura e com que binário; o teste aponta para uma pasta temporária e um `fd` de mentira.
+  property alias fileDirectories: files.directories
+  property alias fileBinary: files.binary
+  // Roda um comando solto (xdg-open, o script de sessão, o niri). O teste troca por uma função que só anota.
+  property var exec: argv => Quickshell.execDetached(argv)
+
+  // Os ids dos apps que abri pelo launcher, o mais novo primeiro, no máximo `Search.RECENTS_KEPT`.
+  property var recentIds: []
+  // A linha de comando perigosa que levou o primeiro Enter e espera o segundo ("command:reboot"), ou "".
+  property string armedKey: ""
+
+  // As seções do texto atual: os resultados que casam, em "Best match" ou nos grupos (Search.js). A linha armada
+  // mostra a confirmação no detalhe.
+  readonly property var candidateSections: decorate(Search.buildSections(String(query).trim(), {
+    apps: appIndex.rows,
+    files: fileRows,
+    settings: settingRows,
+    commands: commandRows
+  }, recentIds), armedKey)
+
+  function decorate(built, armed) {
+    if (armed === "")
+      return built;
+    return built.map(section => ({
+      label: section.label,
+      rows: section.rows.map(row => Search.rowKey(row) === armed
+          ? Object.assign({}, row, { detail: "Press ↵ again to confirm" }) : row)
+    }));
+  }
+
+  // Sem piscar: enquanto o `fd` não responde, as outras fontes já valem. Se elas têm resultado, publico na hora (as
+  // linhas de arquivo da busca anterior que ainda casam com o texto novo continuam, porque `fileRows` guarda a última
+  // resposta e a busca as filtra de novo). Se não têm nada, mantenho as seções como estavam até a resposta chegar: o
+  // "Nothing found" nunca aparece com a busca de arquivos em andamento e some um instante depois.
+  function applySections() {
+    const next = candidateSections;
+    if (Search.countRows(next) === 0 && searching)
+      return;
+    sections = next;
+  }
+
+  onCandidateSectionsChanged: applySections()
+  onSearchingChanged: applySections()
+
+  // A peça avisa qual linha ficou selecionada (nenhuma, com um chip em foco). Mudar a seleção desarma o comando
+  // perigoso, a não ser que a selecionada seja a própria linha armada.
+  function selectRow(row) {
+    if (armedKey !== "" && Search.rowKey(row) !== armedKey)
+      armedKey = "";
+  }
+
+  // O texto que vai para o `fd`: só na busca de texto (sem cálculo, sem página).
+  readonly property string filesText: page === "" && !calculation ? String(query).trim() : ""
+
+  FileSearch {
+    id: files
+    text: root.filesText
+  }
+
+  FileView {
+    id: recentsFile
+    path: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state")
+        + "/wintermute-shell/launcher-recents.json"
+    blockLoading: true
+    blockWrites: true
+    atomicWrites: true
+    printErrors: false
+    onSaveFailed: error => console.warn("launcher: não gravei os recentes:", error)
+  }
+
+  // Relê o arquivo. Ausente, estragado ou fora do formato vale como lista vazia, sem erro na tela.
+  function loadRecents() {
+    recentsFile.reload();
+    // O reload só vale no turno seguinte do laço de eventos; espero a leitura para não ler o que ficou em cache.
+    recentsFile.waitForJob();
+    let text = "";
+    try {
+      text = recentsFile.text();
+    } catch (error) {
+      text = "";
+    }
+    recentIds = Search.parseRecents(text, Search.RECENTS_KEPT);
+  }
+
+  function rememberApp(id) {
+    recentIds = Search.pushRecent(recentIds, id, Search.RECENTS_KEPT);
+    recentsFile.setText(Search.serializeRecents(recentIds));
+  }
+
+  // O comando de cada ação de sessão. Lock, Sleep, Restart e Power off passam pelo settings/session.py, como a tela
+  // inicial dos Ajustes (que usa a janela dos Ajustes para fechar, o que não serve aqui); "Log out" sai do Niri, e a
+  // confirmação já foi a do launcher.
+  function commandArgv(action) {
+    if (action === "logout")
+      return ["niri", "msg", "action", "quit", "--skip-confirmation"];
+    return ["python3", Quickshell.shellDir + "/settings/session.py", action];
+  }
+
+  // O comando de sessão sai depois que o launcher some (o mesmo tempo que os Ajustes esperam), para a janela não
+  // aparecer congelada na tela de bloqueio nem na volta da suspensão.
+  property var pendingCommand: null
+
+  Timer {
+    id: commandDelay
+    interval: Theme.settingsCloseDuration
+    onTriggered: {
+      const argv = root.pendingCommand;
+      root.pendingCommand = null;
+      if (argv)
+        root.exec(argv);
+    }
+  }
 
   readonly property string mode: page === "color" ? "color" : calculation ? "calculator" : "launcher"
   readonly property string modeLabel: page === "color" ? "Color picker" : calculation ? "Calculator" : "Launcher"
@@ -74,18 +209,20 @@ Singleton {
   function open(requestedOutputName, requestedContext) {
     outputName = requestedOutputName || Settings.State.focusedOutputName();
     query = "";
-    ghost = "";
+    armedKey = "";
     context = requestedContext || null;
     closePage();
     // Uma abertura nova não tem cor "pega agora".
     colorFreshStamp = "";
     loadColors();
+    loadRecents();
     opened = true;
   }
 
   function close() {
     opened = false;
     context = null;
+    armedKey = "";
   }
 
   function toggle(requestedOutputName) {
@@ -96,9 +233,10 @@ Singleton {
       open(targetOutput);
   }
 
+  // Digitar desarma o comando perigoso que esperava a confirmação.
   function setQuery(text) {
     query = text;
-    ghost = "";
+    armedKey = "";
   }
 
   // Tab: o texto passa a ser a palavra inteira.
@@ -258,11 +396,46 @@ Singleton {
     console.info("launcher: ferramenta pedida, ainda sem destino:", key);
   }
 
-  // Enter ou clique numa linha. A linha de ação do cálculo traz o texto em `copy`: copio e fecho. Sem fonte
-  // de dados ainda para as outras linhas, só fecho.
+  // Enter ou clique numa linha, despachado pelo alvo dela. A linha de ação do cálculo traz o texto em `copy`: copio e
+  // fecho. Um app executa a própria entrada e entra nos recentes; um arquivo abre com o xdg-open; um ajuste abre a
+  // página no monitor do launcher; um comando roda (o perigoso só no segundo Enter). Tudo fecha o launcher, menos
+  // o primeiro Enter do comando perigoso.
   function activate(row) {
-    if (row && row.copy !== undefined)
+    if (!row) {
+      close();
+      return;
+    }
+    if (row.copy !== undefined) {
       copyText(String(row.copy));
+      close();
+      return;
+    }
+    const target = row.target || {};
+    if (target.type === "command") {
+      runCommand(row);
+      return;
+    }
+    if (target.type === "app") {
+      target.entry.execute();
+      rememberApp(target.id);
+    } else if (target.type === "file") {
+      exec(["xdg-open", target.path]);
+    } else if (target.type === "setting") {
+      Settings.State.open(outputName, target.page);
+    }
+    close();
+  }
+
+  // O primeiro Enter numa linha perigosa arma (o detalhe vira "Press ↵ again to confirm"); o segundo, na mesma
+  // linha, roda e fecha. Os que não são perigosos rodam no primeiro.
+  function runCommand(row) {
+    const key = Search.rowKey(row);
+    if (row.danger && armedKey !== key) {
+      armedKey = key;
+      return;
+    }
+    pendingCommand = commandArgv(row.target.action);
+    commandDelay.restart();
     close();
   }
 }

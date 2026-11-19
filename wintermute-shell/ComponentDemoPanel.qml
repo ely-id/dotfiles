@@ -934,6 +934,11 @@ PanelWindow {
                   Demo.LauncherSpecimen { state: "grouped"; selected: 0; hovered: 2 }
                 }
                 Specimen {
+                  caption: "Comando perigoso armado 640×496 · Power off now selecionada, depois do primeiro Enter · o detalhe vira \"Press ↵ again to confirm\" (text na selecionada) · o segundo Enter roda e fecha; mudar a seleção ou digitar desarma"
+                  stageWidth: 640; stageHeight: 496
+                  Demo.LauncherSpecimen { state: "confirm"; selected: 5 }
+                }
+                Specimen {
                   caption: "Cálculo 640×368 · busca 128*3.5+12 · cartão 624×128 em (8,88) · Copy result selecionada e In hexadecimal · rodapé só com Copy ↵"
                   stageWidth: 640; stageHeight: 368
                   Demo.LauncherSpecimen { state: "calc"; selected: 0 }

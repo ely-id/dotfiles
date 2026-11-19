@@ -4,10 +4,10 @@ import "../launcher/Calculator.js" as Calculator
 import "../launcher/Colors.js" as Colors
 
 // Serviço fictício do launcher para a vitrine e a bancada (decisão 0011). Tem a mesma superfície de
-// launcher/State.qml: opened, outputName, query, ghost, sections, recents, tools, fallbackRows, decimalSeparator,
+// launcher/State.qml: opened, outputName, query, ghost, sections, recents, searching, tools, fallbackRows, decimalSeparator,
 // calculation, mode, modeLabel, modeIcon, searchIcon, actions, context, contextLabel, page, colorHistory, colorShown,
 // colorFreshStamp, colorCopied, colorInfo, colorOrigin e as funções open, close, toggle, setQuery, acceptGhost,
-// copyCommand, copyText, openTool, activate, addColor, showColor, copyColor, pickAnother e closePage. Os dados são
+// copyCommand, copyText, openTool, activate, selectRow, addColor, showColor, copyColor, pickAnother e closePage. Os dados são
 // inventados: o histórico de cores é o do board, e nada aqui lê arquivo nem roda processo.
 // `scenario` escolhe o estado:
 //   "empty"        busca vazia com três recentes e as quatro ferramentas
@@ -15,6 +15,8 @@ import "../launcher/Colors.js" as Colors
 //   "no-result"    busca "xyzzy" que não acha nada, com as duas linhas de ação
 //   "no-result-bare" o mesmo sem as linhas de ação (o que o serviço de verdade oferece por enquanto)
 //   "typing", "grouped" ou "calc" (a busca é `expression`, o cálculo ocupa o launcher).
+//   "confirm"      o "grouped" com a linha "Power off now" armada: o primeiro Enter num comando perigoso deixa o detalhe
+//                  em "Press ↵ again to confirm" (a peça de verdade faz isso no State.qml; aqui o dado já vem assim).
 //   "color"        a página de resultado do seletor de cor: #3FA9D9 "pega agora" no Firefox e o histórico do board.
 //                  `copied` ("", "hex", "rgb" ou "hsl") deixa a linha em "Copied".
 // O cálculo usa a mesma biblioteca da peça de verdade. As linhas de ação seguem o texto que estiver na busca em
@@ -39,13 +41,16 @@ QtObject {
 
   property bool opened: true
   property string outputName: ""
-  property string query: scenario === "typing" ? "ter" : scenario === "grouped" ? "no"
+  property string query: scenario === "typing" ? "ter" : scenario === "grouped" || scenario === "confirm" ? "no"
       : scenario === "calc" ? expression
       : scenario === "no-result" || scenario === "no-result-bare" ? "xyzzy" : ""
   property string ghost: scenario === "typing" ? "minal" : ""
   property var sections: scenario === "typing" ? typingSections
-      : scenario === "grouped" ? groupedSections : []
+      : scenario === "grouped" ? groupedSections
+      : scenario === "confirm" ? confirmSections : []
   property var recents: scenario === "empty" ? recentRows : []
+  // O serviço de verdade tem uma busca de arquivos assíncrona; aqui os dados já estão prontos.
+  readonly property bool searching: false
   readonly property var tools: [
     { key: "color", label: "Color picker", icon: "pipette" },
     { key: "emoji", label: "Emoji", icon: "smile" },
@@ -166,6 +171,16 @@ QtObject {
       ]
     }
   ]
+
+  // O "grouped" com o comando perigoso armado: o único detalhe que muda é o da última linha.
+  readonly property var confirmSections: groupedSections.map(section => ({
+    label: section.label,
+    rows: section.rows.map(row => row.danger ? Object.assign({}, row, { detail: "Press ↵ again to confirm" }) : row)
+  }))
+
+  // A peça avisa a linha selecionada; o fictício só guarda, para o teste de comportamento.
+  property var lastSelectedRow: null
+  function selectRow(row) { lastSelectedRow = row; }
 
   function open(requestedOutputName, requestedContext) { opened = true; }
   function close() { opened = false; closes += 1; }

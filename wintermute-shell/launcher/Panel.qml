@@ -20,7 +20,9 @@ import ".."
 //   empty  busca vazia: "Recent" (as linhas de `service.recents`) e "Tools" (a fila de chips de `service.tools`),
 //          com o divisor do rodapé 16 abaixo dos chips.
 //   none   há texto, não é cálculo e o serviço não achou nada: o bloco "Nothing found" e, 16 abaixo da dica, as
-//          linhas de `service.fallbackRows` (sem rótulo). Sem elas o divisor do rodapé fica nos 16 da dica.
+//          linhas de `service.fallbackRows` (sem rótulo). Sem elas o divisor do rodapé fica nos 16 da dica. Só vale com
+//          a busca de arquivos terminada (`service.searching` falso); enquanto ela dura, sem nenhuma linha para mostrar,
+//          a lista fica vazia em vez de piscar o aviso.
 //   list   as seções do serviço.
 // Os chips entram na seleção pelo teclado (P-72): ↓ depois da última linha (ou direto, sem recentes) vai ao
 // primeiro chip, ← e → andam entre eles, ↑ volta às linhas. Com um chip em foco nenhuma linha fica selecionada.
@@ -46,7 +48,7 @@ Item {
 
   // Posições absolutas (no quadro) de cada rótulo e de cada linha, e do divisor do rodapé.
   readonly property var plan: buildPlan(service.page, service.sections, service.calculation,
-      String(service.query).trim(), service.recents, service.tools, service.fallbackRows)
+      String(service.query).trim(), service.recents, service.tools, service.fallbackRows, service.searching)
   readonly property int rowCount: plan.rows.length
   readonly property int chipCount: plan.chips ? plan.chips.items.length : 0
   readonly property real listTop: Theme.launcherSearchHeight + Theme.launcherDividerHeight
@@ -60,7 +62,7 @@ Item {
   width: implicitWidth
   height: implicitHeight
 
-  function buildPlan(page, sections, calculation, query, recents, tools, fallbackRows) {
+  function buildPlan(page, sections, calculation, query, recents, tools, fallbackRows, searching) {
     if (page === "color") {
       return { kind: "color", labels: [], rows: [], card: null, chips: null, notice: null,
           footerY: Theme.launcherColorFooterY };
@@ -91,7 +93,9 @@ Item {
       kind = "empty";
       sections = (recents || []).length > 0 ? [{ label: "Recent", rows: recents }] : [];
     } else if (!(sections || []).some(section => (section.rows || []).length > 0)) {
-      kind = "none";
+      // Sem linha e com a busca de arquivos em andamento, ainda não sei que não há nada: a lista fica vazia.
+      if (!searching)
+        kind = "none";
       sections = [];
     }
     (sections || []).forEach(section => {
@@ -228,8 +232,24 @@ Item {
         entry.y + Theme.launcherResultHeight + (selected === rowCount - 1 ? Theme.launcherFooterGap : 0));
   }
 
-  onSelectedChanged: ensureVisible()
-  onChipIndexChanged: ensureVisible()
+  // Avisa o serviço qual linha está selecionada (nenhuma, com um chip em foco): mudar a seleção desarma o comando
+  // perigoso que esperava a confirmação. Também quando o plano se refaz, porque a linha selecionada pode ter mudado.
+  function reportSelection() {
+    if (!service.selectRow)
+      return;
+    const entry = chipIndex < 0 ? plan.rows[selected] : null;
+    service.selectRow(entry ? entry.row : null);
+  }
+
+  onSelectedChanged: {
+    ensureVisible();
+    reportSelection();
+  }
+  onChipIndexChanged: {
+    ensureVisible();
+    reportSelection();
+  }
+  onPlanChanged: reportSelection()
   onRowCountChanged: {
     if (selected > rowCount - 1)
       selected = Math.max(0, rowCount - 1);
@@ -362,7 +382,11 @@ Item {
           danger: !!modelData.row.danger
           selected: index === root.selected && root.chipIndex < 0
           forceHovered: index === root.hoverIndex
-          onClicked: root.activateIndex(index)
+          // O clique também seleciona a linha: depois do primeiro clique num comando perigoso, o Enter vale para ele.
+          onClicked: {
+            root.selected = index;
+            root.activateIndex(index);
+          }
         }
       }
     }

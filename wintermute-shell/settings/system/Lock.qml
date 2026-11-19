@@ -8,7 +8,7 @@ import "../.." as Shell
 // Página Bloqueio e suspensão (ficha 13; Figma 13:15971): modal de 580×420. Seletor "Plugged in" /
 // "On battery" de 168×40 em (30,84), três linhas de valor a partir de y 144 (bloquear, desligar a tela e
 // suspender) e a chave "Ask for password on wake". Sem bateria, o seletor some e as linhas sobem para
-// y 84, como na origem. Cada valor abre o menu suspenso da origem, que fica assim por enquanto (P-46). A chave fica guardada e só
+// y 84, como na origem. Cada valor abre o menu suspenso dos Ajustes (Dropdown.qml, F6-T17). A chave fica guardada e só
 // passa a valer com a tela de bloqueio da F7. Lê o estado por `idle` (decisão 0011).
 Settings.Modal {
   id: root
@@ -95,7 +95,8 @@ Settings.Modal {
       id: dropdownLoader
       active: !!root.dropdownField
       x: root.width - width - 38
-      y: root.dropdownCenter - height / 2
+      // Com a linha de 44 o menu cheio tem 280 e passaria da base do modal na linha Sleep: mesma trava da Tela (F6-T17).
+      y: Math.max(60, Math.min(root.dropdownCenter - height / 2, root.height - height - 24))
       sourceComponent: Component {
         Settings.Dropdown {
           objectName: "lockDropdown"

@@ -20,7 +20,7 @@
 # Não conta: Qt.rgba(0, 0, 0, 0), que é só transparente.
 #   - texto de interface com acento: a interface fala inglês (decisão 0012)
 #
-# Ficam de fora o Theme.qml, o LegacyColors.qml, a vitrine (ComponentDemoPanel.qml,
+# Ficam de fora o Theme.qml, a vitrine (ComponentDemoPanel.qml,
 # FontTestPanel.qml) e os dados fictícios de demo/. Uma linha com o comentário
 # "proveniencia:" seguido da fonte (ex.: // proveniencia: ficha 13, logo) também
 # fica de fora: é o jeito de dizer de onde veio um valor que não é token.
@@ -35,7 +35,7 @@ repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo"
 base="${1:-HEAD}"
 
-fora='^wintermute-shell/(Theme\.qml|LegacyColors\.qml|ComponentDemoPanel\.qml|FontTestPanel\.qml|demo/)'
+fora='^wintermute-shell/(Theme\.qml|ComponentDemoPanel\.qml|FontTestPanel\.qml|demo/)'
 
 # Texto de interface com letra acentuada (À a ÿ). Com a locale em UTF-8 o bash recusa a faixa [À-ÿ]
 # no [[ =~ ]] ("Invalid range end"), e a checagem ficava desligada sem reprovar nada. O grep com

@@ -218,7 +218,7 @@ Settings.Modal {
       sourceComponent: Component {
         Settings.Dropdown {
           objectName: "displayDropdown"
-          maximumHeight: Math.max(56, root.height - 84)
+          maximumHeight: Math.max(2 * Shell.Theme.settingsDropdownInset + Shell.Theme.settingsDropdownRowHeight, root.height - 84)
           width: root.dropdownField === "scale" ? 226 : 276
           options: root.dropdownRow ? root.dropdownRow.options : []
           currentValue: root.dropdownRow ? root.dropdownRow.current : ""

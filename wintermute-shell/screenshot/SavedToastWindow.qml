@@ -26,7 +26,7 @@ PanelWindow {
   screen: bar.screen
   visible: requested || reveal > 0.001
   color: "transparent"
-  // O desfoque do compositor atrás do cartão; sem ler a camada de compatibilidade do tema, como o editor e a captura.
+  // O desfoque do compositor atrás do cartão, como o editor e a captura.
   BackgroundEffect.blurRegion: savedBlur
   onRevealChanged: savedBlur.changed()
   Region {

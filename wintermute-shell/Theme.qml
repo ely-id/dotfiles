@@ -13,9 +13,6 @@ import Quickshell.Io
 // Nunca invente um valor que não esteja aqui ou nas fichas de
 // docs/design/pecas/. Se faltar, pergunte — não chute.
 //
-// O bloco "Compatibilidade com o código de partida", no fim, não é tema: é o
-// que mantém o código antigo abrindo até cada peça ser redesenhada.
-//
 // Cores com alpha neste arquivo usam Qt.rgba / Qt.alpha (canais 0–1).
 // tokens.json guarda alpha no formato CSS #RRGGBBAA; use fromCss() para converter.
 // Qt Quick usa #AARRGGBB se você montar uma string de 8 dígitos na mão.
@@ -259,6 +256,19 @@ Singleton {
   readonly property int settingsPickerRowHeight: 44      // opção de 520×44, raio 12
   readonly property int settingsPickerListTop: 140       // busca de 44 em y 84 e 12 de folga
   readonly property int settingsPickerMaxHeight: 460     // altura máxima do modal; a lista rola dentro
+  // Menu suspenso dos Ajustes (ficha 13; composição A-05, P-81, F6-T17). Não tem board: as medidas saem do menu do Wi-Fi, da linha do launcher e de contas sobre tokens.
+  readonly property int settingsDropdownInset: 8                  // lista a 8 de cada borda do vidro de pop-up (SecurityMenu; `launcherRowX`); 20 − 8 = 12, o `radiusRow`, concêntrico com o raio do vidro
+  readonly property int settingsDropdownRowHeight: launcherResultHeight // linha de 44 (P-81), a do launcher, raio `radiusRow`
+  readonly property int settingsDropdownTextX: 12                 // texto e ícone da esquerda a 12 da borda da linha; o ícone da direita termina a 12 da borda direita; o separador é recuado 12 de cada lado
+  readonly property int settingsDropdownIconSize: 16              // ícones de 16, colorizados em `text`
+  readonly property int settingsDropdownIconGap: 8                // entre o ícone e o texto: o mesmo 8 do selo dos Ajustes, que tem o ícone de 16 em x 12 e o texto em 36 (36 − 12 − 16)
+  readonly property int settingsDropdownIconTextX: settingsDropdownTextX + settingsDropdownIconSize + settingsDropdownIconGap // 12 + 16 + 8 = 36
+  readonly property int settingsDropdownSeparatorLine: 1          // linha em `border`
+  readonly property int settingsDropdownSeparatorGap: 4           // 4 acima e 4 abaixo, na grade de 4
+  readonly property int settingsDropdownSeparatorHeight: settingsDropdownSeparatorGap + settingsDropdownSeparatorLine + settingsDropdownSeparatorGap // 4 + 1 + 4 = 9, a mesma altura do separador da origem
+  readonly property int settingsDropdownMaxHeight: 2 * settingsDropdownInset + 6 * settingsDropdownRowHeight // 16 + 6 × 44 = 280: a conta da origem (16 + 6 × 40 = 256) com a linha de 44
+  readonly property int settingsDropdownScrollbarWidth: 2         // barra de rolagem de 2 em `dot`, sem fundo, como a do menu do Wi-Fi
+  readonly property real settingsDropdownDisabledOpacity: 0.4     // opção desativada: opacidade 0,4, o desativado do botão ícone e do botão de texto (ficha 00); sem hover nem seleção
   // Tela e Organizar monitores (ficha 13; Figma 13:16041 e 13:16062).
   readonly property int settingsDisplayPreviewHeight: 280   // desenho dos monitores de 520×280, raio 16, em (30,84)
   readonly property int settingsDisplayRowsTop: 380         // primeira linha 16 abaixo do desenho
@@ -890,22 +900,4 @@ Singleton {
     }
     onLoadFailed: root.selectionLoaded = true
   }
-
-  // ---------------------------------------------------------------------------
-  // Compatibilidade com o código de partida
-  // ---------------------------------------------------------------------------
-  // O código que copiei na F0 ainda lê nomes que o tema Armitage não tem.
-  // Mantenho esses nomes aqui, com os valores da origem, para a shell abrir com
-  // o visual antigo enquanto as peças não são redesenhadas (F1 a F6). Cada fase
-  // apaga daqui o que a peça dela deixou de ler. Código novo não usa nada deste
-  // bloco.
-  //
-  // Sobraram só os papéis que ainda têm leitor: `translucent`, lido pela shell
-  // inteira; e `sidebarDivider`, lido só pelo menu suspenso dos Ajustes, que
-  // mantém o desenho da origem por enquanto (pendência P-46). O acento e o texto
-  // saem daqui e vêm dos tokens direto.
-  readonly property LegacyColors colors: LegacyColors {}
-  readonly property bool translucent: colors.translucent
-
-  readonly property color sidebarDivider: colors.sidebarDivider
 }

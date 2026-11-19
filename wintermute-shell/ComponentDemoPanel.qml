@@ -1479,6 +1479,32 @@ PanelWindow {
                 }
               }
 
+              SectionBlock {
+                title: "Menu suspenso (ficha 13, composição A-05, P-81) · peça real com opções inventadas"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Lista simples (Lock & sleep) · vidro de pop-up, lista a 8, linhas de 44 raio 12, a atual em accentSubtle"
+                  stageWidth: 181; stageHeight: 148
+                  Demo.DropdownSpecimen { kind: "list" }
+                }
+                Specimen {
+                  caption: "Com ícones (Orientation) · monitor de 16 em x 12, texto em x 36, hover numa linha"
+                  stageWidth: 276; stageHeight: 192
+                  Demo.DropdownSpecimen { kind: "icons"; hover: 2 }
+                }
+                Specimen {
+                  caption: "Bandeja · marcada, submenu, separador de 9 (4 + 1 + 4) e desativada a 0,4; o foco do teclado na primeira linha"
+                  stageWidth: 236; stageHeight: 245
+                  Demo.DropdownSpecimen { kind: "tray"; focused: true }
+                }
+                Specimen {
+                  caption: "Com rolagem (Refresh rate) · altura máxima 280 = 16 + 6 × 44, barra de 2 em dot, a atual à vista"
+                  stageWidth: 276; stageHeight: 280
+                  Demo.DropdownSpecimen { kind: "scroll" }
+                }
+              }
+
               Demo.InformationService { id: demoInformation }
 
               SectionBlock {

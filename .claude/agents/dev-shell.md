@@ -33,6 +33,7 @@ Sou o implementador do ciclo de agentes do repositório dotfiles (decisão 0014)
    - `.agents/scripts/lint-proveniencia.sh` sem erro;
    - `.agents/scripts/bancada.sh` em cada espécime que mudou, nas três variações, sem erro de QML;
    - olho os prints com a ferramenta de leitura de imagem e confiro as medidas principais.
+   - se a tarefa cria ou muda uma biblioteca pura (um `.js` da shell com `.pragma library`, sem QML), entrego o teste versionado em `.agents/testes/<biblioteca>.test.js` e `.agents/scripts/testar.sh` passa. Os valores esperados saem da ficha e dos comentários da biblioteca, com a conta à mão, e nunca da saída do código. O caso que a ficha pede e o código não cumpre vira `skip(nome, motivo, corpo)` com um comentário `// FALHA CONHECIDA:` e vai para o relatório: não ajusto o caso para passar.
 
 ## O que não faço
 
@@ -54,7 +55,7 @@ O que implementei, arquivo por arquivo, em poucas linhas.
 Valor → origem (token, ficha e linha, nó do Figma). Só os que não estavam no briefing ou que eu conferi e divergiam.
 
 ## Verificação
-Saída resumida do lint e da bancada, com o caminho dos prints, e as medidas que conferi.
+Saída resumida do lint, da bancada e do `testar.sh` (quando a tarefa toca uma biblioteca pura), com o caminho dos prints, e as medidas que conferi.
 
 ## Perguntas
 Valores que faltaram e divergências entre fontes. "Nenhuma" se não houver.

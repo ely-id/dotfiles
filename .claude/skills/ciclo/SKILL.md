@@ -35,8 +35,8 @@ O painel fica em `${DOTFILES_PAINEL:-~/Documents/Journal/projeto-dotfiles}`. Tod
 1. **Escolher.** A próxima tarefa aberta da fase ativa, na ordem da nota, que não esteja marcada `bloqueada:`. Se a fase estiver `planejada` sem tarefas detalhadas, a primeira tarefa é detalhar a fase pela ficha e passar o estado para `em andamento`. Uma tarefa de NoGo vale antes das outras.
 2. **Planejar.** Ler a ficha da peça, os tokens, a nota da fase e as respostas de pendência que tocam a tarefa. Quando precisar do Figma, usar o board pelo node-id de `docs/design/README.md` (skill `figma:figma-design-to-code` antes de `get_design_context`). Conferir na origem o que for comportamento. Montar o briefing com o modelo abaixo. Faltou valor: pendência e `bloqueada:`, como nas regras.
 3. **Implementar.** Chamar o subagente `dev-shell` com o briefing. Para trabalho mecânico (trocar textos para inglês, ler um log, procurar um padrão em muitos arquivos), chamar o `varredura`.
-4. **Revisar.** Ler o `git diff` inteiro. Conferir: cada valor visual sai de token ou da ficha; o escopo é o da tarefa; o espécime e o serviço fictício acompanham a peça (decisão 0011); comentários em primeira pessoa; interface em inglês (decisão 0012). Rodar `.agents/scripts/lint-proveniencia.sh`. Problema na revisão volta para o `dev-shell` com a lista do que corrigir.
-5. **Verificar.** Chamar o `qa-visual` com o identificador da tarefa, os critérios do briefing e a lista de espécimes, sem o relato do dev. Ele devolve `APROVADO` ou `REPROVADO`, com evidência.
+4. **Revisar.** Ler o `git diff` inteiro. Conferir: cada valor visual sai de token ou da ficha; o escopo é o da tarefa; o espécime e o serviço fictício acompanham a peça (decisão 0011); comentários em primeira pessoa; interface em inglês (decisão 0012). Rodar `.agents/scripts/lint-proveniencia.sh`. Problema na revisão volta para o `dev-shell` com a lista do que corrigir. Se a tarefa criou ou mudou uma biblioteca pura (um `.js` da shell com `.pragma library`, sem QML), rodar `.agents/scripts/testar.sh`, conferir que o teste está em `.agents/testes/` com os esperados tirados da ficha, e transformar cada falha conhecida (`skip`) em pendência no painel.
+5. **Verificar.** Chamar o `qa-visual` com o identificador da tarefa, os critérios do briefing e a lista de espécimes, sem o relato do dev. Ele devolve `APROVADO` ou `REPROVADO`, com evidência. Quando a tarefa toca uma biblioteca pura, o `testar.sh` e o teste dela entram nos critérios.
 6. **Corrigir.** `REPROVADO` volta ao `dev-shell` com os achados do QA, e o QA roda de novo. Depois de duas reprovações na mesma tarefa, paro de insistir: abro uma pendência com os achados e marco a tarefa `(bloqueada: P-NN)`.
 7. **Registrar**, na hora em que a tarefa passa:
    - copiar os prints aprovados para `handoffs/FN-prints/` no painel, com o nome `FN-TNN-<o-que-é>-<variação>.png`;
@@ -77,7 +77,7 @@ Fase, ficha, board do Figma (node-id) e as pendências respondidas que valem aqu
 Cada medida, cor, raio, tempo e fonte que a peça usa, com a origem: token do `Theme.qml`, linha da ficha ou nó do Figma. Nada fica para o dev descobrir.
 
 ## Arquivos
-O que muda, o que é criado e o que é apagado. Espécime em `demo/` e serviço fictício, quando a peça lê serviço.
+O que muda, o que é criado e o que é apagado. Espécime em `demo/` e serviço fictício, quando a peça lê serviço. Teste em `.agents/testes/<biblioteca>.test.js`, quando a tarefa cria ou muda uma biblioteca pura (decidido na `F6-T18`, P-82).
 
 ## Fora do escopo
 O que não mexer, mesmo que pareça errado.

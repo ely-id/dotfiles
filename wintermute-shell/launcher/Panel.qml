@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "." as Launcher
+import "../clipboard" as Clipboard
 import ".."
 
 // O launcher (ficha 14): vidro de 640, cabeçalho de busca, lista por seções que rola entre o cabeçalho e o
@@ -11,14 +12,17 @@ import ".."
 // Medidas no quadro do launcher: o primeiro rótulo em y 64, cada linha de 44 logo abaixo do rótulo, o rótulo
 // seguinte 8 abaixo da última linha do grupo e o divisor do rodapé 4 abaixo da última linha (P-68).
 //
-// Sete formas. A página do seletor de cor (`service.page`, F5-T08) tira a busca e a lista de cena e vale por si, e a do
-// seletor de emoji (F5-T09) também; a do menu de ações (F5-T05) tira só a busca; as outras quatro são escolhidas pelo
+// Oito formas. A página do seletor de cor (`service.page`, F5-T08) tira a busca e a lista de cena e vale por si, e a do
+// seletor de emoji (F5-T09) e a do histórico da área de transferência (F6-T05) também; a do menu de ações (F5-T05) tira só a busca; as outras quatro são escolhidas pelo
 // texto da busca (`plan.kind`):
 //   color  `service.page === "color"`: o cabeçalho de busca vira voltar e título, o corpo é o resultado do seletor de cor
 //          (ColorPage.qml) e o divisor do rodapé fica fixo em y 432, com 476 de altura no total, sem rolar.
 //   emoji  `service.page === "emoji"`: o cabeçalho com voltar e o campo "Search emoji", as seis abas e a grade que rola
 //          (EmojiPage.qml), com o divisor do rodapé fixo em y 392, 436 de altura no total. O rodapé troca o modo pela prévia
 //          do emoji e pelo nome dele.
+//   clipboard `service.page === "clipboard"` (o chip "Clipboard"): o cabeçalho com o ícone `clipboard` e o campo "Search history", a
+//          lista de 280 à esquerda, a prévia e os metadados à direita, ou o vazio (ClipboardPage.qml, com os dados de
+//          `clipboardService`), com o divisor do rodapé fixo em y 392, 436 de altura no total. As ações do rodapé são da página.
 //   actions `service.page === "actions"` (Ctrl+K numa linha): o cabeçalho de busca vira voltar e o nome do item
 //          (ActionsHeader.qml) e a lista é a de `service.actionSections`, com o rótulo em y 64, uma linha por ação a partir
 //          de y 88 e o divisor do rodapé 4 abaixo da última, como em toda lista. ↑↓ andam, Enter roda, Esc, Backspace, o
@@ -52,6 +56,12 @@ Item {
   property alias emojiSelected: emojiPage.selected
   property alias emojiHover: emojiPage.hoverIndex
   property alias emojiStartTab: emojiPage.startTab
+  // O histórico da área de transferência (F6-T05): o serviço dele (o de verdade é clipboard/State.qml, e a vitrine troca por um
+  // fictício), e, para fixar na vitrine, a linha selecionada, a linha sob o ponteiro e o texto da busca.
+  property var clipboardService: Clipboard.State
+  property alias clipboardSelected: clipboardPage.selected
+  property alias clipboardHover: clipboardPage.hoverIndex
+  property alias clipboardQuery: clipboardPage.query
   // Chip das ferramentas com o foco do teclado (índice em `service.tools`), ou -1. Para fixar na vitrine.
   property int chipIndex: -1
   // Chip sob o ponteiro, para fixar o hover na vitrine.
@@ -69,9 +79,9 @@ Item {
   readonly property int chipCount: plan.chips ? plan.chips.items.length : 0
   readonly property real listTop: Theme.launcherSearchHeight + Theme.launcherDividerHeight
   // Sem lista, o divisor do rodapé é o próprio divisor do cabeçalho.
-  // As páginas do seletor de cor (476) e do de emoji (436) têm altura fixa: não encolhem para caber, porque a rolagem delas
-  // é a da própria grade.
-  readonly property real footerY: plan.kind === "color" || plan.kind === "emoji" ? plan.footerY
+  // As páginas do seletor de cor (476), do de emoji (436) e do histórico da área de transferência (436) têm altura fixa: não
+  // encolhem para caber, porque a rolagem delas é a da própria grade ou lista.
+  readonly property real footerY: plan.kind === "color" || plan.kind === "emoji" || plan.kind === "clipboard" ? plan.footerY
       : Math.max(Theme.launcherSearchHeight, Math.min(plan.footerY, maxHeight - Theme.launcherFooterHeight))
 
   implicitWidth: Theme.launcherWidth
@@ -87,6 +97,10 @@ Item {
     if (page === "emoji") {
       return { kind: "emoji", labels: [], rows: [], card: null, chips: null, notice: null,
           footerY: Theme.launcherEmojiFooterY };
+    }
+    if (page === "clipboard") {
+      return { kind: "clipboard", labels: [], rows: [], card: null, chips: null, notice: null,
+          footerY: Theme.clipboardFooterY };
     }
     const labels = [];
     const rows = [];
@@ -167,12 +181,14 @@ Item {
   }
 
   // O foco do teclado: no campo de busca, ou, nas páginas sem campo (seletor de cor e ações), na própria página. A do emoji
-  // tem o campo dela.
+  // e a do histórico da área de transferência têm o campo delas.
   function focusCurrent() {
     if (plan.kind === "color")
       colorPage.forceActiveFocus(Qt.OtherFocusReason);
     else if (plan.kind === "emoji")
       emojiPage.focusField();
+    else if (plan.kind === "clipboard")
+      clipboardPage.focusField();
     else if (plan.kind === "actions")
       actionsHeader.forceActiveFocus(Qt.OtherFocusReason);
     else
@@ -429,6 +445,7 @@ Item {
     Launcher.SearchField {
       id: search
       visible: root.plan.kind !== "color" && root.plan.kind !== "actions" && root.plan.kind !== "emoji"
+          && root.plan.kind !== "clipboard"
       width: parent.width
       text: root.service.query
       // Sem sugestão fantasma no modo cálculo.
@@ -472,7 +489,7 @@ Item {
 
     Flickable {
       id: list
-      visible: root.plan.kind !== "color" && root.plan.kind !== "emoji"
+      visible: root.plan.kind !== "color" && root.plan.kind !== "emoji" && root.plan.kind !== "clipboard"
       y: root.listTop
       width: parent.width
       height: Math.max(0, root.footerY - root.listTop)
@@ -564,12 +581,22 @@ Item {
       forceCursor: root.forceCursor
     }
 
+    Clipboard.ClipboardPage {
+      id: clipboardPage
+      visible: root.plan.kind === "clipboard"
+      width: parent.width
+      height: Theme.clipboardFooterY
+      service: root.clipboardService
+      launcher: root.service
+      forceCursor: root.forceCursor
+    }
+
     Launcher.Footer {
       y: root.footerY
       width: parent.width
       modeIcon: root.service.modeIcon
       modeLabel: root.service.modeLabel
-      actions: root.service.actions
+      actions: root.plan.kind === "clipboard" ? clipboardPage.footerActions : root.service.actions
       previewMode: root.plan.kind === "emoji"
       previewGlyph: emojiPage.previewGlyph
       previewName: emojiPage.previewName

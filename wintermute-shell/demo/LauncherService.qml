@@ -33,6 +33,8 @@ import "../launcher" as Launcher
 //                  é a do "grouped" ("no"), e a do cálculo é `expression`.
 //   "color"        a página de resultado do seletor de cor: #3FA9D9 "pega agora" no Firefox e o histórico do board.
 //                  `copied` ("", "hex", "rgb" ou "hsl") deixa a linha em "Copied".
+//   "clipboard"    a página do histórico da área de transferência (F6-T05): só o `page`, o modo e o ícone; o que ela mostra é do
+//                  serviço fictício dela (demo/ClipboardService.qml) e a vitrine é demo/ClipboardSpecimen.qml.
 //   "emoji", "emoji-empty", "emoji-search" e "emoji-none": o seletor de emoji (F5-T09). A grade com os onze recentes do board
 //                  (👋 👍 🎮 🔥 ✨ 🙏 😂 💜 ☕ 🚀 ✅), a mesma sem recentes, a busca `emojiText` (padrão "gato", que mostra que o
 //                  português funciona) e a busca "xyzzy", sem resultado. O inventário é o emoji.json de verdade, lido na primeira
@@ -101,15 +103,15 @@ QtObject {
 
   readonly property var calculation: Calculator.describe(query, decimalSeparator)
 
-  // A página aberta no lugar da busca: "", "color" ou "actions".
+  // A página aberta no lugar da busca: "", "color", "emoji", "clipboard" ou "actions".
   readonly property bool isActions: scenario.indexOf("actions-") === 0
   readonly property bool isEmoji: scenario.indexOf("emoji") === 0
-  property string page: scenario === "color" ? "color" : isActions ? "actions" : isEmoji ? "emoji" : ""
+  property string page: scenario === "color" ? "color" : isActions ? "actions" : isEmoji ? "emoji" : scenario === "clipboard" ? "clipboard" : ""
 
   readonly property bool calculating: calculation !== null && page !== "actions"
-  readonly property string mode: page === "color" ? "color" : page === "emoji" ? "emoji" : calculating ? "calculator" : "launcher"
-  readonly property string modeLabel: page === "color" ? "Color picker" : page === "emoji" ? "Emoji" : calculating ? "Calculator" : "Launcher"
-  readonly property string modeIcon: page === "color" ? "pipette" : page === "emoji" ? "smile" : calculating ? "calculator" : "sparkles"
+  readonly property string mode: page === "color" ? "color" : page === "emoji" ? "emoji" : page === "clipboard" ? "clipboard" : calculating ? "calculator" : "launcher"
+  readonly property string modeLabel: page === "color" ? "Color picker" : page === "emoji" ? "Emoji" : page === "clipboard" ? "Clipboard" : calculating ? "Calculator" : "Launcher"
+  readonly property string modeIcon: page === "color" ? "pipette" : page === "emoji" ? "smile" : page === "clipboard" ? "clipboard" : calculating ? "calculator" : "sparkles"
   readonly property string searchIcon: calculation ? "calculator" : "search"
   readonly property var actions: page === "color" ? [
     { label: "Copy HEX", keys: ["↵"], primary: true },

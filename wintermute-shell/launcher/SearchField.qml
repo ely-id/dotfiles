@@ -20,6 +20,8 @@ Item {
   property bool showIcon: true
   // O seletor de emoji também trata Backspace no campo vazio (voltar) e Shift+Tab (aba anterior).
   property bool pageKeys: false
+  // O histórico da área de transferência (ficha 18) também usa o campo para o Ctrl+P (fixar) e o Del (apagar o item).
+  property bool itemKeys: false
   // Com os chips das ferramentas em foco, ← e → andam nos chips; senão são do campo e movem o cursor do texto.
   property bool captureHorizontal: false
   // O contexto em que o launcher foi aberto ("On workspace 3"); vazio, sem etiqueta.
@@ -36,6 +38,8 @@ Item {
   signal actionsPressed
   signal backtabPressed
   signal backspaceOnEmpty
+  signal pinPressed
+  signal deletePressed
 
   readonly property bool cursorShown: editor.activeFocus || forceCursor
   readonly property bool cursorAtEnd: editor.cursorPosition === editor.length
@@ -45,6 +49,23 @@ Item {
 
   function focusEditor() {
     editor.forceActiveFocus(Qt.OtherFocusReason);
+  }
+
+  // As teclas do item do histórico (`itemKeys`): Ctrl+P fixa e o Del apaga. Com o cursor no meio do texto o Del é do campo e apaga o
+  // caractere (devolvo falso e o TextInput trata); no fim do texto, ou com o campo vazio, ele apaga o item. Devolve se tratei a tecla.
+  function handleItemKey(key, modifiers) {
+    if (!root.itemKeys)
+      return false;
+    if ((modifiers & Qt.ControlModifier) && key === Qt.Key_P) {
+      root.pinPressed();
+      return true;
+    }
+    if (key === Qt.Key_Delete && !(modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))
+        && editor.cursorPosition === editor.length) {
+      root.deletePressed();
+      return true;
+    }
+    return false;
   }
 
   function moveCursorToEnd() {
@@ -152,6 +173,8 @@ Item {
         } else if (root.pageKeys && event.key === Qt.Key_Backspace && editor.length === 0
             && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))) {
           root.backspaceOnEmpty();
+          event.accepted = true;
+        } else if (root.handleItemKey(event.key, event.modifiers)) {
           event.accepted = true;
         }
       }

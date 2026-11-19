@@ -1342,6 +1342,52 @@ PanelWindow {
                   Demo.AnnotateSpecimen { scene: "large" }
                 }
               }
+
+              SectionBlock {
+                title: "Histórico da área de transferência (ficha 18, board 13:19344; texto 13:19621, imagem 13:19678, busca 13:19746, fixados 13:19790, vazio 13:19846) · dentro do launcher, peça real com serviço fictício e dados inventados · o espécime não escuta a área de transferência"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Texto · vidro 640×436 · \"Today\" em y 72 · cinco linhas de 264×52 em x 8 e y 84, 136, 188, 240 e 292, a primeira selecionada (accentSubtle, meta em text) · bloco de 28 em (16,96) · divisor em x 280 · prévia de 328×208 em (296,72), Geist Mono 12 · metadados em y 308, 332 e 356 · rodapé Copy ↵ · Pin Ctrl P · Delete Del"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.ClipboardSpecimen { state: "text" }
+                }
+                Specimen {
+                  caption: "Hover numa linha · fundo hover (a primeira segue selecionada)"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.ClipboardSpecimen { state: "text"; hovered: 3 }
+                }
+                Specimen {
+                  caption: "Imagem · a captura selecionada · a imagem inteira dentro da prévia, sem deformar, cortada no raio (composição, A-05) · Source, Copied e \"1920 × 1080 · PNG · 412 KB\""
+                  stageWidth: 640; stageHeight: 436
+                  Demo.ClipboardSpecimen { state: "image" }
+                }
+                Specimen {
+                  caption: "Busca \"firefox\" · \"2 results\" sem a divisão em seções · prévia de link: bloco de 40 com o globe, título em Medium 15, URL em Mono 11 muted que quebra linha · só Source e Copied"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.ClipboardSpecimen { state: "search" }
+                }
+                Specimen {
+                  caption: "Fixados · \"Pinned\" em y 72 com o pin de 16 em accentText e o título cortado em 184 · \"Today\" 4 abaixo da última linha · metadado \"Pinned\" no lugar de \"Copied\" · o rodapé diz Unpin (composição, A-05)"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.ClipboardSpecimen { state: "pinned" }
+                }
+                Specimen {
+                  caption: "Vazio · círculo de 48 em (296,120) · \"Nothing copied yet\" centrado em y 196 · dica de duas linhas a partir de y 212 · sem divisor vertical · rodapé só com Close Esc"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.ClipboardSpecimen { state: "empty" }
+                }
+                Specimen {
+                  caption: "Busca sem resultado (composição, A-05) · o mesmo bloco, com o search-x e o texto do launcher para a busca digitada"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.ClipboardSpecimen { state: "no-results" }
+                }
+                Specimen {
+                  caption: "Cinquenta itens (o teto da sessão) · a lista rola e a linha selecionada fica sempre à vista"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.ClipboardSpecimen { state: "many"; selected: 12 }
+                }
+              }
             }
 
             // =================================================================

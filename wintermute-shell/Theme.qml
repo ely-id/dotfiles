@@ -498,6 +498,54 @@ Singleton {
   readonly property int launcherEmojiPerRow: 11
   readonly property int launcherEmojiGlyphSize: 28
   readonly property int launcherEmojiEndGap: 20                     // 20 de folga abaixo da última fileira (a fileira termina em 372 e o divisor está em 392)
+
+  // Histórico da área de transferência (F6-T05, ficha 18; board 13:19344, estados texto 13:19621, imagem 13:19678, busca 13:19746, fixados 13:19790 e vazio
+  // 13:19846). Mora dentro do launcher: mesma casca de 640×436, mesmo cabeçalho e mesmo rodapé, então o vidro, o campo de busca, o divisor em y 56, o bloco de
+  // 28 da linha (launcherBlock*), o rótulo de seção (launcherLabel*) e as teclas do rodapé são os do launcher. As coordenadas são as do quadro de 640×436: o
+  // Figma dá as de dentro a partir da borda de 1, e já somei 1.
+  readonly property int clipboardFooterY: 392                       // altura fixa de 436: divisor do rodapé em y 392 (13:19621)
+  readonly property int clipboardColumnWidth: 280                   // coluna da lista; o divisor vertical `border` de 1 em x 280 vai de y 57 até o rodapé (335)
+  readonly property int clipboardFirstLabelY: 60                    // primeiro rótulo de seção em y 60 (3 abaixo do divisor), caixa de 24; centro em y 72
+  readonly property int clipboardLabelGap: 4                        // rótulo da segunda seção 4 abaixo da última linha da primeira (188 → 192, board dos fixados)
+  readonly property int clipboardRowWidth: 264                      // linha de 264×52 em x 8, raio radiusRow, empilhadas sem folga (a primeira em y 84)
+  readonly property int clipboardRowHeight: 52
+  readonly property int clipboardBlockY: 12                         // bloco 28 (launcherBlockSize) em (8,12) da linha; o do launcher fica em (8,8)
+  readonly property int clipboardTitleX: 44                         // título: Geist Medium 13 `text`, caixa de 212×20 em (44,8); fixada, a caixa tem 184
+  readonly property int clipboardTitleY: 8
+  readonly property int clipboardTitleWidth: 212
+  readonly property int clipboardTitleWidthPinned: 184
+  readonly property int clipboardTitleHeight: 20
+  readonly property int clipboardMetaCenterY: 35                    // meta: Geist Medium 11, caixa de 212 em x 44, centrada em y 35 (`text` na selecionada, `muted` nas outras)
+  readonly property int clipboardPinX: 236                          // ícone `pin` de 16 em (236,18), em `accentText`
+  readonly property int clipboardPinY: 18
+  readonly property int clipboardPinSize: 16
+  readonly property int clipboardPreviewX: 296                      // prévia 328×208 em (296,72), raio radiusRow, borda `border` de 1, fundo `cardHover`
+  readonly property int clipboardPreviewY: 72
+  readonly property int clipboardPreviewWidth: 328
+  readonly property int clipboardPreviewHeight: 208
+  readonly property int clipboardPreviewPadding: 16                 // texto e bloco do link a 16 da borda de dentro da prévia
+  readonly property int clipboardPreviewTextWidth: 296              // texto: Geist Mono Medium 12, linha de 20, caixa de 296×176 em (16,16), corta o que passar
+  readonly property int clipboardPreviewTextHeight: 176
+  readonly property int clipboardPreviewLineHeight: 20
+  readonly property int fontClipboardPreview: 12                    // Geist Mono Medium; o texto da prévia
+  readonly property int clipboardLinkBlockSize: 40                  // link: bloco 40×40 em (16,16), raio radiusChip, `accentSubtle`, com o `globe` de 20 em (10,10) em `accentText`
+  readonly property int clipboardLinkIconSize: 20
+  readonly property int clipboardLinkIconOffset: 10
+  readonly property int clipboardLinkTitleY: 68                     // título Geist Medium 15 (fontLabel), caixa de 296×24 em (16,68)
+  readonly property int clipboardLinkTitleHeight: 24
+  readonly property int clipboardLinkUrlY: 96                       // URL Geist Mono Medium 11 (fontMonoCaption), linha de 16, `muted`, em (16,96), 296 de largura, quebra linha
+  readonly property int clipboardLinkUrlLineHeight: 16
+  readonly property int clipboardMetaRowsTop: 296                   // metadados: linhas de 24 centradas em y 308, 332 e 356 (a primeira caixa começa em y 296)
+  readonly property int clipboardMetaRowHeight: 24
+  readonly property int clipboardMetaLabelWidth: 120                // rótulo: Geist Medium 11 `muted`, caixa de 120 em x 296
+  readonly property int clipboardMetaValueWidth: 208                // valor: Geist Medium 11 `text`, caixa de 208 alinhada à direita, terminando em x 624
+  readonly property int clipboardMetaValueRight: 624
+  // Vazio (13:19846): o mesmo desenho do "sem resultado" do launcher, com outras alturas. Círculo de 48 em (296,120); título Geist Medium 15 numa caixa de 24 centrada em y
+  // 196; dica Geist Regular 13, duas linhas de 20 a partir de y 212, 400 de largura, centrada.
+  readonly property int clipboardEmptyCircleY: 120
+  readonly property int clipboardEmptyTitleY: 184                   // caixa de 24 centrada em y 196
+  readonly property int clipboardEmptyHintY: 212
+  readonly property int clipboardEmptyHintWidth: 400
   readonly property int launcherEmojiRecentMax: 11                  // os recentes do board são uma fileira de 11
   readonly property int launcherEmojiPreviewX: 12                   // prévia no rodapé: caixa de 32×44 em x 12, emoji de 20 (13:17663)
   readonly property int launcherEmojiPreviewWidth: 32

@@ -21,8 +21,8 @@ import Quickshell.Io
 // As ferramentas do estado vazio (F5-T04) são fixas. As duas linhas de ação do "sem resultado" (F5-T11, P-73) são "Search the
 // web" (xdg-open no Google) e "Search files", que liga `deepFiles`: a mesma busca de arquivos na pasta pessoal inteira.
 // O seletor de cor (F5-T08) abre uma página própria, `page === "color"`, com a cor mais recente do histórico; o seletor de emoji (F5-T09) é `page === "emoji"`, com o
-// inventário lido na primeira abertura (EmojiInventory.qml) e os últimos copiados em emoji-recents.json; as outras (a F6)
-// ainda não existem, então `openTool` só registra no log para elas. O menu "Actions" (F5-T05, Ctrl+K) é outra página, `page === "actions"`: as ações do
+// inventário lido na primeira abertura (EmojiInventory.qml) e os últimos copiados em emoji-recents.json; o histórico da área de transferência (F6-T05) é `page === "clipboard"`, com os dados em
+// clipboard/State.qml; as ferramentas que ainda não existem só são registradas no log por `openTool`. O menu "Actions" (F5-T05, Ctrl+K) é outra página, `page === "actions"`: as ações do
 // item que estava selecionado (a conta mora em Actions.js) e, para "Open on workspace…", uma segunda camada com os
 // workspaces do monitor.
 Singleton {
@@ -70,8 +70,8 @@ Singleton {
   // Enquanto não for null, o modo cálculo ocupa o launcher inteiro.
   readonly property var calculation: Calculator.describe(query, decimalSeparator)
 
-  // A página aberta no lugar da busca: "" (a busca), "color" (o resultado do seletor de cor), "emoji" (o seletor de emoji)
-  // ou "actions" (o menu de ações do item selecionado). Abrir o launcher sempre começa na busca.
+  // A página aberta no lugar da busca: "" (a busca), "color" (o resultado do seletor de cor), "emoji" (o seletor de emoji),
+  // "clipboard" (o histórico da área de transferência) ou "actions" (o menu de ações do item selecionado). Abrir o launcher sempre começa na busca.
   property string page: ""
 
   // ---- Fontes de resultado (F5-T02) ----
@@ -236,9 +236,9 @@ Singleton {
 
   // O menu de ações é do launcher, mesmo quando o item é um cálculo: o modo do rodapé não muda.
   readonly property bool calculating: calculation !== null && page !== "actions"
-  readonly property string mode: page === "color" ? "color" : page === "emoji" ? "emoji" : calculating ? "calculator" : "launcher"
-  readonly property string modeLabel: page === "color" ? "Color picker" : page === "emoji" ? "Emoji" : calculating ? "Calculator" : "Launcher"
-  readonly property string modeIcon: page === "color" ? "pipette" : page === "emoji" ? "smile" : calculating ? "calculator" : "sparkles"
+  readonly property string mode: page === "color" ? "color" : page === "emoji" ? "emoji" : page === "clipboard" ? "clipboard" : calculating ? "calculator" : "launcher"
+  readonly property string modeLabel: page === "color" ? "Color picker" : page === "emoji" ? "Emoji" : page === "clipboard" ? "Clipboard" : calculating ? "Calculator" : "Launcher"
+  readonly property string modeIcon: page === "color" ? "pipette" : page === "emoji" ? "smile" : page === "clipboard" ? "clipboard" : calculating ? "calculator" : "sparkles"
   // Ícone do cabeçalho de busca.
   readonly property string searchIcon: calculation ? "calculator" : "search"
   // Ações do rodapé: { label, keys, primary }. No cálculo "Copy" e "Actions"; o "Paste" (Ctrl+↵) ficou de fora (P-71).
@@ -451,7 +451,7 @@ Singleton {
   }
 
   // Clique num chip, ou Enter com o chip em foco. O seletor de cor abre a página com a cor mais recente, ou vai direto
-  // para a lupa quando não há nenhuma guardada; o de emoji abre a página com a busca vazia; o de captura de tela fecha o launcher e abre a janela de captura (ficha 17).
+  // para a lupa quando não há nenhuma guardada; o de emoji abre a página com a busca vazia; o de histórico abre a página do histórico; o de captura de tela fecha o launcher e abre a janela de captura (ficha 17).
   // Para as outras ferramentas ainda não há o que abrir: registro no log e deixo o launcher aberto.
   function openTool(key) {
     if (key === "emoji") {
@@ -468,6 +468,10 @@ Singleton {
       }
       return;
     }
+    if (key === "clipboard") {
+      openClipboard();
+      return;
+    }
     if (key === "screenshot") {
       // A captura abre no monitor do launcher depois de ele sumir, para ele não sair no quadro (CaptureState espera).
       const from = outputName;
@@ -476,6 +480,12 @@ Singleton {
       return;
     }
     console.info("launcher: ferramenta pedida, ainda sem destino:", key);
+  }
+
+  // O chip "Clipboard": abre a página do histórico (ficha 18, clipboard/ClipboardPage.qml). O que ela mostra vem do clipboard/State.qml,
+  // que por enquanto é vazio (F6-T16). A busca da página é dela, então aqui só troco a página.
+  function openClipboard() {
+    page = "clipboard";
   }
 
   // ---- Seletor de emoji (ficha 16, F5-T09) ----

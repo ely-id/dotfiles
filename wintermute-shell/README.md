@@ -31,7 +31,6 @@ Com a shell aberta, aciono ações pelo IPC do Quickshell (`qs -p ~/Projects/dot
 | `volume muteOutput` / `muteInput` | Alterna o mudo da saída ou do microfone |
 | `brightness increase` / `decrease` | Ajusta o brilho do monitor focado em passos de 5% |
 | `media playPause` / `next` / `previous` | Controla o reprodutor MPRIS ativo |
-| `screenshot loaded <caminho> [saída]` | Mostra a prévia de uma captura recém-salva |
 
 ## Onde configurar
 

@@ -10,6 +10,7 @@ import "settings" as Settings
 import "settings/appearance" as Appearance
 import "settings/system" as System
 import "notifications" as Notifications
+import "screenshot" as Screenshot
 import "wallpaper/desktop" as Wallpaper
 
 ShellRoot {
@@ -91,6 +92,7 @@ ShellRoot {
       if (!Settings.State.opened) return;
       Launcher.State.close();
       Launcher.LoupeState.abort();
+      Screenshot.CaptureState.abort();
     }
   }
   // O "+" do organizador pede o launcher pelo NiriMsg (que fica na raiz e não importa launcher/): abre no monitor
@@ -107,6 +109,35 @@ ShellRoot {
       if (!Launcher.State.opened) return;
       Settings.State.close();
       Launcher.LoupeState.abort();
+      Screenshot.CaptureState.abort();
+    }
+  }
+
+  // A captura de tela (ficha 17) também pede teclado exclusivo, então abrir a captura fecha o launcher, os Ajustes e a lupa.
+  // Quem já estava aberto saiu agora: a captura espera ele sumir da tela antes de pegar o quadro (CaptureState.open).
+  Connections {
+    target: Screenshot.CaptureState
+    function onPhaseChanged() {
+      if (Screenshot.CaptureState.phase === "")
+        return;
+      Launcher.State.close();
+      Settings.State.close();
+      Launcher.LoupeState.abort();
+    }
+  }
+
+  // A captura abre no monitor em foco, como o launcher.
+  IpcHandler {
+    target: "screenshot"
+    function open() {
+      Screenshot.CaptureState.open(Settings.State.focusedOutputName(), Launcher.State.opened || Settings.State.opened);
+    }
+    function close() { Screenshot.CaptureState.close(); }
+    function toggle() {
+      if (Screenshot.CaptureState.phase !== "")
+        Screenshot.CaptureState.close();
+      else
+        open();
     }
   }
 
@@ -154,6 +185,7 @@ ShellRoot {
       Settings.Window { menuScreen: modelData }
       Launcher.Window { menuScreen: modelData }
       Launcher.LoupeWindow { menuScreen: modelData }
+      Screenshot.CaptureWindow { menuScreen: modelData }
       FontTestPanel {
         panelScreen: modelData
         opened: root.testPanelOpen

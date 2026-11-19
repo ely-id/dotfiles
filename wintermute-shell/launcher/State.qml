@@ -8,6 +8,7 @@ import "Calculator.js" as Calculator
 import "Colors.js" as Colors
 import "Emoji.js" as Emoji
 import "Search.js" as Search
+import "../screenshot" as Screenshot
 import Quickshell
 import Quickshell.Io
 
@@ -450,8 +451,8 @@ Singleton {
   }
 
   // Clique num chip, ou Enter com o chip em foco. O seletor de cor abre a página com a cor mais recente, ou vai direto
-  // para a lupa quando não há nenhuma guardada; o de emoji abre a página com a busca vazia. Para as outras ferramentas
-  // ainda não há o que abrir: registro no log e deixo o launcher aberto.
+  // para a lupa quando não há nenhuma guardada; o de emoji abre a página com a busca vazia; o de captura de tela fecha o launcher e abre a janela de captura (ficha 17).
+  // Para as outras ferramentas ainda não há o que abrir: registro no log e deixo o launcher aberto.
   function openTool(key) {
     if (key === "emoji") {
       openEmoji();
@@ -465,6 +466,13 @@ Singleton {
       } else {
         pickAnother();
       }
+      return;
+    }
+    if (key === "screenshot") {
+      // A captura abre no monitor do launcher depois de ele sumir, para ele não sair no quadro (CaptureState espera).
+      const from = outputName;
+      close();
+      Screenshot.CaptureState.open(from, true);
       return;
     }
     console.info("launcher: ferramenta pedida, ainda sem destino:", key);

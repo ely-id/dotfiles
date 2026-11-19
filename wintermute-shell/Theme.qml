@@ -505,6 +505,50 @@ Singleton {
   readonly property int launcherEmojiNameX: 48                      // nome: caixa de 220×44 em x 48, Geist Medium 11 `text` (13:17664)
   readonly property int launcherEmojiNameWidth: 220
 
+  // Captura de tela (ficha 17, board 13:19344; estado "Início (modo área)" 13:19354, "Modo janela" 13:19441). O quadro do board é uma
+  // tela de 720×450; as coordenadas são as do Figma já com o 1 da borda somado onde o nó tem borda.
+  readonly property color captureScrim: Qt.rgba(0, 0, 0, 0.30)      // véu preto a 30% sobre a tela inteira (13:19370)
+  readonly property color captureCrosshair: Qt.rgba(1, 1, 1, 0.60)  // mira: duas linhas brancas a 60% (13:19371, 13:19372)
+  readonly property int captureCrosshairWidth: 1                    // linhas de 1 px, de ponta a ponta do monitor
+  readonly property int captureCoordsHeight: 24                     // pílula de coordenadas (13:19373): vidro de 24, raio 8, Geist Mono Medium 11
+  readonly property int captureCoordsRadius: 8
+  readonly property int captureCoordsOffset: 8                      // canto de cima à esquerda a (+8,+8) do ponteiro; perto da borda direita ou de baixo, a (−8,−8) para o outro lado
+  // Recuo de cada lado do texto. No board a pílula tem 72 com "420, 236", que mede 54 em Geist Mono Medium 11 (TextMetrics.width, medido no Qt
+  // com a fonte instalada; o avanço do texto, `Text.implicitWidth`, é 52,75). Recuo = (72 − 54) / 2 = 9.
+  readonly property int captureCoordsPaddingX: 9
+  readonly property int captureHintHeight: 40                       // dica (13:19375): vidro de 40, raio 20, centrado na largura, a 24 do topo
+  readonly property int captureHintRadius: 20
+  readonly property int captureHintTop: 24
+  readonly property int captureHintPaddingX: 16                     // fila a 16 da esquerda e da direita (a largura é a da fila mais 16 de cada lado)
+  readonly property int captureHintRowHeight: 20                    // fila de 20 de altura (a altura da tecla), centrada na vertical; texto de linha 16
+  readonly property int captureHintGap: 8                           // 8 entre os itens
+  readonly property int captureHintLineHeight: 16
+  readonly property int captureBarWidth: 496                        // barra de modos (13:19381): vidro de 496×56, raio radiusCard, centrada, a 24 da base
+  readonly property int captureBarHeight: 56
+  readonly property int captureBarBottom: 24
+  readonly property int captureBarPadding: 8                        // tudo na barra começa em y 8; o primeiro modo, em x 8
+  readonly property int captureModeWidth: 88                        // modos de 88×40, raio radiusChip, em x 8, 100 e 192 (passo de 92: 88 e 4 de folga)
+  readonly property int captureModeHeight: 40
+  readonly property int captureModeStep: 92
+  readonly property int captureModeIconX: 14                        // ícone de 16 em (14,12)
+  readonly property int captureModeIconY: 12
+  readonly property int captureModeIconSize: 16
+  readonly property int captureModeLabelX: 36                       // rótulo: caixa de 48×40 em x 36, Geist Medium 13, centrado na vertical
+  readonly property int captureModeLabelWidth: 48
+  readonly property int captureDividerHeight: 24                    // divisores de 1×24 em (292,16) e (432,16)
+  readonly property int captureDividerY: 16
+  readonly property int captureDividerLeftX: 292
+  readonly property int captureDividerRightX: 432
+  readonly property int captureDelayX: 304                          // atraso (13:19392): caixa de 72×40 em (304,8)
+  readonly property int captureDelayWidth: 72
+  readonly property int captureDelayIconX: 12                       // `clock` de 16 em (12,12), em `text` (o traço do glifo no Figma é #F2F3F5)
+  readonly property int captureDelayIconY: 12
+  readonly property int captureDelayLabelX: 32                      // "0 s": caixa de 32×40 em x 32, Geist Medium 13 `muted`
+  readonly property int captureDelayLabelWidth: 32
+  readonly property int captureCursorX: 380                         // IconButton de 40 (raio 12, ícone 20) com `mouse-pointer-2` em (380,8)
+  readonly property int captureCloseX: 444                          // IconButton de 40 com `x` em (444,8)
+  readonly property int captureButtonSize: 40
+
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.
   // Números e atalhos: Geist Mono.

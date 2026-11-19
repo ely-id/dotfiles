@@ -804,7 +804,9 @@ PanelWindow {
           Text {
             x: 0
             anchors.verticalCenter: parent.verticalCenter
-            text: (root.selectedPhaseTab === 4
+            text: (root.selectedPhaseTab === 5
+                ? "6 · Captura de tela · "
+                : root.selectedPhaseTab === 4
                 ? "5 · Launcher · "
                 : root.selectedPhaseTab === 3
                 ? "4 · Ajustes · "
@@ -825,6 +827,13 @@ PanelWindow {
             anchors.rightMargin: 24
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
+
+            Chip {
+              text: "F6 · Capture"
+              iconName: "scan"
+              selected: root.selectedPhaseTab === 5
+              onClicked: root.selectedPhaseTab = 5
+            }
 
             Chip {
               text: "F5 · Launcher"
@@ -1121,6 +1130,51 @@ PanelWindow {
                   caption: "Ponto na borda direita da imagem (324,166) · a lupa mostra a passagem da imagem para a janela, pixel por pixel"
                   stageWidth: 560; stageHeight: 340
                   Demo.ColorLoupeSpecimen { pointX: 324; pointY: 166 }
+                }
+              }
+            }
+
+            // =================================================================
+            // Aba F6 — Captura de tela (ficha 17)
+            // =================================================================
+            Column {
+              visible: root.selectedPhaseTab === 5
+              width: parent.width
+              spacing: 32
+
+              SectionBlock {
+                title: "Janela de captura (ficha 17, board 13:19344) · peça real com serviço fictício, sobre um fundo fictício · clique nos modos e no cursor; com o palco em foco, Espaço troca o modo"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Início, modo Area 720×450 (13:19354) · véu de 30% · mira de 1 px a 60% em (420,236) · pílula de coordenadas de 24 a (+8,+8) · dica de 40 a 24 do topo · barra de 496×56 a 24 da base, Area selecionado"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen {}
+                }
+                Specimen {
+                  caption: "Ponteiro perto da borda direita e da de baixo (700,430) · a pílula de coordenadas passa para o outro lado do ponteiro e não sai do palco"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { pointX: 700; pointY: 430 }
+                }
+                Specimen {
+                  caption: "\"Mostrar o cursor\" ligado · o botão no estado selecionado do IconButton · hover do modo Window (composição, A-05)"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { showCursor: true; hoverMode: 1 }
+                }
+                Specimen {
+                  caption: "Ponteiro sobre a barra (420,396) · a mira e as coordenadas somem e o ponteiro do sistema volta"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { pointX: 420; pointY: 396 }
+                }
+                Specimen {
+                  caption: "Modo Window (13:19441) · só o botão selecionado muda; a dica, a mira e as coordenadas não aparecem (o que o modo mostra é a F6-T12)"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { mode: "window" }
+                }
+                Specimen {
+                  caption: "Modo Screen · o mesmo, com Screen selecionado"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.CaptureSpecimen { mode: "screen" }
                 }
               }
             }

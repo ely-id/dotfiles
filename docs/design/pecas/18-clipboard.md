@@ -166,3 +166,38 @@ Testei o `watch.py` com entrada e variáveis fabricadas, o serviço pelo `ingest
 | Título do menu sem item | Clipboard |
 | Título da imagem | Screenshot HH:MM · Image HH:MM |
 | Manual | Clipboard history (Super+V) |
+
+## Wayland e XWayland: o que o serviço precisa e o roteiro do teste (`F6-T06`)
+
+O aceite da fase pede copiar e colar entre aplicativos Wayland e XWayland, nos dois sentidos, com o histórico mostrando os dois. O teste só existe na sessão do Niri; aqui fica o que conferi e o roteiro.
+
+### O que conferi nesta máquina (2026-11-19)
+
+- O Niri é o 26.04 e o `xwayland-satellite` está instalado. Desde a 25.08 o Niri sobe o `xwayland-satellite` sozinho quando ele existe, sem linha nenhuma na configuração (a minha não tem). É ele que roda os aplicativos X11 (Steam, o Battle.net pelo umu-launcher) e que faz a ponte da área de transferência: o que um aplicativo X11 copia aparece como uma seleção comum do Wayland, e o que um aplicativo Wayland copia fica disponível para os X11.
+- **O serviço do histórico não precisa de nada a mais.** Ele escuta a seleção do Wayland pelo `wl-paste --watch`, então o que vem de um aplicativo X11 chega pelo mesmo caminho. O que ele devolve com o Enter vai pelo `wl-copy`, e a ponte entrega aos X11.
+- Os nomes de tipo do X11 já são tratados: o `wl-paste --type text` aceita `UTF8_STRING`, `STRING` e `TEXT` como texto, e o `watch.py` conta `UTF8_STRING` e `STRING` como texto simples na hora de separar uma cópia de imagem de uma cópia de texto. Isto eu li no código e na documentação do `wl-clipboard`; quem confirma é o passo 2 do roteiro.
+- A origem de um item copiado num aplicativo X11 é a janela em foco, como nos outros: o Niri vê a janela do X11 com o `app_id` que o `xwayland-satellite` informa (a classe da janela), e o nome sai da entrada `.desktop` quando ela existe.
+
+### O que pode dar errado, e onde olhar
+
+- **Ponte parada.** Se nada passa de um lado para o outro, confiro se o `xwayland-satellite` está rodando (`pgrep -a xwayland-satellite`) e o que ele diz no diário (`journalctl --user -b | grep -i satellite`).
+- **O aplicativo de origem fechou.** No Wayland quem copiou é quem serve o conteúdo: fechado o aplicativo, a área de transferência esvazia. O histórico guarda uma cópia, então o Super+V e o Enter devolvem o item.
+- **Seleção primária.** O histórico só escuta a área de transferência (Ctrl+C), e não a seleção primária (o texto só selecionado com o mouse).
+- **Imagem que não é PNG.** Um aplicativo X11 que só oferece a imagem em outro formato não entra no histórico (só PNG nesta versão), mas o colar direto entre os dois aplicativos não depende do histórico.
+
+### Roteiro (sessão do Niri, com a shell aberta e o Super+V aplicado)
+
+Uso um aplicativo Wayland (Ghostty ou Firefox) e um X11 (Steam, ou o Battle.net pelo umu-launcher). A Steam e o Battle.net são X11; na dúvida sobre outra janela, o `xlsclients` (se estiver instalado) lista as que passam pelo `xwayland-satellite`.
+
+1. **Wayland para X11.** Copio uma linha no Ghostty e colo num campo de texto da Steam (a busca da loja ou o chat). Esperado: o texto colado é o mesmo.
+2. **X11 para Wayland.** Copio um texto na Steam (o nome de um jogo, um trecho de uma página) e colo no Ghostty. Esperado: o texto colado é o mesmo, com os acentos.
+3. **O histórico mostra os dois.** Super+V. Esperado: os dois itens no topo, cada um com o aplicativo certo em "Source" (a Steam pode aparecer pelo nome da classe da janela, se não houver entrada `.desktop` com o mesmo nome).
+4. **Do histórico para o X11.** No Super+V escolho o item mais antigo, Enter, e Ctrl+V na Steam. Esperado: cola o item escolhido, e ele sobe para o topo do histórico sem duplicar.
+5. **Do histórico para o Wayland.** O mesmo, colando no Firefox.
+6. **Aplicativos GNOME.** Repito o 1 e o 2 entre um aplicativo GNOME (Arquivos ou o Editor de texto, que são Wayland) e a Steam.
+7. **Battle.net pelo umu-launcher.** Copio um texto no cliente (o nome de usuário na tela de conta, por exemplo) e colo no Ghostty; copio no Ghostty e colo no campo de busca do cliente.
+8. **Origem fechada.** Copio um texto num aplicativo X11, fecho o aplicativo, e colo no Ghostty. Esperado: pode não colar nada (é o comportamento do Wayland). Depois, Super+V, Enter no item e Ctrl+V: cola.
+9. **Imagem.** Copio uma imagem no Firefox ("Copiar imagem") e colo num aplicativo que aceite imagem. No Super+V: um item só, de imagem, com a prévia.
+10. **Teclado e gestos.** Com o histórico aberto, digito na busca um texto com acentos pelo `us altgr-intl` (AltGr+vírgula para "ç", AltGr+e para "é"). Fecho, e confiro que os gestos de três dedos do touchpad do Niri continuam trocando de workspace e de coluna.
+
+**FAIL** da fase: o colar só funciona entre aplicativos Wayland (os passos 1, 2, 4 ou 7 falham), ou o teclado ou os gestos mudam com a shell aberta.

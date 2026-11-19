@@ -10,8 +10,9 @@
 //   secondary  textos de segunda importância em que a busca também casa (app: genericName e keywords; ajuste: o
 //              nome da página mãe). Casar só ali vale a nota mais baixa.
 //   target     o alvo da linha: { type: "app", id, entry } | { type: "file", path, directory } |
-//              { type: "setting", page } | { type: "command", action }. É o que `activate` despacha, e o que as
-//              próximas tarefas (menu de ações, "Search files") vão ler.
+//              { type: "setting", page } | { type: "command", action } e, nas linhas de ação do "sem resultado",
+//              { type: "web-search", text } | { type: "file-search", text }. É o que `activate` despacha e o que o
+//              menu de ações lê.
 
 // ---- Limites (a minha proposta da P-78: o board não decide estas regras) ----
 // Até este total de resultados, uma seção só, "Best match"; com mais, os grupos.
@@ -24,6 +25,16 @@ var RECENTS_SHOWN = 3;
 // A busca de arquivos só roda com este mínimo de caracteres, e o `fd` para neste número de resultados.
 var FILES_MIN_CHARS = 2;
 var FILES_MAX_RESULTS = 50;
+// A busca profunda ("Search files" do estado sem resultado, F5-T11) vale com 1 caractere, pede até 200 candidatos ao `fd`
+// e mostra 20 linhas. Os três números são a proposta da P-78: a P-73 só diz que a busca é "mais funda" que a normal.
+var DEEP_FILES_MIN_CHARS = 1;
+var DEEP_FILES_MAX_RESULTS = 200;
+var DEEP_FILES_SHOWN = 20;
+// O que o `fd` ganha a mais na busca profunda: as ocultas entram, e o conteúdo dos repositórios (`.git`) fica de fora,
+// senão ele afoga o resto. O `.gitignore` continua valendo, que é o padrão do `fd`.
+var DEEP_FILES_OPTIONS = ["--hidden", "--exclude", ".git"];
+// O buscador de "Search the web" é o Google (P-73, 2026-11-18: "acho que seria melhor"). O texto, codificado, entra no fim.
+var WEB_SEARCH_URL = "https://www.google.com/search?q=";
 
 // Os grupos, na ordem fixa do board. `key` é a chave da fonte em `sources`.
 var GROUPS = [
@@ -315,6 +326,33 @@ function rowKey(row) {
   return target && target.type === "command" ? "command:" + target.action : "";
 }
 
+// ---- Linhas de ação do "sem resultado" ----
+
+// O endereço da busca na web para um texto. O `encodeURIComponent` falha com uma ponta solta de UTF-16 (meio par de
+// substituição); se o texto trouxer uma, tiro esses caracteres e codifico o resto.
+function webSearchUrl(text) {
+  let encoded = "";
+  try {
+    encoded = encodeURIComponent(String(text));
+  } catch (error) {
+    encoded = encodeURIComponent(String(text).replace(/[\ud800-\udfff]/g, ""));
+  }
+  return WEB_SEARCH_URL + encoded;
+}
+
+// As linhas de ação do "Nothing found" (P-73): "Search the web" e, se `offerFiles`, "Search files", com o texto entre aspas
+// curvas no detalhe. `text` já vem sem espaços nas pontas. Cada linha carrega o alvo para o `activate` despachar.
+function fallbackRows(text, offerFiles) {
+  const detail = "“" + text + "”";
+  const rows = [{ title: "Search the web", detail: detail, kind: "Action", icon: "globe",
+      target: { type: "web-search", text: text } }];
+  if (offerFiles) {
+    rows.push({ title: "Search files", detail: detail, kind: "Action", icon: "folder",
+        target: { type: "file-search", text: text } });
+  }
+  return rows;
+}
+
 // ---- Arquivos ----
 
 // O caminho local de uma URL "file://" (o que o StandardPaths devolve); o que já é caminho passa como está.
@@ -331,11 +369,19 @@ function localPath(url) {
 
 // A linha de comando do `fd`: o texto como trecho fixo, sem maiúsculas, arquivos, pastas e links, sem as ocultas
 // (o padrão do `fd`), com caminhos absolutos separados por NUL. O texto vai depois de `--`, como argumento, nunca por
-// shell; as pastas vêm depois dele.
-function fdCommand(binary, text, directories, maxResults) {
+// shell; as pastas vêm depois dele. `options` são as opções a mais (a busca profunda passa DEEP_FILES_OPTIONS); sem
+// elas o comando é o da busca normal.
+function fdCommand(binary, text, directories, maxResults, options) {
   return [binary || "fd", "--fixed-strings", "--ignore-case", "--type", "file", "--type", "directory",
-      "--type", "symlink", "--max-results", String(maxResults || FILES_MAX_RESULTS), "--absolute-path", "--print0",
-      "--", String(text)].concat(directories || []);
+      "--type", "symlink", "--max-results", String(maxResults || FILES_MAX_RESULTS), "--absolute-path", "--print0"]
+      .concat(options || [], ["--", String(text)], directories || []);
+}
+
+// A busca profunda mostra uma seção só, "Files", com os arquivos que casam ordenados pela nota de sempre, até
+// DEEP_FILES_SHOWN. Mesmo com poucos resultados não vira "Best match", e as outras fontes não entram.
+function deepSections(query, fileRows) {
+  const found = rank(query, fileRows, [], 0).slice(0, DEEP_FILES_SHOWN);
+  return found.length === 0 ? [] : [{ label: "Files", rows: found.map(entry => entry.row) }];
 }
 
 var IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg", "avif", "tif", "tiff", "heic", "ico"];

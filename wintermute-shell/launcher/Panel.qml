@@ -30,7 +30,9 @@ import ".."
 //   none   há texto, não é cálculo e o serviço não achou nada: o bloco "Nothing found" e, 16 abaixo da dica, as
 //          linhas de `service.fallbackRows` (sem rótulo). Sem elas o divisor do rodapé fica nos 16 da dica. Só vale com
 //          a busca de arquivos terminada (`service.searching` falso); enquanto ela dura, sem nenhuma linha para mostrar,
-//          a lista fica vazia em vez de piscar o aviso.
+//          a lista fica vazia em vez de piscar o aviso. A exceção é a busca profunda (F5-T11): o aviso que já estava na
+//          tela fica até a resposta (`service.holdNotice`), para o launcher não piscar uma lista vazia entre o Enter em
+//          "Search files" e o resultado.
 //   list   as seções do serviço.
 // Os chips entram na seleção pelo teclado (P-72): ↓ depois da última linha (ou direto, sem recentes) vai ao
 // primeiro chip, ← e → andam entre eles, ↑ volta às linhas. Com um chip em foco nenhuma linha fica selecionada.
@@ -62,7 +64,7 @@ Item {
   // Posições absolutas (no quadro) de cada rótulo e de cada linha, e do divisor do rodapé.
   readonly property var plan: buildPlan(service.page, service.sections, service.calculation,
       String(service.query).trim(), service.recents, service.tools, service.fallbackRows, service.searching,
-      service.actionSections)
+      service.actionSections, service.holdNotice)
   readonly property int rowCount: plan.rows.length
   readonly property int chipCount: plan.chips ? plan.chips.items.length : 0
   readonly property real listTop: Theme.launcherSearchHeight + Theme.launcherDividerHeight
@@ -77,7 +79,7 @@ Item {
   width: implicitWidth
   height: implicitHeight
 
-  function buildPlan(page, sections, calculation, query, recents, tools, fallbackRows, searching, actionSections) {
+  function buildPlan(page, sections, calculation, query, recents, tools, fallbackRows, searching, actionSections, holdNotice) {
     if (page === "color") {
       return { kind: "color", labels: [], rows: [], card: null, chips: null, notice: null,
           footerY: Theme.launcherColorFooterY };
@@ -116,8 +118,9 @@ Item {
       kind = "empty";
       sections = (recents || []).length > 0 ? [{ label: "Recent", rows: recents }] : [];
     } else if (!(sections || []).some(section => (section.rows || []).length > 0)) {
-      // Sem linha e com a busca de arquivos em andamento, ainda não sei que não há nada: a lista fica vazia.
-      if (!searching)
+      // Sem linha e com a busca de arquivos em andamento, ainda não sei que não há nada: a lista fica vazia, a não ser que
+      // o aviso já estivesse na tela (busca profunda), e então ele continua.
+      if (!searching || holdNotice)
         kind = "none";
       sections = [];
     }
@@ -230,6 +233,8 @@ Item {
   // `shownDepth` não é uma ligação com o serviço: ele só muda em `followDepth`, para eu ver a diferença.
   property int shownDepth: 0
   property var savedSelection: []
+  // Entrei na busca profunda e a primeira resposta ainda não chegou (ver `onDeepFilesChanged`).
+  property bool resetOnAnswer: false
   // A camada cuja seleção ainda estou repondo, ou -1. Ver `followDepth`.
   property int restoreDepth: -1
   Component.onCompleted: shownDepth = service.actionsDepth || 0
@@ -388,6 +393,18 @@ Item {
       root.selected = 0;
       root.chipIndex = -1;
       list.contentY = 0;
+    }
+    // Entrei na busca profunda: a seleção volta à primeira linha quando a resposta chega, e não antes, porque até lá o
+    // "Nothing found" segurado ainda mostra "Search files" selecionada.
+    function onDeepFilesChanged() {
+      root.resetOnAnswer = root.service.deepFiles;
+    }
+    function onSearchingChanged() {
+      if (root.resetOnAnswer && !root.service.searching) {
+        root.resetOnAnswer = false;
+        root.selected = 0;
+        list.contentY = 0;
+      }
     }
     // Entrar na página ou voltar dela: o campo some ou volta, e o foco acompanha (depois que a cena se refaz).
     function onPageChanged() {

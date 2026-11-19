@@ -5,7 +5,8 @@ import "../launcher" as Launcher
 // O launcher de verdade (launcher/Panel.qml) com um serviço fictício, sem janela e sem véu (ficha 14).
 //   state    "empty" (busca vazia: três recentes e as ferramentas), "empty-tools" (sem recentes),
 //            "no-result" (busca "xyzzy", com as duas linhas de ação), "no-result-bare" (o mesmo sem as
-//            linhas), "typing" (busca "ter" com a sugestão "minal"), "grouped" (busca "no", quatro
+//            linhas), "deep-files" (a busca profunda, "Search files": busca "notes", uma seção "Files" com seis
+//            arquivos, alguns em pastas ocultas), "no-result-deep" (a busca profunda sem resultado: só "Search the web"), "typing" (busca "ter" com a sugestão "minal"), "grouped" (busca "no", quatro
 //            seções), "confirm" (o mesmo, com o comando perigoso armado: selecione a linha 5), "calc" (a busca é
 //            `expression`; o cálculo ocupa o launcher) ou "color" (a página de resultado do seletor de cor: #3FA9D9
 //            "pega agora" no Firefox e o histórico do board), "actions-app", "actions-file", "actions-command",

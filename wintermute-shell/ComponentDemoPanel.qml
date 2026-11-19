@@ -979,9 +979,19 @@ PanelWindow {
                   Demo.LauncherSpecimen { state: "no-result" }
                 }
                 Specimen {
-                  caption: "Sem resultado sem as linhas de ação (o que o serviço de verdade oferece por enquanto, P-73) 640×240 · divisor em 196"
+                  caption: "Sem resultado sem as linhas de ação (a F5-T04 o desenhou assim; o serviço de verdade já não cai nele) 640×240 · divisor em 196"
                   stageWidth: 640; stageHeight: 240
                   Demo.LauncherSpecimen { state: "no-result-bare" }
+                }
+                Specimen {
+                  caption: "Busca profunda (\"Search files\", F5-T11, P-73) · busca notes · uma seção, Files, com seis arquivos, três em pastas ocultas · divisor em 356"
+                  stageWidth: 640; stageHeight: 400
+                  Demo.LauncherSpecimen { state: "deep-files"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Busca profunda sem resultado · só Search the web (divisor do rodapé em 244) 640×288"
+                  stageWidth: 640; stageHeight: 288
+                  Demo.LauncherSpecimen { state: "no-result-deep" }
                 }
               }
 

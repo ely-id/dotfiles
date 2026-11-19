@@ -13,10 +13,13 @@ import "Search.js" as Search
 // as linhas e o `State.qml` as mistura com as outras fontes.
 //
 // O binário, as pastas e os limites são propriedades, para o teste apontar para uma pasta temporária e para um `fd`
-// de mentira. A "Search files" da F5-T11 vai reaproveitar isto com outras pastas e mais resultados.
+// de mentira. Com `deep` ligado (a "Search files" do estado sem resultado, F5-T11) a mesma busca roda na pasta pessoal
+// inteira, com as ocultas, sem `.git`, pedindo mais candidatos e valendo com 1 caractere.
 //
-//   text       o que buscar; abaixo de `minChars` não busco nada e a lista fica vazia
+//   text       o que buscar; abaixo do mínimo do modo não busco nada e a lista fica vazia
+//   deep       a busca profunda
 //   output     a saída crua do `fd` da última busca concluída (caminhos absolutos separados por NUL)
+//   outputDeep o modo a que `output` responde: ele não vale para o outro modo
 //   searching  há uma busca pendente (no atraso ou no `fd`) para o texto atual
 //   available  o `fd` existe; se não existir, aviso uma vez no log e o grupo Files fica de fora
 Scope {
@@ -28,13 +31,20 @@ Scope {
   property var directories: defaultDirectories()
   property int minChars: Search.FILES_MIN_CHARS
   property int maxResults: Search.FILES_MAX_RESULTS
+  // A busca profunda: a pasta pessoal inteira (quem diz onde ela fica é o StandardPaths, nenhum caminho escrito aqui), o
+  // mínimo e o limite dela. O teste troca `deepDirectories` por uma pasta temporária.
+  property bool deep: false
+  property var deepDirectories: [Search.localPath(StandardPaths.writableLocation(StandardPaths.HomeLocation))]
+  property int deepMinChars: Search.DEEP_FILES_MIN_CHARS
+  property int deepMaxResults: Search.DEEP_FILES_MAX_RESULTS
   // Atraso entre a última tecla e a busca: o tempo de controle que a shell já usa, sem tempo novo.
   property int delay: Theme.controlDuration
   property string text: ""
 
   property string output: ""
-  // O texto a que `output` responde, para quem quiser conferir.
+  // O texto e o modo a que `output` responde, para quem quiser conferir.
   property string outputText: ""
+  property bool outputDeep: false
   readonly property bool searching: pending
   // Atualizado a cada busca (o PATH pode mudar enquanto a shell roda).
   property bool available: true
@@ -63,18 +73,31 @@ Scope {
   }
 
   onTextChanged: schedule()
+  // Trocar de modo refaz a busca do mesmo texto no outro.
+  onDeepChanged: schedule()
+
+  // Quantos caracteres o modo atual pede.
+  function requiredChars() {
+    return deep ? deepMinChars : minChars;
+  }
+
+  // O `fd` existe? O State pergunta para decidir se oferece a "Search files".
+  function present() {
+    return String(StandardPaths.findExecutable(binary)) !== "";
+  }
 
   // Texto novo: mata a busca anterior e, se o texto é grande o bastante, espera o atraso para começar a nova.
   function schedule() {
     kill();
     const wanted = String(text).trim();
-    if (wanted.length < minChars) {
+    if (wanted.length < requiredChars()) {
       debounce.stop();
       pending = false;
       if (output !== "") {
         output = "";
         outputText = "";
       }
+      outputDeep = deep;
       return;
     }
     pending = true;
@@ -91,11 +114,11 @@ Scope {
 
   function start() {
     const wanted = String(text).trim();
-    if (wanted.length < minChars) {
+    if (wanted.length < requiredChars()) {
       pending = false;
       return;
     }
-    available = String(StandardPaths.findExecutable(binary)) !== "";
+    available = present();
     if (!available) {
       if (!warned) {
         warned = true;
@@ -104,12 +127,14 @@ Scope {
       finish("", wanted);
       return;
     }
-    if (!directories || directories.length === 0) {
+    const where = deep ? deepDirectories : directories;
+    if (!where || where.length === 0) {
       finish("", wanted);
       return;
     }
     current = runner.createObject(root, {
-      command: Search.fdCommand(binary, wanted, directories, maxResults),
+      command: deep ? Search.fdCommand(binary, wanted, where, deepMaxResults, Search.DEEP_FILES_OPTIONS)
+          : Search.fdCommand(binary, wanted, where, maxResults),
       searchGeneration: generation,
       searchedText: wanted
     });
@@ -118,6 +143,8 @@ Scope {
   function finish(result, wanted) {
     output = result;
     outputText = wanted;
+    // Uma troca de modo mata a busca no ar, então a resposta que chega é sempre do modo de agora.
+    outputDeep = deep;
     pending = false;
   }
 

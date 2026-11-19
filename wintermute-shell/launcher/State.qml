@@ -17,8 +17,9 @@ import Quickshell.Io
 // A biblioteca Search.js casa e ordena, decide entre "Best match" e os grupos e calcula a sugestão fantasma; aqui ficam
 // as fontes, os recentes (launcher-recents.json), a confirmação do comando perigoso e `activate`, que despacha pelo
 // alvo da linha (`row.target`). O cálculo (F5-T03) depende só do texto, então `calculation`, o modo e o rodapé saem dele.
-// As ferramentas do estado vazio (F5-T04) são fixas. O seletor de cor (F5-T08) abre uma página própria,
-// `page === "color"`, com a cor mais recente do histórico; o seletor de emoji (F5-T09) é `page === "emoji"`, com o
+// As ferramentas do estado vazio (F5-T04) são fixas. As duas linhas de ação do "sem resultado" (F5-T11, P-73) são "Search the
+// web" (xdg-open no Google) e "Search files", que liga `deepFiles`: a mesma busca de arquivos na pasta pessoal inteira.
+// O seletor de cor (F5-T08) abre uma página própria, `page === "color"`, com a cor mais recente do histórico; o seletor de emoji (F5-T09) é `page === "emoji"`, com o
 // inventário lido na primeira abertura (EmojiInventory.qml) e os últimos copiados em emoji-recents.json; as outras (a F6)
 // ainda não existem, então `openTool` só registra no log para elas. O menu "Actions" (F5-T05, Ctrl+K) é outra página, `page === "actions"`: as ações do
 // item que estava selecionado (a conta mora em Actions.js) e, para "Open on workspace…", uma segunda camada com os
@@ -47,7 +48,9 @@ Singleton {
   // A resposta de arquivos que ainda falta para o texto atual: o `fd` rodando, ou um texto novo que ainda não chegou ao
   // `fd` (o atraso da busca). Derivado do texto, e não do estado interno do FileSearch, para valer no mesmo instante em
   // que o texto muda. O launcher nunca mostra "Nothing found" enquanto isto é verdade.
-  readonly property bool searching: filesText.length >= files.minChars && (files.searching || files.outputText !== filesText)
+  // Na busca profunda a resposta que vale é a do modo profundo: `outputDeep` evita tomar a da busca normal por ela.
+  readonly property bool searching: filesText.length >= (deepFiles ? files.deepMinChars : files.minChars)
+      && (files.searching || files.outputText !== filesText || files.outputDeep !== deepFiles)
   // As ferramentas da busca vazia, na ordem do board: { key, label, icon }. A chave vai para `openTool`.
   readonly property var tools: [
     { key: "color", label: "Color picker", icon: "pipette" },
@@ -55,9 +58,10 @@ Singleton {
     { key: "screenshot", label: "Screenshot", icon: "scan" },
     { key: "clipboard", label: "Clipboard", icon: "clipboard" }
   ]
-  // As linhas de ação do "sem resultado" ("Search the web", "Search files"). O que elas fazem é a P-73, ainda
-  // aberta: por enquanto não ofereço nenhuma, e o aviso aparece sem elas.
-  readonly property var fallbackRows: []
+  // As linhas de ação do "sem resultado" (P-73): "Search the web" e, se o `fd` existe e a busca ainda não é a profunda,
+  // "Search files". Na primeira vez que a profunda espera a resposta o bloco fica como estava, com as duas linhas
+  // (`deepAnswered` ainda falso); depois só a da web.
+  readonly property var fallbackRows: Search.fallbackRows(String(query).trim(), files.present() && !(deepFiles && deepAnswered))
 
   // O resultado sai no formato do locale do sistema (decisão 0012; P-70).
   readonly property string decimalSeparator: Qt.locale().decimalPoint
@@ -79,12 +83,26 @@ Singleton {
   readonly property var commandRows: Search.commandRows()
   // A pasta pessoal, para escrever "~" no detalhe dos arquivos.
   property string homeDir: Quickshell.env("HOME") || ""
-  readonly property var fileRows: Search.fileRows(files.output, homeDir)
+  // A saída do `fd` só vale no modo a que ela responde.
+  readonly property var fileRows: files.outputDeep === deepFiles ? Search.fileRows(files.output, homeDir) : []
   // Onde a busca de arquivos procura e com que binário; o teste aponta para uma pasta temporária e um `fd` de mentira.
   property alias fileDirectories: files.directories
   property alias fileBinary: files.binary
   // Roda um comando solto (xdg-open, o script de sessão, o niri). O teste troca por uma função que só anota.
   property var exec: argv => Quickshell.execDetached(argv)
+
+  // ---- Busca profunda (F5-T11, P-73): "Search files" no estado sem resultado ----
+  // Ligada, o launcher continua aberto com o mesmo texto e a busca de arquivos roda na pasta pessoal inteira, com as ocultas,
+  // sem `.git`, e só o grupo "Files" aparece (Search.deepSections). Sai ao apagar o texto, ao fechar e ao abrir.
+  property bool deepFiles: false
+  // O `fd` profundo já respondeu desde que o modo ligou. Até lá o "Nothing found" que estava na tela continua com as duas linhas.
+  property bool deepAnswered: false
+  // O "Nothing found" é o que está na tela e o modo profundo o segura enquanto o `fd` não responde, em vez de mostrar uma
+  // lista vazia. Não é uma ligação: o Panel o lê no mesmo instante em que `searching` muda, e uma ligação poderia chegar
+  // depois dele e deixar passar um quadro de lista vazia. Quem o escreve é `applySections` (e `searchFiles`, antes de ligar o modo).
+  property bool holdNotice: false
+  // Onde a busca profunda procura; o teste aponta para uma pasta temporária.
+  property alias deepFileDirectories: files.deepDirectories
 
   // Os ids dos apps que abri pelo launcher, o mais novo primeiro, no máximo `Search.RECENTS_KEPT`.
   property var recentIds: []
@@ -93,12 +111,14 @@ Singleton {
 
   // As seções do texto atual: os resultados que casam, em "Best match" ou nos grupos (Search.js). A linha armada
   // mostra a confirmação no detalhe.
-  readonly property var candidateSections: decorate(Search.buildSections(String(query).trim(), {
-    apps: appIndex.rows,
-    files: fileRows,
-    settings: settingRows,
-    commands: commandRows
-  }, recentIds), armedKey)
+  readonly property var candidateSections: decorate(deepFiles
+      ? Search.deepSections(String(query).trim(), fileRows)
+      : Search.buildSections(String(query).trim(), {
+        apps: appIndex.rows,
+        files: fileRows,
+        settings: settingRows,
+        commands: commandRows
+      }, recentIds), armedKey)
 
   function decorate(built, armed) {
     if (armed === "")
@@ -123,10 +143,18 @@ Singleton {
     if (Search.countRows(next) === 0 && searching)
       return;
     sections = next;
+    // O que ficou na tela é o "Nothing found" quando não há linha, há texto e não é cálculo. No modo profundo ele é segurado
+    // enquanto a próxima resposta não chega (ver `holdNotice`).
+    holdNotice = deepFiles && Search.countRows(next) === 0 && String(query).trim() !== "" && !calculation;
   }
 
   onCandidateSectionsChanged: applySections()
-  onSearchingChanged: applySections()
+  onSearchingChanged: {
+    // A primeira resposta do `fd` profundo: dali em diante o bloco sem resultado só oferece a busca na web.
+    if (deepFiles && !searching)
+      deepAnswered = true;
+    applySections();
+  }
 
   // A peça avisa qual linha ficou selecionada (nenhuma, com um chip em foco). Mudar a seleção desarma o comando
   // perigoso, a não ser que a selecionada seja a própria linha armada.
@@ -142,6 +170,7 @@ Singleton {
   FileSearch {
     id: files
     text: root.filesText
+    deep: root.deepFiles
   }
 
   FileView {
@@ -233,6 +262,7 @@ Singleton {
   function open(requestedOutputName, requestedContext) {
     outputName = requestedOutputName || Settings.State.focusedOutputName();
     query = "";
+    leaveDeep();
     armedKey = "";
     context = requestedContext || null;
     closePage();
@@ -247,6 +277,7 @@ Singleton {
     opened = false;
     context = null;
     armedKey = "";
+    leaveDeep();
   }
 
   function toggle(requestedOutputName) {
@@ -261,6 +292,16 @@ Singleton {
   function setQuery(text) {
     query = text;
     armedKey = "";
+    // Apagar o texto todo sai da busca profunda.
+    if (String(text).trim() === "")
+      leaveDeep();
+  }
+
+  // Sai da busca profunda: a próxima busca é a normal.
+  function leaveDeep() {
+    deepFiles = false;
+    deepAnswered = false;
+    holdNotice = false;
   }
 
   // Tab: o texto passa a ser a palavra inteira.
@@ -516,6 +557,10 @@ Singleton {
       runCommand(row);
       return;
     }
+    if (target.type === "file-search") {
+      searchFiles();
+      return;
+    }
     if (target.type === "app") {
       target.entry.execute();
       rememberApp(target.id);
@@ -523,8 +568,21 @@ Singleton {
       exec(["xdg-open", target.path]);
     } else if (target.type === "setting") {
       Settings.State.open(outputName, target.page);
+    } else if (target.type === "web-search") {
+      exec(["xdg-open", Search.webSearchUrl(target.text)]);
     }
     close();
+  }
+
+  // "Search files": o launcher fica aberto, com o mesmo texto, e a busca de arquivos passa a ser a profunda. `holdNotice` e
+  // `deepAnswered` vão antes do modo, para o Panel, que lê `searching` no instante em que o modo liga, já achar o bloco
+  // "Nothing found" segurado e com as duas linhas, e não uma lista vazia.
+  function searchFiles() {
+    if (deepFiles)
+      return;
+    deepAnswered = false;
+    holdNotice = true;
+    deepFiles = true;
   }
 
   // O primeiro Enter numa linha perigosa arma (o detalhe vira "Press ↵ again to confirm"); o segundo, na mesma

@@ -8,7 +8,7 @@ import "../launcher/Search.js" as Search
 import "../launcher" as Launcher
 
 // Serviço fictício do launcher para a vitrine e a bancada (decisão 0011). Tem a mesma superfície de
-// launcher/State.qml: opened, outputName, query, ghost, sections, recents, searching, tools, fallbackRows, decimalSeparator,
+// launcher/State.qml: opened, outputName, query, ghost, sections, recents, searching, tools, fallbackRows, deepFiles, holdNotice, decimalSeparator,
 // calculation, mode, modeLabel, modeIcon, searchIcon, actions, context, contextLabel, page, colorHistory, colorShown,
 // colorFreshStamp, colorCopied, colorInfo, colorOrigin, o menu de ações (actionsItem, actionsLevel, actionsWorkspaces,
 // actionsDepth, actionsTitle, actionSections, armedKey) e as funções open, close, toggle, setQuery, acceptGhost,
@@ -20,7 +20,10 @@ import "../launcher" as Launcher
 //   "empty"        busca vazia com três recentes e as quatro ferramentas
 //   "empty-tools"  busca vazia sem recentes (só as ferramentas)
 //   "no-result"    busca "xyzzy" que não acha nada, com as duas linhas de ação
-//   "no-result-bare" o mesmo sem as linhas de ação (o que o serviço de verdade oferece por enquanto)
+//   "no-result-bare" o mesmo sem nenhuma linha de ação (como a F5-T04 o desenhou: divisor em 196, 240 de altura; o serviço de verdade já não cai nele, porque "Search the web" sempre aparece)
+//   "deep-files"   a busca profunda (F5-T11, "Search files"): a busca "notes" com uma seção só, "Files", de seis arquivos, alguns em
+//                  pastas ocultas (`~/.config/...` fictícias), a primeira selecionada
+//   "no-result-deep" a busca profunda que não achou nada: o "Nothing found" só com "Search the web" (divisor em 244, 288 de altura)
 //   "typing", "grouped" ou "calc" (a busca é `expression`, o cálculo ocupa o launcher).
 //   "confirm"      o "grouped" com a linha "Power off now" armada: o primeiro Enter num comando perigoso deixa o detalhe
 //                  em "Press ↵ again to confirm" (a peça de verdade faz isso no State.qml; aqui o dado já vem assim).
@@ -62,11 +65,13 @@ QtObject {
   property string query: scenario === "typing" ? "ter" : scenario === "grouped" || scenario === "confirm" ? "no"
       : scenario === "calc" || scenario === "actions-calc" ? expression
       : isActions ? "no"
-      : scenario === "no-result" || scenario === "no-result-bare" ? "xyzzy" : ""
+      : scenario === "deep-files" ? "notes"
+      : scenario === "no-result" || scenario === "no-result-bare" || scenario === "no-result-deep" ? "xyzzy" : ""
   property string ghost: scenario === "typing" ? "minal" : ""
   property var sections: scenario === "typing" ? typingSections
       : scenario === "grouped" ? groupedSections
-      : scenario === "confirm" ? confirmSections : []
+      : scenario === "confirm" ? confirmSections
+      : scenario === "deep-files" ? deepSections : []
   property var recents: scenario === "empty" ? recentRows : []
   // O serviço de verdade tem uma busca de arquivos assíncrona; aqui os dados já estão prontos.
   readonly property bool searching: false
@@ -76,10 +81,23 @@ QtObject {
     { key: "screenshot", label: "Screenshot", icon: "scan" },
     { key: "clipboard", label: "Clipboard", icon: "clipboard" }
   ]
-  readonly property var fallbackRows: scenario === "no-result-bare" ? [] : [
-    { title: "Search the web", detail: "“" + query.trim() + "”", kind: "Action", icon: "globe" },
-    { title: "Search files", detail: "“" + query.trim() + "”", kind: "Action", icon: "folder" }
-  ]
+  // As mesmas linhas do serviço de verdade (Search.fallbackRows): as duas, só a da web depois da busca profunda, ou nenhuma.
+  readonly property var fallbackRows: scenario === "no-result-bare" ? [] : Search.fallbackRows(query.trim(), !deepFiles)
+  // A busca profunda ligada (F5-T11), e o aviso segurado até a resposta: o fictício já tem a resposta, então nunca segura.
+  readonly property bool deepFiles: scenario === "deep-files" || scenario === "no-result-deep"
+  readonly property bool holdNotice: false
+
+  // Os arquivos da busca profunda, como o `fd` os devolveria (caminhos absolutos separados por NUL, a pasta termina em "/"),
+  // e as seções que o serviço de verdade tira deles (Search.deepSections). A pasta pessoal fictícia é a dos outros cenários.
+  readonly property string deepOutput: [
+    "/home/user/Documents/notes.md",
+    "/home/user/.config/notes-app/notes.json",
+    "/home/user/Downloads/release-notes.txt",
+    "/home/user/.local/share/notes-app/notes.sqlite",
+    "/home/user/Documents/work/meeting-notes.md",
+    "/home/user/.local/share/notes/"
+  ].join("\0") + "\0"
+  readonly property var deepSections: Search.deepSections("notes", Search.fileRows(deepOutput, "/home/user"))
 
   readonly property var calculation: Calculator.describe(query, decimalSeparator)
 

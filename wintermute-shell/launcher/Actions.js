@@ -17,7 +17,8 @@ function action(title, icon, extra) {
 }
 
 // Os tipos de item que têm menu: "app", "file", "setting", "command" e "calc" (a linha do cálculo, que traz `copy`).
-// Linha sem alvo e sem texto para copiar (as ações do "sem resultado") não tem menu: devolve "".
+// Linha sem alvo de um tipo que tenha menu e sem texto para copiar (as ações do "sem resultado", que têm alvo
+// "web-search" e "file-search") não tem menu: devolve "".
 function itemType(row) {
   if (!row)
     return "";

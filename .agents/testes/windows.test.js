@@ -137,6 +137,15 @@ test("o tamanho em pixels do monitor: com escala o quadro tem mais pixels que a 
   equal(W.pixelSize({ width: 333, height: 201 }, 1.5, 1.5), { width: 500, height: 302 }, "499,5 e 301,5 arredondam para cima");
 });
 
+test("com razões diferentes nos dois eixos, a largura usa a horizontal e a altura a vertical", () => {
+  // 320 × 2 = 640 e 300 × 1,25 = 375; se trocasse os eixos daria 400 e 600
+  equal(W.pixelSize({ width: 320, height: 300 }, 2, 1.25), { width: 640, height: 375 });
+  equal(W.pixelSize({ width: 320, height: 300 }, 1.25, 2), { width: 400, height: 600 });
+  equal(W.pixelSize({ width: 100, height: 100 }, 1, 3), { width: 100, height: 300 }, "uma razão 1 não mexe no outro eixo");
+  equal(W.pillText("Firefox", { width: 320, height: 300 }, 2, 1.25), "Firefox · 640 × 375", "a pílula mostra o tamanho em pixels do quadro");
+  equal(W.pillSuffix({ width: 320, height: 300 }, 2, 1.25), " · 640 × 375");
+});
+
 test("a pílula da janela: 'Nome · 320 × 300', com o ponto do meio e o sinal de vezes", () => {
   equal(W.pillText("Firefox", { width: 320, height: 300 }, 1, 1), "Firefox · 320 × 300");   // o texto do board
   equal(W.pillSuffix({ width: 320, height: 300 }, 1, 1), " · 320 × 300");

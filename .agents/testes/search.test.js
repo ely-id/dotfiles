@@ -180,6 +180,14 @@ test("sem sugestão com o texto vazio, com espaço no fim ou sem resultado", () 
   equal(S.ghost("ter", undefined), "");
 });
 
+test("sem sugestão com espaço no fim, mesmo quando o título tem o espaço ali (só a regra do espaço explica o vazio)", () => {
+  // A ficha 14: o fantasma só vale "sem espaço no fim". "visual " é prefixo de "Visual Notes" (7 caracteres iguais, o sétimo é o espaço), então
+  // sem a conferência do espaço o resto seria "Notes". O caso de "ter " contra "Terminal" não pega isso: "Terminal" não tem espaço na posição 3.
+  equal(S.ghost("visual ", sectionsOf("Visual Notes")), "");
+  equal(S.ghost("visual", sectionsOf("Visual Notes")), " Notes", "sem o espaço o fantasma aparece, com o espaço que o título tem");
+  equal(S.ghost("visual\t", sectionsOf("Visual\tNotes")), "", "tabulação no fim também é espaço");
+});
+
 test("a sugestão vem só da primeira linha da primeira seção", () => {
   const sections = [{ label: "Apps", rows: [{ title: "Terminal" }, { title: "Terra" }] }, { label: "Files", rows: [{ title: "Tertiary.txt" }] }];
   equal(S.ghost("ter", sections), "minal");

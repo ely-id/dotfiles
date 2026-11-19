@@ -161,6 +161,20 @@ test("numa seleção pequena a área das alças encolhe e o miolo continua pegá
   eq(S.hitTest(tiny, 104, 104, HIT), "move");
 });
 
+test("a área de cada alça é um terço do lado menor, não a metade (seleção de 30×30: 10 de lado, não 15)", () => {
+  // O comentário de hitTest e a ficha 17: a área "encolhe numa seleção pequena, para o miolo continuar movível". 30 / 3 = 10, então a área do
+  // canto vai de 95 a 105 em volta do centro (100, 100). Com a metade do lado (15) iria até 107,5.
+  const small = { x: 100, y: 100, width: 30, height: 30 };
+  eq(S.hitTest(small, 104, 104, HIT), "nw", "a 4 do canto é da alça");
+  eq(S.hitTest(small, 106, 106, HIT), "move", "a 6 do canto já é do miolo (seria da alça com metade do lado)");
+  eq(S.hitTest(small, 95, 95, HIT), "nw", "a borda de dentro da área, a 5 antes do centro");
+  eq(S.hitTest(small, 94, 95, HIT), "", "um pixel antes");
+  // o lado menor é que conta: 60 × 24 dá 24 / 3 = 8 (área de 4 em volta do centro), e não 60 / 3 = 20
+  const wide = { x: 100, y: 100, width: 60, height: 24 };
+  eq(S.hitTest(wide, 103, 103, HIT), "nw", "a 3 do canto");
+  eq(S.hitTest(wide, 105, 105, HIT), "move", "a 5 do canto, que só seria da alça se valesse o lado maior");
+});
+
 test("a área mínima da alça é de 4: ao lado do canto, o pixel certo já é da alça do meio", () => {
   const tiny = { x: 100, y: 100, width: 8, height: 8 };       // o lado da área seria 8 / 3 = 2, e o mínimo de 4 vale
   eq(S.hitTest(tiny, 101, 100, HIT), "nw", "a área do canto vai de 98 a 101");
@@ -207,6 +221,41 @@ test("as ações vão para cima quando embaixo encostaria na barra", () => {
 test("a barra só interessa se a pílula chega nela", () => {
   const sel = { x: 100, y: 100, width: 100, height: 100 };         // ações em x 0..208: a barra começa em x 112, então toca
   eq(S.actionsPill(sel, ACT.w, ACT.h, GAP, GAP, W, H, null, { x: 400, y: 300, width: 100, height: 50 }).where, "below", "a barra está longe");
+});
+
+test("encostar conta: com a borda de baixo da pílula exatamente na barra (sem sobrepor), as ações vão para cima", () => {
+  // O comentário de touches: "encostar conta: a pílula não pode ficar colada na barra". A base da seleção é 314, as ações ficariam em y 322..370 e
+  // a barra começa em y 370: as bordas são adjacentes, sem sobreposição, e mesmo assim a pílula não pode ficar ali.
+  const sel = { x: 160, y: 124, width: 400, height: 190 };
+  const p = S.actionsPill(sel, ACT.w, ACT.h, GAP, GAP, W, H, null, BAR);
+  eq([p.x, p.y, p.where], [352, 68, "above"]);
+  // com a barra um pixel mais abaixo há folga de 1 e a pílula fica embaixo
+  const folga = S.actionsPill(sel, ACT.w, ACT.h, GAP, GAP, W, H, null, { x: BAR.x, y: 371, width: BAR.width, height: BAR.height });
+  eq([folga.x, folga.y, folga.where], [352, 322, "below"], "um pixel de folga basta");
+});
+
+test("encostar conta também na horizontal: a pílula de ações adjacente à lateral da barra vai para cima", () => {
+  // seleção de 200 de largura em x 200: as ações ocupam x 192..400, y 308..356; a barra começa em x 400 e cobre y 330..380 na vertical.
+  const sel = { x: 200, y: 100, width: 200, height: 200 };
+  const lateral = { x: 400, y: 330, width: 100, height: 50 };
+  const p = S.actionsPill(sel, ACT.w, ACT.h, GAP, GAP, W, H, null, lateral);
+  eq([p.x, p.y, p.where], [192, 44, "above"]);
+  const folga = S.actionsPill(sel, ACT.w, ACT.h, GAP, GAP, W, H, null, { x: 401, y: 330, width: 100, height: 50 });
+  eq([folga.x, folga.y, folga.where], [192, 308, "below"], "um pixel de folga basta");
+});
+
+test("encostar conta também para a pílula de tamanho: as ações em cima, adjacentes a ela na horizontal, vão para dentro", () => {
+  // seleção em x 200..496: a pílula de tamanho ocupa x 200..288 (y 72..96) e as ações, em cima, ocupariam x 288..496 (y 48..96). A borda direita
+  // da pílula de tamanho (288) é a esquerda das ações, sem sobrepor. Embaixo não cabe (a base está em 448).
+  const sel = { x: 200, y: 104, width: 296, height: 344 };
+  const size = S.sizePill(sel, SIZE.w, SIZE.h, GAP, W);
+  eq([size.x, size.y, size.width], [200, 72, 88]);
+  const p = S.actionsPill(sel, ACT.w, ACT.h, GAP, GAP, W, H, size, null);
+  eq(p.where, "inside");
+  // com a seleção 1 pixel mais larga as ações passam a x 289 e há folga: ficam em cima
+  const larga = { x: 200, y: 104, width: 297, height: 344 };
+  const p2 = S.actionsPill(larga, ACT.w, ACT.h, GAP, GAP, W, H, S.sizePill(larga, SIZE.w, SIZE.h, GAP, W), null);
+  eq([p2.x, p2.y, p2.where], [289, 48, "above"], "um pixel de folga basta");
 });
 
 test("as ações vão para dentro quando em cima também não cabe", () => {

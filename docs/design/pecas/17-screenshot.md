@@ -91,6 +91,19 @@ O board desenha esse estado só. O resto é composição minha (ajuste A-05), se
 - **Vários monitores:** a seleção é uma só; começar outra num monitor apaga a anterior.
 - **As quatro ações** ainda não fazem nada além de avisar no log: capturar e copiar são a `F6-T13`, salvar a `F6-T03` e anotar a `F6-T14`.
 
+## Modo janela e modo tela: conferido no Figma e como funcionam (`F6-T12`)
+
+Li o estado "Modo janela" (`13:19441`): o escurecimento (`13:19457`), o anel (`13:19458`) e a pílula (`13:19459`). **O modo tela não tem board:** é composição minha (ajuste A-05), com os mesmos valores.
+
+- **Modo janela:** a tela inteira escurecida a 45%, sem mira, sem coordenadas e sem dica, com o ponteiro normal. A janela sob o ponteiro ganha o **anel** de 2 px no acento, raio 14, todo por fora dela (para a janela de 320×300 em (360,56), o anel tem 324×304 em (358,54)). Como no board, a janela destacada não fica mais clara que o resto: só o anel a marca.
+- **A pílula:** o vidro pequeno das outras pílulas da captura (24 de altura, raio 8, Geist Mono Medium 11 `text`), com `Nome · 320 × 300`: o nome do aplicativo e o tamanho da janela em pixels do monitor. Fica alinhada à esquerda da janela e termina 8 acima do anel; sem lugar acima, vai para dentro, a 8 do canto de cima à esquerda; não sai do monitor, e um nome comprido é cortado com reticências para ela não passar da largura da janela. O recuo de cada lado é 13: (152 − 126) / 2, com os 152 do board e os 126 que `Firefox · 320 × 300` avança (19 caracteres em Geist Mono Medium 11). Aqui a medida é o avanço do texto, e não a largura do desenho das outras duas pílulas: com o desenho, a pílula mudaria 1 px conforme a primeira letra do nome.
+- **O nome** é o `Name` da entrada `.desktop` da janela, achada pelo `appId`; sem entrada, o título da janela; sem título, o `appId`; sem nada, "Window".
+- **Quais janelas:** as do workspace ativo do monitor, na foto tirada quando a captura abre, porque a imagem está congelada. Quando duas se sobrepõem, vale a de cima: as flutuantes antes das lado a lado, e, entre flutuantes, a mais nova.
+- **De onde vem a posição:** do `layout` que o Niri informa de cada janela. A conta, que mora num lugar só (`screenshot/Windows.js`, `place`): posição = `tile_pos_in_workspace_view` + `window_offset_in_tile`; tamanho = `window_size`. Janela sem posição fica de fora. **Esta conta nunca rodou com janelas de verdade**: a origem da "vista do workspace" e se as janelas lado a lado trazem posição só dá para conferir na sessão do Niri. Ao abrir, a captura escreve no log quantas janelas achou e quantas têm posição.
+- **Escolher:** clicar na janela destacada, ou Enter, escolhe a janela; sem janela sob o ponteiro, o clique não faz nada.
+- **Modo tela:** o monitor do ponteiro fica sem escurecimento (é a imagem que vai ser capturada), com o anel de 2 no acento por dentro da borda, sem raio, e a pílula com o nome e o tamanho do monitor (`eDP-1 · 1920 × 1080`) a 8 do canto de cima à esquerda. Os outros monitores ficam escurecidos a 45%. Clicar em qualquer ponto, ou Enter, escolhe o monitor.
+- **As duas escolhas** ainda só avisam no log: tirar a imagem é a `F6-T13`.
+
 ## Textos em inglês (decisão 0012)
 
 | Board | Shell |

@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+"""Escreve o arquivo da shell na configuração do Niri: o anel de foco no acento da variação e o raio das janelas.
+
+Uso:
+  niri_theme.py check    --accent "#RRGGBB" [--output ARQUIVO]
+  niri_theme.py generate --accent "#RRGGBB" [--output ARQUIVO]
+
+A shell chama o `generate` quando começa e toda vez que a variação (Chiba, Freeside, Sprawl) muda. O arquivo é só
+dela: `~/.config/niri/cfg/wintermute.kdl` (ou o que `XDG_CONFIG_HOME` apontar). Por isso, ao contrário do
+keybinds.py, aqui não existe --apply. Em troca, eu nunca escrevo por cima de um arquivo que já existe sem o marcador
+`[wintermute]` na primeira linha, para jamais passar por cima de um arquivo meu. `check` só mostra o que escreveria.
+Se o destino é um link simbólico, escrevo no alvo e o link continua link. Um link quebrado vira arquivo novo no alvo.
+Só uso a biblioteca padrão.
+"""
+
+import argparse
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+MARCADOR = "[wintermute]"
+# Uso fullmatch, não match com `$`: no `re` do Python o `$` casa antes de uma quebra de linha final, e um "#52C2F6\n"
+# passaria e quebraria a string do KDL em duas linhas.
+RE_COR = re.compile(r"#[0-9A-Fa-f]{6}")
+
+# Largura do anel (ficha 19, estado 1: anel de acento de 2 px) e raio das janelas (ficha 19, "raios (12)"; ficha 17, o
+# anel de 14 da captura em volta de uma janela de 12).
+LARGURA_DO_ANEL = 2
+RAIO_DAS_JANELAS = 12
+
+
+class Erro(Exception):
+    pass
+
+
+def destino_padrao():
+    base = os.environ.get("XDG_CONFIG_HOME") or str(Path.home() / ".config")
+    return Path(base) / "niri" / "cfg" / "wintermute.kdl"
+
+
+def resolver_destino(caminho):
+    """Segue o link simbólico até o alvo. Na F8 a pasta niri/ do repositório pode ser ligada por link à ~/.config, e eu
+    tenho de escrever no alvo e deixar o link como está. Link quebrado devolve o caminho do alvo, que será criado."""
+    return Path(os.path.realpath(Path(caminho).expanduser()))
+
+
+def normalizar_cor(texto):
+    """Só aceito #RRGGBB. Devolvo em maiúsculas, que é como a shell e o arquivo escrevem."""
+    if not isinstance(texto, str) or not RE_COR.fullmatch(texto):
+        raise Erro("cor inválida: %r. Preciso de #RRGGBB, ex. \"#52C2F6\"" % (texto,))
+    return texto.upper()
+
+
+def gerar(cor):
+    return "\n".join([
+        "// %s Gerado pela shell, por wintermute-shell/settings/appearance/niri_theme.py. Não edito este arquivo à mão:" % MARCADOR,
+        "// a shell o reescreve quando a variação muda. Ele só vale com `include \"./cfg/wintermute.kdl\"` no fim do config.kdl.",
+        "// Para desfazer: tiro essa linha do config.kdl e apago este arquivo.",
+        "layout {",
+        "    focus-ring {",
+        "        width %d" % LARGURA_DO_ANEL,
+        "        active-color \"%s\" // o acento da variação em uso" % cor,
+        "    }",
+        "}",
+        "",
+        "// Raio 12 em todas as janelas, depois do 20 do rules.kdl. O anel acompanha o raio da janela.",
+        "window-rule {",
+        "    geometry-corner-radius %d" % RAIO_DAS_JANELAS,
+        "    clip-to-geometry true",
+        "}",
+        "",
+    ])
+
+
+def situacao(destino, texto):
+    """O que aconteceria com o arquivo: "novo", "igual", "muda", ou um Erro se ele não é meu."""
+    if not destino.exists():
+        return "novo"
+    if destino.is_dir():
+        raise Erro("%s é uma pasta" % destino)
+    try:
+        atual = destino.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        raise Erro("não consegui ler %s: %s" % (destino, e))
+    primeira = atual.split("\n", 1)[0]
+    if MARCADOR not in primeira:
+        raise Erro("%s já existe e não tem o marcador %s na primeira linha. Não é meu, então não escrevo nele" % (destino, MARCADOR))
+    return "igual" if atual == texto else "muda"
+
+
+def validar_no_niri(texto):
+    """Passa o texto pelo `niri validate` antes de trocar o arquivo. Sem o niri, aviso e sigo."""
+    if shutil.which("niri") is None:
+        print("aviso: `niri` não está no PATH; não validei o arquivo antes de escrever", file=sys.stderr)
+        return
+    with tempfile.TemporaryDirectory() as pasta:
+        arquivo = Path(pasta) / "config.kdl"
+        arquivo.write_text(texto, encoding="utf-8")
+        r = subprocess.run(["niri", "validate", "-c", str(arquivo)], capture_output=True, text=True)
+    if r.returncode != 0:
+        raise Erro("o `niri validate` recusou o arquivo, então não escrevi nada:\n%s" % (r.stdout + r.stderr).strip())
+
+
+def escrever(texto, destino):
+    # `destino` já é o alvo final (resolver_destino), então o provisório nasce na pasta do alvo e o os.replace não
+    # atravessa sistemas de arquivos nem troca um link por arquivo comum.
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    # Escrevo num arquivo ao lado e troco de nome, para o Niri (que observa o arquivo) nunca ler um pela metade.
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=destino.parent, prefix=destino.name + ".", suffix=".tmp", delete=False) as f:
+        f.write(texto)
+        provisorio = f.name
+    try:
+        os.replace(provisorio, destino)
+    except OSError:
+        # Não deixo o provisório para trás se a troca falhar.
+        try:
+            os.unlink(provisorio)
+        except OSError:
+            pass
+        raise
+
+
+def comando_check(args):
+    destino = resolver_destino(args.output or destino_padrao())
+    texto = gerar(normalizar_cor(args.accent))
+    estado = situacao(destino, texto)
+    print("%s: %s" % (destino, {"novo": "seria criado", "igual": "já está assim, não seria reescrito", "muda": "seria reescrito"}[estado]), file=sys.stderr)
+    sys.stdout.write(texto)
+
+
+def comando_generate(args):
+    destino = resolver_destino(args.output or destino_padrao())
+    texto = gerar(normalizar_cor(args.accent))
+    estado = situacao(destino, texto)
+    if estado == "igual":
+        # Não reescrevo: o Niri recarrega a configuração a cada mudança num arquivo incluído, e não quero isso à toa.
+        print("sem mudança em %s" % destino)
+        return
+    validar_no_niri(texto)
+    try:
+        escrever(texto, destino)
+    except OSError as e:
+        raise Erro("não consegui escrever em %s: %s" % (destino, e))
+    print("%s %s" % ("criei" if estado == "novo" else "atualizei", destino))
+
+
+def main(argv=None):
+    p = argparse.ArgumentParser(description="Escreve o anel de foco e o raio das janelas do Niri no acento da variação.")
+    sub = p.add_subparsers(dest="comando", required=True)
+    for nome, ajuda, funcao in (("check", "mostra o que escreveria, sem escrever", comando_check),
+                                ("generate", "escreve o arquivo da shell na configuração do Niri", comando_generate)):
+        c = sub.add_parser(nome, help=ajuda)
+        c.add_argument("--accent", required=True, metavar="#RRGGBB", help="o acento da variação em uso")
+        c.add_argument("--output", metavar="ARQUIVO", help="onde escrever (padrão: niri/cfg/wintermute.kdl dentro de XDG_CONFIG_HOME ou ~/.config)")
+        c.set_defaults(funcao=funcao)
+
+    args = p.parse_args(argv)
+    try:
+        args.funcao(args)
+    except Erro as e:
+        print("erro: %s" % e, file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

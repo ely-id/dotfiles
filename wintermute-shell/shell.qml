@@ -25,7 +25,12 @@ ShellRoot {
 
   // A escuta da área de transferência (ficha 18) só liga aqui, na shell de verdade: a vitrine e a bancada importam o serviço e não
   // ganham processo nenhum. Sem o protocolo de controle de dados do compositor (como no GNOME) o histórico fica vazio, com um aviso.
-  Component.onCompleted: Clipboard.State.start()
+  Component.onCompleted: {
+    Clipboard.State.start();
+    // O anel de foco do Niri no acento da variação (ficha 19): escreve niri/cfg/wintermute.kdl aqui, na shell de verdade, e de novo a
+    // cada troca de variação. A vitrine e a bancada não chamam e não tocam na configuração do Niri.
+    Appearance.NiriTheme.start();
+  }
 
   // O bloqueio antes de suspender dependia de um plugin compilado que mora na
   // tela de bloqueio da origem. Tirei na F0 para a shell abrir só com QML.

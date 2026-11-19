@@ -851,6 +851,10 @@ Singleton {
 
   function reload() { themeFile.reload(); }
 
+  // Vira verdadeiro na primeira leitura do theme.json, deu certo ou não (sem arquivo vale o padrão, chiba). Quem precisa agir sobre
+  // o acento escolhido (settings/appearance/NiriTheme.qml) espera isto, para não agir sobre o padrão antes de a escolha chegar.
+  property bool selectionLoaded: false
+
   FileView {
     id: themeFile
     path: root.themeFilePath
@@ -864,7 +868,9 @@ Singleton {
       } catch (error) {
         console.warn("Could not read theme selection:", error);
       }
+      root.selectionLoaded = true;
     }
+    onLoadFailed: root.selectionLoaded = true
   }
 
   // ---------------------------------------------------------------------------

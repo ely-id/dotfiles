@@ -14,6 +14,7 @@ Durante a construção da shell, a configuração do Niri em `~/.config/niri/` m
 - Entrada: teclado `us altgr-intl`, touchpad e gestos.
 - Telas e escala.
 - Layout: espaçamentos, anel de foco e a reserva de espaço da barra lateral.
+- `wintermute.kdl`: o anel de foco no acento da variação e o raio 12 das janelas, que a shell escreve e reescreve (`wintermute-shell/settings/appearance/niri_theme.py`, marcado `[wintermute]`, ficha 19). Recolho o arquivo e a linha `include "./cfg/wintermute.kdl"` do `config.kdl`.
 - Regras de janela.
 - Animações.
 - Inicialização da sessão: a shell e os serviços de que ela depende.

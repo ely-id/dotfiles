@@ -119,6 +119,22 @@ Nada muda no desenho. O que muda é que as escolhas passam a produzir uma imagem
 - **Limites conhecidos:** num monitor com escala fracionária, o PNG pode sair com 1 px a mais ou a menos; o recorte da janela herda a conta da posição, que só dá para conferir na sessão do Niri.
 - **Nunca rodou de verdade:** a captura do quadro não existe fora do Niri. O recorte foi testado sobre imagens fictícias de pixels conhecidos, e a cópia com um `wl-copy` de mentira.
 
+## Prévia na barra: conferido no Figma e como funciona (`F6-T04`)
+
+Li os três estados da prévia: em repouso (`13:19531`), em hover (`13:19557`) e com a barra recolhida (`13:19592`). A peça é a `screenshot/Preview.qml` que veio da origem, redesenhada.
+
+- **Repouso, barra aberta:** a miniatura de 156×112, raio 12, com a borda `borderStrong` de 1 por cima da imagem e a sombra do vidro; fica 6 acima dos controles. Sem véu em repouso.
+- **Hover:** véu preto a 50% e quatro botões redondos de 32 (raio 16), em y 40 e x 8, 44, 80 e 116: copiar (`copy`), salvar (`save`), anotar (`pencil`) e fechar (`x`). Cada botão tem o fundo `#0D0E11` a 70%, a borda `borderStrong` de 1 e o ícone de 16 em `text`; sob o ponteiro, o fundo é o `text` a 20%.
+- **Barra recolhida:** 48×48, raio 12, borda `borderStrong`, sem sombra, 6 acima do controle recolhido. O board não desenha o hover recolhido; compus (ajuste A-05) com o véu e um botão só, o de copiar, centrado, porque é o que cabe.
+- **Some em 6 s** (`capturePreviewDuration`), e não nos 30 s da origem. Com o ponteiro em cima o tempo para, e recomeça do zero quando o ponteiro sai; uma captura nova também recomeça. Durante um arraste ele já parava.
+- **Copiar:** o botão chama o `wl-copy` e mostra o `check` em `successText` por 1,5 s (`launcherCopiedDuration`), o mesmo sinal do launcher ao copiar uma cor. A etiqueta "Copy’d" roxa da origem saiu. O sinal só aparece com o ponteiro em cima, porque os botões só existem no hover.
+- **Fechar** apaga a prévia. **Salvar e anotar** ainda só avisam no log (`F6-T03` e `F6-T14`).
+- **O clique na miniatura recolhida** não copia mais: quem copia é o botão.
+- **Arrastar** para outro aplicativo continua desligado até a `F6-T15`.
+- Os botões aparecem e somem em `hoverDuration` (120 ms).
+- **Diferença para o board:** o anel de 1 px de cada botão redondo se mistura com a imagem escurecida, e não com o fundo do botão, então sai um pouco mais claro que no Figma e varia com a imagem. Deixei assim; vejo ao vivo se incomoda.
+- A peça lê `service` (decisão 0011), com `demo/ScreenshotService.qml` e `demo/ScreenshotPreviewSpecimen.qml`, que usam um desenho inventado.
+
 ## Textos em inglês (decisão 0012)
 
 | Board | Shell |

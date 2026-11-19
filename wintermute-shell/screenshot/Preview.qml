@@ -48,14 +48,26 @@ Item {
     else if (key === "dismiss") service.dismiss();
   }
 
-  // O arraste da captura para outro aplicativo usa o plugin em C++ de
-  // native/, que precisa ser compilado. Fica desligado até a F6: este objeto
-  // ocupa o lugar dele e recusa o arraste, e a prévia continua copiando e
-  // fechando normalmente.
-  QtObject {
-    id: nativeDrag
-    function start(source, imageSource, hotSpot) { return false; }
+  // O arraste da captura para outro aplicativo usa o plugin em C++ de native/, que precisa ser compilado (README da shell).
+  // Não importo o módulo aqui: tento carregar NativeDrag.qml, e se o plugin não existir (a bancada, a tela de teste, uma
+  // instalação sem o passo de compilação) a prévia fica com `refusal`, que recusa o arraste. Copiar, salvar, anotar e fechar
+  // não dependem dele. Crio o componente antes do Loader para dar uma linha de aviso só, com o que fazer, em vez da mensagem
+  // crua do Qt sobre o módulo que falta.
+  readonly property Component nativeComponent: Qt.createComponent("NativeDrag.qml")
+  Loader {
+    id: nativeLoader
+    sourceComponent: root.nativeComponent.status === Component.Ready ? root.nativeComponent : null
   }
+  Component.onCompleted: {
+    if (nativeComponent.status !== Component.Ready)
+      console.warn("Screenshot drag plugin not found: dragging the preview to another app is off (see wintermute-shell/README.md).");
+  }
+  QtObject {
+    id: refusal
+    function start(source, imageSource, hotSpot, radius) { return false; }
+  }
+  readonly property bool nativeDragAvailable: nativeLoader.status === Loader.Ready
+  readonly property var nativeDrag: nativeDragAvailable ? nativeLoader.item : refusal
 
   // A sombra do vidro por baixo; recolhida, sem sombra (o nó 13:19592 não tem).
   Shell.Shadow {
@@ -99,7 +111,9 @@ Item {
     anchors.fill: parent
     property point pressPosition
     property bool started: false
-    cursorShape: root.service.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+    // A mão aberta promete um arraste: sem o plugin, o cursor fica o normal.
+    cursorShape: !root.nativeDragAvailable ? Qt.ArrowCursor
+        : root.service.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
     onPressed: mouse => { pressPosition = Qt.point(mouse.x, mouse.y); started = false; }
     onPositionChanged: mouse => {
       if (!pressed || started || Math.hypot(mouse.x - pressPosition.x, mouse.y - pressPosition.y)
@@ -108,7 +122,8 @@ Item {
       started = true;
       const generation = root.service.generation;
       root.service.dragging = root.dragging = true;
-      const accepted = nativeDrag.start(root, root.service.imageSource, pressPosition);
+      const accepted = root.nativeDrag.start(root, root.service.imageSource, pressPosition,
+          Shell.Theme.capturePreviewRadius);
       root.service.dragging = root.dragging = false;
       if (accepted && generation === root.service.generation) root.service.dismiss();
     }

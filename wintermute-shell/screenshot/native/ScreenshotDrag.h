@@ -32,14 +32,19 @@ class ScreenshotDrag : public QObject {
 public:
     using QObject::QObject;
 
-    Q_INVOKABLE bool start(QQuickItem *source, const QString &imageSource, const QPointF &hotSpot) {
+    // `radius` é o raio do desenho que acompanha o ponteiro, em pixels lógicos: quem chama passa o da prévia
+    // (Theme.capturePreviewRadius), e nenhum valor de desenho fica aqui.
+    Q_INVOKABLE bool start(QQuickItem *source, const QString &imageSource, const QPointF &hotSpot, qreal radius) {
         if (!source || !source->window()) return false;
-        const QByteArray png = QByteArray::fromBase64(imageSource.mid(22).toLatin1());
+        // A prévia entrega a imagem como data URL em PNG; qualquer outro prefixo eu recuso.
+        static const QString prefix = QStringLiteral("data:image/png;base64,");
+        if (!imageSource.startsWith(prefix)) return false;
+        const QByteArray png = QByteArray::fromBase64(imageSource.mid(prefix.size()).toLatin1());
         const QImage image = QImage::fromData(png, "PNG");
         if (image.isNull()) return false;
 
         const QString directory = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation)
-            + "/pond-screenshot";
+            + "/wintermute-shell";
         if (!QDir().mkpath(directory)) return false;
         QFile::setPermissions(directory, QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
         QTemporaryFile file(directory + "/Screenshot-XXXXXX.png");
@@ -64,7 +69,7 @@ public:
             QPainter painter(&preview);
             painter.setRenderHint(QPainter::Antialiasing);
             QPainterPath clip;
-            clip.addRoundedRect(QRectF(QPointF(), size), 12, 12);
+            clip.addRoundedRect(QRectF(QPointF(), size), radius, radius);
             painter.setClipPath(clip);
             const QRect crop((scaled.width() - pixels.width()) / 2,
                              (scaled.height() - pixels.height()) / 2, pixels.width(), pixels.height());
@@ -74,10 +79,10 @@ public:
         drag->setHotSpot(hotSpot.toPoint());
         const Qt::DropAction action = drag->exec(Qt::CopyAction, Qt::CopyAction);
 
-        // File receivers can open the URL after the native drag has finished.
+        // Quem recebe um arquivo pode abrir a URL depois de o arraste terminar: por isso o arquivo fica mais 60 s.
         file.setAutoRemove(false);
         QTimer::singleShot(60000, qApp, [path = file.fileName()] { QFile::remove(path); });
-        // Wayland targets can read the payload yet finish with IgnoreAction.
+        // No Wayland o destino pode ler os dados e mesmo assim terminar com IgnoreAction: por isso também conto a leitura.
         return action == Qt::CopyAction || *transferred;
     }
 };

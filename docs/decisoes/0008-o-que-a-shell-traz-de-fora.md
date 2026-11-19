@@ -30,7 +30,7 @@ Item a item:
 | Papel de parede (`wallpaper/desktop`, `wallpaper/daylight`, `wallpaper/control.py`) | Entra o código, como `wintermute-shell/wallpaper/` | Seletor na F4 |
 | Fotos de papel de parede e o catálogo delas | Não entram | Na F4 entram os meus papéis de parede, um por variação |
 | Arte do manual da origem (SVG de 2,9 MB) | Não entra | A F4 segue o desenho do Figma |
-| Plugin do arraste da captura (`screenshot/native/`) | O código entra, desligado | Compilado e religado na F6 |
+| Plugin do arraste da captura (`screenshot/native/`) | O código entra, desligado | Compilado e religado na F6. Feito na `F6-T15`: o módulo passou a se chamar `Wintermute.Screenshot.Native`, compila com dois comandos do `cmake` (README da shell) e entra no Qt por `cmake --install ... --prefix /usr` ou, sem instalar, por `QML_IMPORT_PATH` apontando para a pasta `build/`. A prévia o carrega por um `Loader` e abre sem ele, só sem o arraste |
 | Plugin de sistema (segura a suspensão até a tela travar) | Sai de `shell.qml` | A F7 decide de onde parte a tela de bloqueio |
 | Tela de bloqueio | Não entra na F0. "Bloquear" e "Suspender" ficam sem efeito | F7 |
 | Gerenciador de pacotes da origem | Sai | O selo de atualização e o cartão de instalações passam a ler o Cachy Update, na F2 e na F4 |

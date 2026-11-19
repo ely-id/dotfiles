@@ -650,6 +650,24 @@ Singleton {
   // As cinco cores, na ordem do board: laranja, amarelo, o acento, verde e branco. Cada marca guarda a cor do momento em que foi feita.
   readonly property var captureAnnotateColors: [attentionText, warning, accentText, successText, text]
 
+  // Aviso de salvo (F6-T03, ficha 17; board 13:19344, nó 13:19610 dentro de 13:19608). Cartão de 280×64 no vidro padrão, com o brilho do acento, raio radiusCard. As coordenadas
+  // são a partir da borda de fora do cartão (o Figma dá as internas a partir de dentro da borda de 1; já somei 1). Onde ele aparece, por quanto tempo e a janela em volta são composição (A-05).
+  readonly property int captureSavedWidth: 280
+  readonly property int captureSavedHeight: 64
+  readonly property int captureSavedBlockX: 12                       // bloco do ícone: 40×40 em (12,12), raio radiusChip, fundo `control`
+  readonly property int captureSavedBlockY: 12
+  readonly property int captureSavedBlockSize: 40
+  readonly property int captureSavedIconInset: 10                    // `circle-check` de 20×20 em (10,10) dentro do bloco, em `successText`
+  readonly property int captureSavedIconSize: 20
+  readonly property int captureSavedTextX: 64                        // título e caminho: caixas de 200×20, centradas na vertical, uma linha
+  readonly property int captureSavedTextWidth: 200
+  readonly property int captureSavedTextHeight: 20
+  readonly property int captureSavedTitleY: 12                       // título Geist Medium 13 `text` em (64,12)
+  readonly property int captureSavedPathY: 32                        // caminho Geist Medium 11 `muted` em (64,32), reticências no fim
+  readonly property int captureSavedDuration: 3000                   // o aviso some em 3 s: o tempo de um toast de notificação de urgência baixa (notifications/State.qml, [3000, 8000, 15000]); o board só diz "toast curto" (composição, A-05)
+  readonly property int captureSavedSlide: 4                         // entra e sai com 4 de deslize horizontal, como o toast de notificação (notifications/ToastWindow.qml)
+  readonly property int captureSavedShadowPadding: 55                // folga da janela em volta do cartão para a sombra do vidro (0,12 blur 32 e 0,2 blur 6), a mesma do toast de notificação
+
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.
   // Números e atalhos: Geist Mono.

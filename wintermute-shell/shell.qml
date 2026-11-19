@@ -194,6 +194,7 @@ ShellRoot {
         onToggleRequested: root.expanded = !root.expanded
       }
       Notifications.ToastWindow { id: toast; bar: sidebar }
+      Screenshot.SavedToastWindow { bar: sidebar }
       Notifications.CenterWindow { bar: sidebar }
       Calendar.Window { bar: sidebar }
       Battery.Window { bar: sidebar }

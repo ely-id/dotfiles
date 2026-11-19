@@ -26,7 +26,8 @@ import Quickshell.Io
 // `registerFrame`), e `grab` faz a conta do recorte em pixels do quadro (Crop.js), grava um PNG num arquivo temporário, copia para a
 // área de transferência (clipboard.py copy-file) e, quando a escolha é a de capturar, entrega o arquivo à prévia (State.qml). A janela
 // só fecha depois de o PNG estar gravado, porque o recorte precisa do quadro vivo. Anotar (F6-T14) grava o recorte e abre o editor com ele, sem copiar
-// e sem prévia (AnnotateState.qml); salvar continua sem destino.
+// e sem prévia (AnnotateState.qml). Salvar (F6-T03) grava o recorte direto na pasta definitiva (SavedState.qml), sem copiar e sem prévia,
+// e avisa "Screenshot saved" (SavedToast.qml).
 //
 // A regra de ouro da ficha: a captura sempre começa do zero. Nenhuma propriedade abaixo é lida de arquivo nem guardada
 // entre uma abertura e outra: `reset()` devolve tudo ao padrão na abertura e de novo no fechamento, para a próxima vez
@@ -48,7 +49,7 @@ Singleton {
   property string mode: "area"
   // Mostrar o cursor na captura. Desligado ao abrir.
   property bool showCursor: false
-  // O atraso antes de capturar, em segundos. Sempre 0 ao abrir; o seletor é a F6-T03.
+  // O atraso antes de capturar, em segundos. Sempre 0 ao abrir; o seletor saiu da F6-T03 (P-16) e o "0 s" da barra fica como está no board.
   property int delaySeconds: 0
   // A área selecionada no modo Area (null: nenhuma), o monitor em que ela nasceu (ela fica presa a ele) e se o ponteiro
   // ainda a está arrastando (sem alças nem ações enquanto arrasta). Sempre vazia ao abrir, como o resto.
@@ -85,7 +86,8 @@ Singleton {
 
   // Os comandos e a entrega à prévia saem por funções que o teste troca. `exec` roda sem esperar (a cópia e a remoção do arquivo
   // antigo; o wl-copy fica vivo em segundo plano servindo a área de transferência), `makeDir` cria a pasta do arquivo e chama
-  // `done(true)` ou `done(false)`, `deliver` mostra o arquivo na prévia da barra e `openEditor` o abre no editor de anotação.
+  // `done(true)` ou `done(false)`, `deliver` mostra o arquivo na prévia da barra, `openEditor` o abre no editor de anotação e `notifySaved`
+  // mostra o aviso de captura salva (também usado pela prévia e pelo editor, para o teste não depender da janela do aviso).
   property var exec: argv => Quickshell.execDetached(argv)
   property var makeDir: (dir, done) => {
     makeDirComponent.createObject(root, { command: ["mkdir", "-p", "--", dir], done: done }).running = true;
@@ -93,6 +95,8 @@ Singleton {
   property var deliver: (path, outputName) => Screenshot.State.receive(path, outputName)
   // Abre o editor de anotação com o PNG do recorte (F6-T14).
   property var openEditor: (path, outputName) => Screenshot.AnnotateState.openFile(path, outputName)
+  // Mostra o aviso "Screenshot saved" para o arquivo salvo `path`, no monitor `outputName` (F6-T03).
+  property var notifySaved: (path, outputName) => Screenshot.SavedState.show(path, outputName)
 
   readonly property string helper: decodeURIComponent(Qt.resolvedUrl("clipboard.py").toString().replace(/^file:\/\//, ""))
 
@@ -231,10 +235,10 @@ Singleton {
 
   // As quatro ações da pílula de ações e as escolhas dos modos Window e Screen. Capturar (`capture`, `captureWindow`, `captureScreen`)
   // grava, copia, mostra na prévia e fecha; copiar (`copySelection`) grava, copia e fecha, sem a prévia. Anotar (`annotateSelection`, F6-T14) grava o
-  // recorte, fecha a captura e abre o editor com ele, sem copiar e sem a prévia. Salvar é a F6-T03 (esperando a P-15 e a P-16): até lá só diz
-  // no log que ainda não tem destino, e a janela continua aberta.
+  // recorte, fecha a captura e abre o editor com ele, sem copiar e sem a prévia. Salvar (`saveSelection`, F6-T03) grava o recorte direto na pasta
+  // definitiva, mostra o aviso e fecha, sem copiar e sem a prévia.
   function copySelection() { grabSelection("copy"); }
-  function saveSelection() { pending("salvar a área"); }
+  function saveSelection() { grabSelection("save"); }
   function annotateSelection() { grabSelection("annotate"); }
   function capture() { grabSelection("capture"); }
 
@@ -248,10 +252,6 @@ Singleton {
   }
 
   function captureScreen(outputName) { grab(outputName, null, "capture"); }
-
-  function pending(action) {
-    console.log("screenshot: " + action + " ainda não tem destino (F6-T03); nada foi feito");
-  }
 
   function grabSelection(kind) {
     if (!selection || selecting) {
@@ -291,8 +291,9 @@ Singleton {
 
   // Grava o PNG do recorte e entrega. `rect` é um retângulo em pixels lógicos do monitor `outputName`, ou null para o monitor inteiro.
   // `kind` diz o que fazer com o PNG: "capture" grava, copia, mostra na prévia e fecha; "copy" grava, copia e fecha; "annotate" grava, fecha e abre
-  // o editor de anotação com o arquivo, sem copiar e sem a prévia (F6-T14). Se a gravação falhar, fica um aviso no log, a janela fecha e
-  // nada vai para a área de transferência, para a prévia nem para o editor.
+  // o editor de anotação com o arquivo, sem copiar e sem a prévia (F6-T14); "save" grava direto na pasta definitiva (SavedState.dir) com o nome
+  // no padrão do Niri, mostra o aviso de salvo e fecha, sem copiar e sem a prévia (F6-T03). Se a gravação falhar, fica um aviso no log, a janela
+  // fecha e nada vai para a área de transferência, para a prévia, para o editor nem para o aviso.
   function grab(outputName, rect, kind) {
     if (phase !== "open" || saving)
       return;
@@ -311,7 +312,7 @@ Singleton {
     }
     saving = true;
     const token = ++grabToken;
-    const dir = captureDir();
+    const dir = kind === "save" ? Screenshot.SavedState.dir : captureDir();
     makeDir(dir, made => {
       if (token !== grabToken)
         return;
@@ -319,20 +320,31 @@ Singleton {
         finishGrab(token, false, "", outputName, kind);
         return;
       }
-      const path = nextFile(dir);
+      const path = kind === "save" ? Screenshot.SavedState.nextPath() : nextFile(dir);
       cropper.save(pixels, path, ok => finishGrab(token, ok, path, outputName, kind));
     });
   }
 
   function finishGrab(token, ok, path, outputName, kind) {
     if (token !== grabToken) {
-      // Fechei a captura enquanto ela gravava: o arquivo ficou pronto e sem uso. Apago, para não sobrar na pasta.
-      if (ok && path !== "")
-        exec(["rm", "-f", "--", path]);
+      // Fechei a captura enquanto ela gravava. O arquivo temporário ficou pronto e sem uso: apago, para não sobrar na pasta. O arquivo salvo
+      // é o que eu pedi: fica na pasta definitiva, e o aviso sai (nunca apago nada de lá).
+      if (ok && path !== "") {
+        if (kind === "save")
+          notifySaved(path, outputName);
+        else
+          exec(["rm", "-f", "--", path]);
+      }
       return;
     }
     if (!ok) {
       console.warn("screenshot: não consegui gravar a imagem da captura; nada foi copiado nem mostrado. Fechando.");
+      close();
+      return;
+    }
+    if (kind === "save") {
+      // O arquivo salvo não passa pelo `keepFile`: a captura seguinte não o apaga.
+      notifySaved(path, outputName);
       close();
       return;
     }

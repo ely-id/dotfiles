@@ -1287,6 +1287,22 @@ PanelWindow {
               }
 
               SectionBlock {
+                title: "Aviso de captura salva (ficha 17, aviso de salvo, board 13:19344, nó 13:19610) · peça real com serviço fictício e um caminho inventado · onde aparece e por quanto tempo é composição (A-05)"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Cartão 280×64, raio 16, vidro padrão com o brilho do acento (13:19610) · bloco de 40×40 em (12,12), raio 10, fundo control · circle-check de 20 em successText · título Medium 13 em x 64 · caminho Medium 11 muted com reticências no fim, sem passar de x 264"
+                  stageWidth: 344; stageHeight: 128
+                  Demo.SavedToastSpecimen { x: 32; y: 32 }
+                }
+                Specimen {
+                  caption: "Caminho curto · aparece inteiro, sem reticências"
+                  stageWidth: 344; stageHeight: 128
+                  Demo.SavedToastSpecimen { x: 32; y: 32; path: "~/Pictures/Screenshots/a.png" }
+                }
+              }
+
+              SectionBlock {
                 title: "Editor de anotação (ficha 17, estado 5, board 13:19344, nó 13:19481) · peça real com serviço fictício e uma imagem inventada · com o mouse: escolha a ferramenta e a cor e arraste na imagem; Enter e Esc valem com o campo de texto ou o recorte em andamento"
                 itemGap: 40
 

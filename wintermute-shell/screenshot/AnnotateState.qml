@@ -18,7 +18,8 @@ import Quickshell
 //
 // "Copy" grava a imagem com as marcas num PNG temporário novo (a peça desenha e exporta: `registerExporter`), na mesma pasta e do mesmo
 // jeito da captura (decisão 0017: o CaptureState dá a pasta, o nome, a cópia para a área de transferência e a entrega à prévia), copia,
-// mostra na prévia da barra e fecha o editor. "Save" ainda não tem destino (F6-T03).
+// mostra na prévia da barra e fecha o editor. "Save" (F6-T03) exporta do mesmo jeito, mas direto para a pasta das capturas salvas
+// (SavedState.dir, com o nome no padrão do Niri), mostra o aviso "Screenshot saved" e fecha o editor, sem copiar e sem a prévia.
 Singleton {
   id: root
 
@@ -72,9 +73,43 @@ Singleton {
       exporter = null;
   }
 
-  // "Save" tem o desenho do board, mas ainda não tem para onde ir (a pasta e o formato são a P-15 e a P-16, F6-T03). O editor continua aberto.
+  // "Save" (F6-T03): exporta a imagem com as marcas para a pasta das capturas salvas, mostra o aviso e fecha. Se gravar falhar, fica um aviso
+  // no log e o editor continua aberto, com as marcas, pelo mesmo motivo do "Copy". Não copia e não mostra a prévia.
   function save() {
-    console.log("screenshot: salvar a anotação ainda não tem destino (F6-T03); nada foi feito");
+    if (!opened || saving || !doc.ready || !exporter)
+      return;
+    saving = true;
+    const token = ++saveToken;
+    const capture = Screenshot.CaptureState;
+    const dir = Screenshot.SavedState.dir;
+    const output = outputName;
+    capture.makeDir(dir, made => {
+      if (token !== saveToken)
+        return;
+      if (!made) {
+        finishSave(token, false, "", output);
+        return;
+      }
+      const path = Screenshot.SavedState.nextPath();
+      exporter.exportTo(path, ok => finishSave(token, ok, path, output));
+    });
+  }
+
+  function finishSave(token, ok, path, output) {
+    const capture = Screenshot.CaptureState;
+    if (token !== saveToken) {
+      // Fechei o editor enquanto ele gravava: o arquivo salvo é o que eu pedi, fica na pasta e o aviso sai (nunca apago nada de lá).
+      if (ok && path !== "")
+        capture.notifySaved(path, output);
+      return;
+    }
+    saving = false;
+    if (!ok) {
+      console.warn("screenshot: não consegui salvar a imagem anotada; o editor continua aberto.");
+      return;
+    }
+    capture.notifySaved(path, output);
+    close();
   }
 
   // "Copy": grava, copia, mostra na prévia e fecha, nessa ordem. Se gravar falhar, fica um aviso no log e o editor continua aberto,

@@ -9,7 +9,7 @@ import ".."
 // `service` tem `mode`, `showCursor` e `delaySeconds` e as funções `setMode`, `toggleCursor` e `close` (CaptureState.qml
 // na shell, demo/CaptureService.qml na vitrine).
 //
-// O atraso ainda não é clicável: os valores que ele oferece são a P-16 (F6-T03). Hoje ele só mostra os segundos.
+// O atraso não é clicável: a captura não tem seletor de atraso (P-16). O "0 s" fica como o board o desenha e só mostra os segundos.
 GlassSurface {
   id: root
 
@@ -115,7 +115,7 @@ GlassSurface {
     color: Theme.border
   }
 
-  // O atraso: relógio e segundos. Sem clique e sem hover até a F6-T03.
+  // O atraso: relógio e segundos. Sem clique e sem hover (P-16: a captura não tem seletor de atraso).
   Item {
     x: Theme.captureDelayX
     y: Theme.captureBarPadding

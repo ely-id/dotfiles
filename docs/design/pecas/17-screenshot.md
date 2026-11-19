@@ -65,7 +65,7 @@ Li o estado "Início (modo área)" (`13:19354`) pelo `get_design_context`. O qua
 - **Ponteiro:** fica invisível sobre a área de captura, onde a mira faz o papel dele, e volta ao normal sobre a dica e a barra, onde a mira e as coordenadas somem.
 - **Coordenadas:** em pixels do monitor, inclusive com escala. A largura da pílula é a do texto mais 9 de cada lado: (72 − 54) / 2, com os 54 que `420, 236` mede em Geist Mono Medium 11. Perto da borda direita ou de baixo, a pílula passa para o outro lado do ponteiro.
 - **Dica:** a largura é a da fila mais 16 de cada lado (283 em inglês; o board tem 360 com o texto em português).
-- **Atraso:** mostra "0 s" e não responde a clique: os valores são a P-16.
+- **Atraso:** mostra "0 s" e não responde a clique. A captura não tem seletor de atraso (P-16): o "0 s" fica como o board o desenha.
 - **Hover dos modos não selecionados:** sem desenho no board; usa o fundo `hover` (ajuste A-05).
 - **Diferenças para o board:** a sombra da pílula de coordenadas é a do vidro padrão (no board ela é 0,6 dessa: 27% e 18% em vez de 45% e 30%), e o vidro desenha o brilho interno de 1 px, que o nó não tem. Sobre o véu escuro as duas não aparecem no print; vejo ao vivo. O rótulo "Window" mede 49 e a caixa do board tem 48, então ele fica a 4 do anel do modo selecionado, e não a 8 como "Area".
 
@@ -89,7 +89,7 @@ O board desenha esse estado só. O resto é composição minha (ajuste A-05), se
 - **Teclas:** Enter vale o "Capture"; Esc fecha a captura, com ou sem seleção; Espaço troca o modo e apaga a seleção.
 - **Sempre do zero:** a seleção mora no estado da captura e é apagada ao abrir e ao fechar.
 - **Vários monitores:** a seleção é uma só; começar outra num monitor apaga a anterior.
-- **As quatro ações:** capturar e copiar funcionam desde a `F6-T13` (ver "Capturar e copiar"), e anotar desde a `F6-T14` (ver "Editor de anotação"); salvar (`F6-T03`) ainda só avisa no log.
+- **As quatro ações:** capturar e copiar funcionam desde a `F6-T13` (ver "Capturar e copiar"), anotar desde a `F6-T14` (ver "Editor de anotação") e salvar desde a `F6-T03` (ver "Salvar e o aviso de salvo").
 
 ## Modo janela e modo tela: conferido no Figma e como funcionam (`F6-T12`)
 
@@ -112,7 +112,7 @@ Nada muda no desenho. O que muda é que as escolhas passam a produzir uma imagem
 - **Mostrar o cursor:** a captura tira dois quadros por monitor ao abrir, um sem o cursor e um com; o botão da barra troca o que fica à mostra, e a imagem sai do que está à mostra.
 - **"Capture"** (o botão e o Enter, no modo Area), a janela escolhida e o monitor escolhido: gravam o PNG, copiam para a área de transferência, entregam à prévia da barra e fecham a captura, nessa ordem.
 - **O botão de copiar** da pílula de ações: grava, copia e fecha, sem a prévia.
-- **Anotar** abre o editor com o recorte, desde a `F6-T14`. **Salvar** ainda só avisa no log, com a janela aberta.
+- **Anotar** abre o editor com o recorte, desde a `F6-T14`. **Salvar** grava direto na pasta das capturas e avisa, desde a `F6-T03` (ver "Salvar e o aviso de salvo").
 - **Arquivo temporário:** `$XDG_RUNTIME_DIR/wintermute-shell/capture-….png`. Cada captura apaga o arquivo da anterior. Se gravar falhar, fica um aviso no log, a captura fecha e nada é copiado.
 - **Copiar** é o `wl-copy --type image/png`, pela ação `copy-file` do `screenshot/clipboard.py`.
 - **Atalhos:** o Super+Shift+1 ("Screenshot a region") abre a captura da shell. O Super+Shift+2 (tela) e o Super+Shift+3 (janela) continuam com as ações do Niri, que capturam na hora e sem interface; a imagem delas chega à prévia pelo evento do Niri. No Niri isso só vale depois de eu aplicar o `keybinds.kdl` gerado.
@@ -128,7 +128,7 @@ Li os três estados da prévia: em repouso (`13:19531`), em hover (`13:19557`) e
 - **Barra recolhida:** 48×48, raio 12, borda `borderStrong`, sem sombra, 6 acima do controle recolhido. O board não desenha o hover recolhido; compus (ajuste A-05) com o véu e um botão só, o de copiar, centrado, porque é o que cabe.
 - **Some em 6 s** (`capturePreviewDuration`), e não nos 30 s da origem. Com o ponteiro em cima o tempo para, e recomeça do zero quando o ponteiro sai; uma captura nova também recomeça. Durante um arraste ele já parava.
 - **Copiar:** o botão chama o `wl-copy` e mostra o `check` em `successText` por 1,5 s (`launcherCopiedDuration`), o mesmo sinal do launcher ao copiar uma cor. A etiqueta "Copy’d" roxa da origem saiu. O sinal só aparece com o ponteiro em cima, porque os botões só existem no hover.
-- **Fechar** apaga a prévia. **Anotar** abre o editor com a imagem da prévia, desde a `F6-T14`. **Salvar** ainda só avisa no log (`F6-T03`).
+- **Fechar** apaga a prévia. **Anotar** abre o editor com a imagem da prévia, desde a `F6-T14`. **Salvar** grava a imagem na pasta das capturas e fecha a prévia, desde a `F6-T03` (ver "Salvar e o aviso de salvo").
 - **O clique na miniatura recolhida** não copia mais: quem copia é o botão.
 - **Arrastar** para outro aplicativo continua desligado até a `F6-T15`.
 - Os botões aparecem e somem em `hoverDuration` (120 ms).
@@ -160,10 +160,37 @@ O board desenha um estado só. O comportamento é composição minha (ajuste A-0
 - **Desfazer** (o botão e Ctrl+Z): tira a última marca ou desfaz o último recorte, um por vez. Com um texto em andamento, cancela o texto. Sem nada para desfazer, o botão fica desativado.
 - **O que eu vejo é o que sai:** as marcas ficam guardadas em pixels da imagem, e o mesmo desenho serve para a tela e para o arquivo. As espessuras valem na tela; numa imagem reduzida para caber, o traço do arquivo é proporcionalmente mais grosso (numa imagem de 1600×1000, o contorno de 3 sai com 7 px).
 - **"Copy":** grava a imagem com as marcas num PNG temporário, copia, entrega à prévia da barra e fecha. Com um texto em andamento, confirma o texto antes. Se gravar falhar, o editor continua aberto.
-- **"Save"** ainda só avisa no log (`F6-T03`).
+- **"Save"** exporta a imagem com as marcas direto para a pasta das capturas, avisa e fecha, desde a `F6-T03` (ver "Salvar e o aviso de salvo").
 - **Fechar:** Esc, quando não há texto nem recorte em andamento, fecha e descarta as marcas. Clicar no véu **não** fecha, para um clique errado não jogar o desenho fora.
 - **Sempre do zero:** cada abertura começa com o lápis, a primeira cor e nenhuma marca.
 - **Fora desta versão:** mover, redimensionar ou apagar uma marca já feita; refazer; escolher espessura e fonte.
+
+## Salvar e o aviso de salvo: conferido no Figma e como funciona (`F6-T03`)
+
+Li o aviso (`13:19610`, dentro de `13:19608`) pelo `get_design_context`, conferido em 2026-11-19. As coordenadas são a partir da borda de fora do cartão (o Figma dá as internas a partir de dentro da borda de 1; já somei 1).
+
+- **Cartão:** 280×64, raio 16, o vidro padrão com o brilho do acento (`GlassSurface`, tipo `card`, com a sombra de duas camadas e a borda branca a 20% do vidro padrão).
+- **Bloco do ícone:** 40×40 em (12,12), raio 10, fundo `control`. Dentro dele, o `circle-check` de 20×20 em (10,10) (em (22,22) no cartão), colorido em `successText` (os ícones são brancos e a cor é dada pela peça).
+- **Título:** "Screenshot saved" (no board, "Captura salva"), Geist Medium 13 `text`, caixa de 200×20 em (64,12), centrada na vertical, uma linha.
+- **Caminho:** Geist Medium 11 `muted`, caixa de 200×20 em (64,32), centrada na vertical, uma linha, com reticências no fim. Nunca passa de x 264. O board usa `~/Imagens/Capturas/14-32.png` como exemplo; a vitrine usa um caminho inventado em `~/Pictures/Screenshots`.
+- **Divergência:** a linha antiga desta ficha dizia "check". O Figma desenha o `circle-check` num bloco `control` de 40, e vale o Figma.
+- **Medidas** em tokens `captureSaved*` no `Theme.qml`, com o nó no comentário.
+
+O board desenha só o cartão. O resto é composição minha (ajuste A-05), sem valor novo de desenho:
+
+- **Pasta e formato (P-15 e P-16):** `~/Pictures/Screenshots`, a pasta de imagens do sistema mais `Screenshots`, a mesma em que o Niri salva as capturas dele, para tudo ficar junto. Criada se não existir. O formato é sempre PNG, e a captura não tem seletor de atraso.
+- **Nome do arquivo:** o padrão do Niri, `Screenshot from AAAA-MM-DD HH-MM-SS.png`, na hora local, para os arquivos da shell e os do Niri ficarem juntos e em ordem. Se o mesmo segundo se repetir na sessão, o nome ganha ` (2)`, ` (3)` antes do `.png`. A conta é do `screenshot/Save.js`.
+- **Onde o aviso aparece:** numa janela em camada de sobreposição por tela, sem zona exclusiva, sem teclado e sem aceitar clique, no molde da janela do toast de notificação. A borda esquerda acompanha a borda animada da barra, e o aviso aparece com a barra aberta ou recolhida. Fica **embaixo**, com a base do cartão na base da barra, ao lado de onde a prévia mora, para não disputar lugar com o toast de notificação, que fica em cima. Só no monitor de quem salvou (sem nome, o primeiro).
+- **Quando:** entra e sai com a opacidade e 4 de deslize, em 180 ms (`notificationDuration`), como o toast de notificação, e fica **3000 ms** (`captureSavedDuration`): é o tempo de um toast de notificação de urgência baixa (`notifications/State.qml`, `[3000, 8000, 15000]`); o board só diz "toast curto". Um salvar novo durante o aviso troca o caminho e recomeça o tempo. O aviso não recebe clique: abrir a pasta pelo aviso não existe nesta versão.
+- **O desfoque do compositor** atrás do cartão liga como no editor de anotação, sem ler a camada de compatibilidade do tema.
+- **O caminho mostrado** troca a pasta pessoal por `~`, e só ela: um caminho fora da pasta pessoal aparece inteiro.
+- **Cada "salvar" faz isto:**
+  - **Pílula de ações da seleção:** grava o recorte **direto** na pasta definitiva, mostra o aviso e fecha a captura. Não copia e não mostra a prévia. O arquivo salvo nunca passa pelo apagador do arquivo temporário: a captura seguinte não o apaga. Se a gravação ou a criação da pasta falhar, fica um aviso no log, a captura fecha e não sai aviso de salvo, como nas outras ações. Sem seleção, não faz nada.
+  - **Prévia da barra:** grava a imagem da prévia (o `clipboard.py save`, que confere a assinatura PNG, cria a pasta e **nunca sobrescreve** um arquivo que já exista), mostra o aviso e fecha a prévia. Se falhar, fica um aviso no log e a prévia continua. As capturas do Niri (Super+Shift+2 e 3) chegam à prévia com um arquivo que ele **já salvou**: se esse arquivo já está dentro da pasta de capturas, "salvar" não grava outra cópia, só mostra o aviso com o caminho dele e fecha a prévia. O arquivo temporário da captura da shell fica em `$XDG_RUNTIME_DIR`, e nesse caso a prévia grava uma cópia.
+  - **Editor de anotação:** exporta a imagem com as marcas (o mesmo `exportTo` do "Copy") direto para a pasta definitiva, mostra o aviso e fecha o editor. Com um texto em andamento, confirma o texto antes, como o "Copy". Se gravar falhar, fica um aviso no log e o editor continua aberto, com as marcas. Não copia e não mostra a prévia.
+- **Fechei enquanto gravava:** o arquivo salvo é o que pedi, então fica na pasta e o aviso sai. Nunca apago nada da pasta de capturas.
+- **A peça** lê `service.displayPath` (decisão 0011), com `demo/SavedToastService.qml` e `demo/SavedToastSpecimen.qml`, que usam um caminho inventado.
+- **Nunca rodou de verdade:** a janela em camada não abre fora do Niri (a tela de teste não tem o protocolo de camadas), então a posição, o deslize e o desfoque só dá para conferir na sessão do Niri. O estado, os três "salvar" e o `clipboard.py save` foram testados com pastas temporárias.
 
 ## Textos em inglês (decisão 0012)
 
@@ -173,9 +200,11 @@ O board desenha um estado só. O comportamento é composição minha (ajuste A-0
 | Área · Janela · Tela | Area · Window · Screen |
 | Capturar | Capture |
 | Copiar · Salvar (editor) | Copy · Save |
+| Captura salva | Screenshot saved |
 | Olhe aqui (exemplo) | Look here |
 
 ## A CONFIRMAR
 
-- Pasta padrão de salvar (a prévia usa `~/Imagens/Capturas/`).
-- Formato (PNG) e se o atraso tem lista de valores no Figma — a barra mostra “0 s”, mas a UI do seletor de atraso **não tem board próprio**. **A CONFIRMAR NO FIGMA (node 13:19344)** os tempos oferecidos, ou pergunte.
+- Nada em aberto. Respondidos na `F6-T03`:
+  - **Pasta de salvar (P-15):** `~/Pictures/Screenshots`, a pasta de imagens do sistema mais `Screenshots`, a mesma em que o Niri salva as capturas dele.
+  - **Formato e atraso (P-16):** PNG, e a captura não tem seletor de atraso. O "0 s" da barra de modos fica como o board o desenha, sem responder a clique.

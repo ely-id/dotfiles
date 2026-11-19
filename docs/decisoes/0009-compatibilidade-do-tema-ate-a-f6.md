@@ -43,3 +43,5 @@ No QML, o token `onAccent` se chama `textOnAccent`. No `tokens.json` e nas ficha
 - Toda fase de F1 a F6 tem uma tarefa de conferência: o que a peça deixou de ler sai da camada.
 - A F11 confere que `LegacyColors.qml` e o bloco de compatibilidade não existem mais.
 - Quem lê uma ficha e procura `onAccent` no código precisa saber que o nome é `textOnAccent`. Está anotado em `docs/design/README.md` e no próprio `Theme.qml`.
+
+**Saiu em 2026-11-19, na `F6-T17`:** o menu suspenso dos Ajustes foi o último a ler a camada. Recomposto com as peças da shell (P-81), apaguei o bloco de compatibilidade do `Theme.qml`, o `LegacyColors.qml` e o `PanelStyle.qml`.

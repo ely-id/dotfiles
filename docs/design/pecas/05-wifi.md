@@ -4,7 +4,7 @@
 **Board:** `13:13604`  
 **PNG:** `referencias/armitage/04-paineis-wifi-bluetooth-chiba.png`  
 **QML da Pond:** `wifi/Panel.qml`, `Networks.qml`, `NetworkRow.qml`, `Join.qml`, `AddNetwork.qml`, `Details.qml`, `Connection.qml`, `State.qml`, `SelectField.qml`, `EnterpriseFields.qml`, `FormViewport.qml`, `SecurityMenu.qml`, `SignalIcon.qml` (spec §3.14–3.15)  
-**Pilha:** `CardStack.qml`, `CardLayer.qml`, `PanelCloseButton.qml`, `PanelStyle.qml`
+**Pilha:** `CardStack.qml`, `CardLayer.qml`, `PanelCloseButton.qml` (as medidas ficam nos tokens `cardStack*` do `Theme.qml`; o `PanelStyle.qml` herdado da origem saiu na `F6-T17`)
 
 ## Pilha (vale também para Bluetooth e Som)
 

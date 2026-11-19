@@ -3,7 +3,7 @@
 **Nova?** não (refino)  
 **Board:** `13:14610`  
 **PNG:** `referencias/armitage/05-popups-cartoes-osds-chiba.png`  
-**QML da Pond:** `audio/Panel.qml`, `Devices.qml`, `DeviceRow.qml`, `State.qml` (spec §3.16, `PanelStyle.qml` `audioRowHeight` 40)
+**QML da Pond:** `audio/Panel.qml`, `Devices.qml`, `DeviceRow.qml`, `State.qml` (spec §3.16; o `audioRowHeight` 40 do `PanelStyle.qml` da origem é o token `audioRowHeight` do `Theme.qml`)
 
 ## Medidas
 

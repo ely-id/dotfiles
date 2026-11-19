@@ -25,7 +25,7 @@ Fonte: `tokens.json` → `glass` e `armitage-shell/figma/prelude2.js` (`GLASSF`,
 - Brilho interno: inner shadow x 0, y 1, blur 0, branco 8%.
 - Brilho do acento na base: elipse na cor `accent` a 10% de opacidade, layer blur 40, largura 120% do cartão, altura = min(50% da altura, 80), centrada na borda de baixo (`x = −10% da largura`, `y = h − gh/2`). Efetivo sobre o texto ≤ 8%.
 - Blur de fundo 40 (`Theme.glassBlur: 40`; no niri é `background-effect`). Comecei com 50 na P-03 e voltei para os 40 do Figma em 2026-11-17 (S13), porque achei o vidro desfocado demais.
-- Sombras: `0,2 blur 6 α 0,30` + `0,12 blur 32 α 0,45`. Substitui as 5 camadas de `PanelStyle.qml`.
+- Sombras: `0,2 blur 6 α 0,30` + `0,12 blur 32 α 0,45`. Substitui as 5 camadas do `PanelStyle.qml` da origem (os tokens `glassShadows` do `Theme.qml`).
 - Hover do **cartão de vidro**: soma `cardHover` (branco 4%, `#FFFFFF0A`).
 - Hover de **controle** (botão, linha): `hover` (branco 6%, `#FFFFFF0F`).
 - Pressionado: `pressed` (branco 10%).

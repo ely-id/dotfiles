@@ -1,6 +1,7 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".."
 import Quickshell
 import Quickshell.Io
 
@@ -11,6 +12,9 @@ Singleton {
   property int generation: 0
   property bool copied: false
   property bool dragging: false
+  // O ponteiro está sobre a prévia (quem escreve é a peça, como em `dragging`). Com ele em cima o relógio de sumir não corre:
+  // senão a prévia sumiria debaixo do ponteiro enquanto escolho um botão.
+  property bool hovered: false
   readonly property string helper: decodeURIComponent(Qt.resolvedUrl("clipboard.py").toString().replace(/^file:\/\//, ""))
 
   function receive(path, output) {
@@ -31,6 +35,16 @@ Singleton {
     copied = false;
   }
 
+  // Salvar e anotar ainda não têm destino: salvar é a F6-T03 e anotar a F6-T14. Até lá só registro o pedido no log, e a
+  // prévia continua onde está.
+  function save() {
+    console.log("Screenshot preview: save is not available yet (F6-T03).");
+  }
+
+  function annotate() {
+    console.log("Screenshot preview: annotate is not available yet (F6-T14).");
+  }
+
   function copy() {
     if (!imageSource || copier.running) return;
     copier.captureGeneration = generation;
@@ -42,6 +56,13 @@ Singleton {
   onDraggingChanged: {
     if (dragging) dismissTimer.stop();
     else if (imageSource) dismissTimer.restart();
+  }
+
+  // Saiu o ponteiro: o tempo de 6 s recomeça do zero. O `receive` e o fim da leitura também reiniciam o relógio com o ponteiro
+  // em cima; por isso o `onTriggered` confere `hovered` e não some nesse caso.
+  onHoveredChanged: {
+    if (hovered) dismissTimer.stop();
+    else if (imageSource && !dragging) dismissTimer.restart();
   }
 
   Component {
@@ -83,13 +104,13 @@ Singleton {
 
   Timer {
     id: dismissTimer
-    interval: 30000
-    onTriggered: root.dismiss()
+    interval: Theme.capturePreviewDuration
+    onTriggered: if (!root.hovered && !root.dragging) root.dismiss()
   }
 
   Timer {
     id: copyTag
-    interval: 2000
+    interval: Theme.launcherCopiedDuration   // o mesmo "copiado" do launcher ao copiar uma cor: o `check` por 1,5 s
     onTriggered: root.copied = false
   }
 }

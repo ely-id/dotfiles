@@ -1,21 +1,52 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Effects
 import Quickshell.Widgets
 import "." as Screenshot
 import ".." as Shell
 
+// A prévia da captura de tela na barra (ficha 17, estado 4; board 13:19344): a miniatura de 156×112 acima dos controles
+// (repouso 13:19531, hover 13:19557) e, com a barra recolhida, o quadrado de 48×48 (13:19592). Com o ponteiro em cima, véu
+// de 50% e quatro botões redondos: copiar, salvar, anotar e fechar; recolhida, o véu e só o de copiar (composição, A-05).
+// Não sabe o que cada ação faz: chama `service.copy()`, `save()`, `annotate()` e `dismiss()` (screenshot/State.qml na shell,
+// demo/ScreenshotService.qml na vitrine), e escreve `service.hovered` para o relógio de sumir parar com o ponteiro em cima.
 Item {
   id: root
   required property string outputName
+  property var service: Screenshot.State
   property bool collapsed: false
   property bool dragging: false
-  readonly property bool hasScreenshot: Screenshot.State.imageSource !== ""
-      && Screenshot.State.outputName === outputName
-  width: collapsed ? 48 : 156
-  height: hasScreenshot ? (collapsed ? 48 : 112) : 0
+  // Para fixar o estado na vitrine: o hover da prévia e o do botão sob o ponteiro ("copy", "save", "annotate" ou "dismiss").
+  // Com `hoverPinned` o ponteiro de verdade não escreve em `service.hovered`.
+  property bool hoverPinned: false
+  property string hoverButton: ""
+  readonly property bool hasScreenshot: service.imageSource !== ""
+      && service.outputName === outputName
+  readonly property bool pointerOver: hasScreenshot && hover.hovered
+  readonly property bool showControls: hoverPinned || pointerOver
+  width: collapsed ? Shell.Theme.capturePreviewCollapsedSize : Shell.Theme.capturePreviewWidth
+  height: hasScreenshot
+      ? (collapsed ? Shell.Theme.capturePreviewCollapsedSize : Shell.Theme.capturePreviewHeight) : 0
   visible: hasScreenshot
   opacity: dragging ? 0 : 1
+
+  // O estado guarda se o ponteiro está em cima; só a peça que mostra a prévia escreve, e só quando o valor muda.
+  onPointerOverChanged: if (!hoverPinned) service.hovered = pointerOver
+
+  // Os botões, na ordem do board. Recolhida, só o de copiar, centrado (x 8 nos dois casos: (48 − 32) / 2 = 8).
+  readonly property var buttons: [
+    { key: "copy", icon: "copy", name: "Copy screenshot" },
+    { key: "save", icon: "save", name: "Save screenshot" },
+    { key: "annotate", icon: "pencil", name: "Annotate screenshot" },
+    { key: "dismiss", icon: "x", name: "Dismiss screenshot" }
+  ]
+
+  // Chama a ação de um botão. Separado do clique para a vitrine testar sem o mouse.
+  function trigger(key) {
+    if (key === "copy") service.copy();
+    else if (key === "save") service.save();
+    else if (key === "annotate") service.annotate();
+    else if (key === "dismiss") service.dismiss();
+  }
 
   // O arraste da captura para outro aplicativo usa o plugin em C++ de
   // native/, que precisa ser compilado. Fica desligado até a F6: este objeto
@@ -26,55 +57,41 @@ Item {
     function start(source, imageSource, hotSpot) { return false; }
   }
 
-  Rectangle {
-    id: shadowShape
+  // A sombra do vidro por baixo; recolhida, sem sombra (o nó 13:19592 não tem).
+  Shell.Shadow {
     anchors.fill: parent
-    radius: 12
-    color: "#707070"
-    visible: false
-    layer.enabled: true
+    visible: !root.collapsed
+    cornerRadius: Shell.Theme.capturePreviewRadius
   }
-  Repeater {
-    model: [
-      { blur: 40, offsetY: 4, opacity: 0.10 },
-      { blur: 20, offsetY: 3, opacity: 0.12 },
-      { blur: 12, offsetY: 3, opacity: 0.15 },
-      { blur: 8, offsetY: 2, opacity: 0.20 },
-      { blur: 1, offsetY: 1, opacity: 0.25 }
-    ]
-    MultiEffect {
-      required property var modelData
-      anchors.fill: root
-      source: shadowShape
-      shadowEnabled: true
-      shadowColor: "black"
-      shadowOpacity: modelData.opacity
-      shadowBlur: 1
-      shadowVerticalOffset: modelData.offsetY
-      blurMax: modelData.blur
-    }
-  }
+  // A imagem e o véu, cortados no raio. A borda fica por cima de tudo, como no board.
   ClippingRectangle {
     anchors.fill: parent
-    radius: 12
-    color: "#707070"
-    border { width: 1; color: "#24ffffff" }
+    radius: Shell.Theme.capturePreviewRadius
+    color: "transparent"
     Image {
       id: thumbnail
       objectName: "screenshotThumbnail"
       anchors.fill: parent
-      source: Screenshot.State.imageSource
-      sourceSize: Qt.size(312, 224)
+      source: root.service.imageSource
+      sourceSize: Qt.size(Shell.Theme.capturePreviewWidth * 2, Shell.Theme.capturePreviewHeight * 2)
       fillMode: Image.PreserveAspectCrop
       asynchronous: true
       cache: false
     }
     Rectangle {
+      objectName: "screenshotVeil"
       anchors.fill: parent
-      color: "black"
-      opacity: hover.hovered ? 0.5 : 0.1
-      Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+      color: Shell.Theme.capturePreviewVeil
+      opacity: root.showControls ? 1 : 0
+      Behavior on opacity { NumberAnimation { duration: Shell.Theme.hoverDuration; easing.type: Easing.OutCubic } }
     }
+  }
+  Rectangle {
+    anchors.fill: parent
+    radius: Shell.Theme.capturePreviewRadius
+    color: "transparent"
+    border { width: Shell.Theme.capturePreviewBorderWidth; color: Shell.Theme.borderStrong }
+    antialiasing: true
   }
   HoverHandler { id: hover }
   MouseArea {
@@ -82,85 +99,39 @@ Item {
     anchors.fill: parent
     property point pressPosition
     property bool started: false
-    cursorShape: Screenshot.State.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+    cursorShape: root.service.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
     onPressed: mouse => { pressPosition = Qt.point(mouse.x, mouse.y); started = false; }
-    onClicked: if (root.collapsed && !started) Screenshot.State.copy()
     onPositionChanged: mouse => {
       if (!pressed || started || Math.hypot(mouse.x - pressPosition.x, mouse.y - pressPosition.y)
           < Qt.styleHints.startDragDistance) return;
-      if (Screenshot.State.dragging) return;
+      if (root.service.dragging) return;
       started = true;
-      const generation = Screenshot.State.generation;
-      Screenshot.State.dragging = root.dragging = true;
-      const accepted = nativeDrag.start(root, Screenshot.State.imageSource, pressPosition);
-      Screenshot.State.dragging = root.dragging = false;
-      if (accepted && generation === Screenshot.State.generation) Screenshot.State.dismiss();
+      const generation = root.service.generation;
+      root.service.dragging = root.dragging = true;
+      const accepted = nativeDrag.start(root, root.service.imageSource, pressPosition);
+      root.service.dragging = root.dragging = false;
+      if (accepted && generation === root.service.generation) root.service.dismiss();
     }
   }
 
-  component ActionButton: Rectangle {
-    id: button
-    required property string label
-    required property url iconSource
-    signal activated
-    width: 30
-    height: 30
-    radius: 15
-    color: "white"
-    opacity: hover.hovered && !root.collapsed ? 1 : 0
-    enabled: opacity > 0 && !Screenshot.State.dragging
-    scale: pointer.pressed ? 0.94 : pointer.containsMouse ? 34 / 30 : 1
-    Accessible.role: Accessible.Button
-    Accessible.name: label
-    Accessible.onPressAction: activated()
-    Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
-    Behavior on scale { NumberAnimation { duration: 90; easing.type: Easing.OutCubic } }
-    Image {
-      anchors.centerIn: parent
-      width: 14
-      height: 14
-      source: button.iconSource
-      sourceSize: Qt.size(32, 32)
-      layer.enabled: true
-      layer.effect: MultiEffect { colorization: 1; colorizationColor: Shell.Theme.textOnAccent }
-    }
-    MouseArea {
-      id: pointer
-      anchors.fill: parent
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-      onClicked: button.activated()
-    }
-  }
-  ActionButton {
-    objectName: "dismissScreenshot"
-    x: 8
-    y: 8
-    label: "Dismiss screenshot"
-    iconSource: Qt.resolvedUrl("../icons/x.svg")
-    onActivated: Screenshot.State.dismiss()
-  }
-  ActionButton {
-    objectName: "copyScreenshot"
-    x: parent.width - width - 8
-    y: 8
-    label: "Copy screenshot"
-    iconSource: Qt.resolvedUrl("../icons/copy.svg")
-    onActivated: Screenshot.State.copy()
-  }
-  Rectangle {
-    anchors.horizontalCenter: parent.horizontalCenter
-    y: -13
-    width: 60
-    height: 25
-    radius: 13
-    color: "#CBA6F7"
-    visible: Screenshot.State.copied && !root.collapsed
-    Text {
-      anchors.centerIn: parent
-      text: "Copy’d"
-      color: "#3D2C52"
-      font { family: Shell.Theme.fontFamily; pixelSize: 13; weight: Font.Medium }
+  Repeater {
+    model: root.collapsed ? root.buttons.slice(0, 1) : root.buttons
+
+    delegate: Screenshot.PreviewButton {
+      id: button
+      required property var modelData
+      required property int index
+      objectName: modelData.key + "Screenshot"
+      x: Shell.Theme.capturePreviewButtonPadding + index * Shell.Theme.capturePreviewButtonStep
+      y: Math.round((root.height - height) / 2)
+      iconName: modelData.icon
+      label: modelData.name
+      done: modelData.key === "copy" && root.service.copied
+      hoverPinned: root.hoverButton === modelData.key
+      opacity: root.showControls ? 1 : 0
+      enabled: root.showControls && !root.service.dragging
+      Behavior on opacity { NumberAnimation { duration: Shell.Theme.hoverDuration; easing.type: Easing.OutCubic } }
+      onActivated: root.trigger(modelData.key)
     }
   }
 }

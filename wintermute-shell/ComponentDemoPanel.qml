@@ -1244,6 +1244,47 @@ PanelWindow {
                   Demo.CaptureSpecimen { selX: 440; selY: 250; selW: 280; selH: 200 }
                 }
               }
+
+              SectionBlock {
+                title: "Prévia depois da captura (ficha 17, estado 4, board 13:19344) · peça real com serviço fictício e uma imagem inventada · com `mouse` o hover e os botões respondem ao ponteiro"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Repouso 156×112 (13:19531) · raio 12, borda borderStrong de 1, sombra do vidro por baixo, sem véu"
+                  stageWidth: 220; stageHeight: 170
+                  Demo.ScreenshotPreviewSpecimen { x: 32; y: 24 }
+                }
+                Specimen {
+                  caption: "Hover (13:19557) · véu preto a 50% · quatro botões de 32, raio 16, em x 8, 44, 80 e 116 e y 40: copiar, salvar, anotar, fechar"
+                  stageWidth: 220; stageHeight: 170
+                  Demo.ScreenshotPreviewSpecimen { x: 32; y: 24; hover: true }
+                }
+                Specimen {
+                  caption: "Hover com o ponteiro no botão de anotar · fundo #F2F3F5 a 20%"
+                  stageWidth: 220; stageHeight: 170
+                  Demo.ScreenshotPreviewSpecimen { x: 32; y: 24; hoverButton: "annotate" }
+                }
+                Specimen {
+                  caption: "\"Copiado\" · o botão de copiar mostra o check em successText por 1,5 s (Theme.launcherCopiedDuration; composição, A-05)"
+                  stageWidth: 220; stageHeight: 170
+                  Demo.ScreenshotPreviewSpecimen { x: 32; y: 24; hover: true; copied: true }
+                }
+                Specimen {
+                  caption: "Barra recolhida 48×48 (13:19592) · raio 12, borda, sem sombra"
+                  stageWidth: 120; stageHeight: 100
+                  Demo.ScreenshotPreviewSpecimen { x: 32; y: 24; collapsed: true }
+                }
+                Specimen {
+                  caption: "Recolhida em hover · véu de 50% e o botão de copiar de 32 centrado (composição, A-05; o board não desenha este estado)"
+                  stageWidth: 120; stageHeight: 100
+                  Demo.ScreenshotPreviewSpecimen { x: 32; y: 24; collapsed: true; hover: true }
+                }
+                Specimen {
+                  caption: "Com o mouse · passe o ponteiro e clique nos botões (a vitrine só conta os pedidos)"
+                  stageWidth: 220; stageHeight: 170
+                  Demo.ScreenshotPreviewSpecimen { x: 32; y: 24; mouse: true }
+                }
+              }
             }
 
             // =================================================================

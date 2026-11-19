@@ -594,6 +594,25 @@ Singleton {
   // pílula mudaria 1 px com a primeira letra do nome. Numa fonte mono o avanço só depende de quantos caracteres há. Com a `width` o recuo seria 13,5.
   readonly property int captureTargetPillPaddingX: 13
 
+  // Prévia depois da captura (F6-T04, ficha 17, estado 4; board 13:19344). Repouso (13:19531): miniatura de 156×112, raio radiusRow, borda `borderStrong` de 1 por cima da imagem
+  // e a sombra do vidro (glassShadows). Hover (13:19557, dentro de 13:19554): véu preto a 50% (13:19570) e quatro botões redondos de 32 (13:19571 a 13:19577) em x 8, 44, 80 e 116
+  // e y 40, o meio da altura ((112 − 32) / 2). Barra recolhida (13:19592, dentro de 13:19589): 48×48, mesmo raio e borda, sem sombra (o nó não tem). O hover recolhido não tem board:
+  // é composição (A-05), o véu e um botão só, o de copiar, de 32 centrado (sobram 8 de cada lado).
+  readonly property int capturePreviewWidth: 156
+  readonly property int capturePreviewHeight: 112
+  readonly property int capturePreviewCollapsedSize: 48
+  readonly property int capturePreviewRadius: radiusRow
+  readonly property int capturePreviewBorderWidth: 1                 // a cor é `borderStrong`
+  readonly property color capturePreviewVeil: Qt.rgba(0, 0, 0, 0.50) // véu do hover sobre a imagem (13:19570)
+  readonly property int capturePreviewButtonSize: 32                 // botão redondo (13:19571): raio 16, borda `borderStrong` de 1, ícone de 16 em `text`
+  readonly property int capturePreviewButtonRadius: 16
+  readonly property int capturePreviewButtonStep: 36                 // 32 de botão e 4 de folga: x 8, 44, 80 e 116
+  readonly property int capturePreviewButtonPadding: 8               // o primeiro botão em x 8; recolhida, o único botão também fica a 8 de cada lado
+  readonly property int capturePreviewIconSize: 16
+  readonly property color capturePreviewButton: Qt.rgba(13 / 255, 14 / 255, 17 / 255, 0.70)       // fundo do botão: #0D0E11 a 70%
+  readonly property color capturePreviewButtonHover: Qt.rgba(242 / 255, 243 / 255, 245 / 255, 0.20) // sob o ponteiro: #F2F3F5 (o `text`) a 20%
+  readonly property int capturePreviewDuration: 6000                 // a prévia some sozinha em 6 s (ficha 17: "some em 6 s"); com o ponteiro em cima o relógio para (composição, A-05)
+
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.
   // Números e atalhos: Geist Mono.

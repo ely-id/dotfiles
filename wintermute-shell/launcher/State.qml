@@ -6,6 +6,7 @@ import "../settings" as Settings
 import "Actions.js" as Actions
 import "Calculator.js" as Calculator
 import "Colors.js" as Colors
+import "Emoji.js" as Emoji
 import "Search.js" as Search
 import Quickshell
 import Quickshell.Io
@@ -17,8 +18,9 @@ import Quickshell.Io
 // as fontes, os recentes (launcher-recents.json), a confirmação do comando perigoso e `activate`, que despacha pelo
 // alvo da linha (`row.target`). O cálculo (F5-T03) depende só do texto, então `calculation`, o modo e o rodapé saem dele.
 // As ferramentas do estado vazio (F5-T04) são fixas. O seletor de cor (F5-T08) abre uma página própria,
-// `page === "color"`, com a cor mais recente do histórico; as outras (F5-T09 e a F6) ainda não existem, então
-// `openTool` só registra no log para elas. O menu "Actions" (F5-T05, Ctrl+K) é outra página, `page === "actions"`: as ações do
+// `page === "color"`, com a cor mais recente do histórico; o seletor de emoji (F5-T09) é `page === "emoji"`, com o
+// inventário lido na primeira abertura (EmojiInventory.qml) e os últimos copiados em emoji-recents.json; as outras (a F6)
+// ainda não existem, então `openTool` só registra no log para elas. O menu "Actions" (F5-T05, Ctrl+K) é outra página, `page === "actions"`: as ações do
 // item que estava selecionado (a conta mora em Actions.js) e, para "Open on workspace…", uma segunda camada com os
 // workspaces do monitor.
 Singleton {
@@ -63,8 +65,8 @@ Singleton {
   // Enquanto não for null, o modo cálculo ocupa o launcher inteiro.
   readonly property var calculation: Calculator.describe(query, decimalSeparator)
 
-  // A página aberta no lugar da busca: "" (a busca), "color" (o resultado do seletor de cor) ou "actions" (o menu de
-  // ações do item selecionado). Abrir o launcher sempre começa na busca.
+  // A página aberta no lugar da busca: "" (a busca), "color" (o resultado do seletor de cor), "emoji" (o seletor de emoji)
+  // ou "actions" (o menu de ações do item selecionado). Abrir o launcher sempre começa na busca.
   property string page: ""
 
   // ---- Fontes de resultado (F5-T02) ----
@@ -204,15 +206,17 @@ Singleton {
 
   // O menu de ações é do launcher, mesmo quando o item é um cálculo: o modo do rodapé não muda.
   readonly property bool calculating: calculation !== null && page !== "actions"
-  readonly property string mode: page === "color" ? "color" : calculating ? "calculator" : "launcher"
-  readonly property string modeLabel: page === "color" ? "Color picker" : calculating ? "Calculator" : "Launcher"
-  readonly property string modeIcon: page === "color" ? "pipette" : calculating ? "calculator" : "sparkles"
+  readonly property string mode: page === "color" ? "color" : page === "emoji" ? "emoji" : calculating ? "calculator" : "launcher"
+  readonly property string modeLabel: page === "color" ? "Color picker" : page === "emoji" ? "Emoji" : calculating ? "Calculator" : "Launcher"
+  readonly property string modeIcon: page === "color" ? "pipette" : page === "emoji" ? "smile" : calculating ? "calculator" : "sparkles"
   // Ícone do cabeçalho de busca.
   readonly property string searchIcon: calculation ? "calculator" : "search"
   // Ações do rodapé: { label, keys, primary }. No cálculo "Copy" e "Actions"; o "Paste" (Ctrl+↵) ficou de fora (P-71).
   readonly property var actions: page === "color" ? [
     { label: "Copy HEX", keys: ["↵"], primary: true },
     { label: "Pick another", keys: ["P"], primary: false }
+  ] : page === "emoji" ? [
+    { label: "Copy", keys: ["↵"], primary: true }
   ] : page === "actions" ? [
     { label: "Run", keys: ["↵"], primary: true },
     { label: "Back", keys: ["Esc"], primary: false }
@@ -271,9 +275,10 @@ Singleton {
     return ["wl-copy", "--", text];
   }
 
-  // O wl-copy fica vivo em segundo plano servindo a área de transferência, por isso `execDetached`.
+  // O wl-copy fica vivo em segundo plano servindo a área de transferência, por isso `execDetached` (o `exec` de cima,
+  // que o teste troca por uma função que só anota).
   function copyText(text) {
-    Quickshell.execDetached(copyCommand(text));
+    exec(copyCommand(text));
   }
 
   // ---- Seletor de cor (ficha 15, F5-T08) ----
@@ -398,14 +403,19 @@ Singleton {
     actionsItem = null;
     actionsLevel = "actions";
     actionsWorkspaces = [];
+    emojiQuery = "";
     if (query !== "")
       setQuery("");
   }
 
   // Clique num chip, ou Enter com o chip em foco. O seletor de cor abre a página com a cor mais recente, ou vai direto
-  // para a lupa quando não há nenhuma guardada. Para as outras ferramentas ainda não há o que abrir: registro no log e
-  // deixo o launcher aberto.
+  // para a lupa quando não há nenhuma guardada; o de emoji abre a página com a busca vazia. Para as outras ferramentas
+  // ainda não há o que abrir: registro no log e deixo o launcher aberto.
   function openTool(key) {
+    if (key === "emoji") {
+      openEmoji();
+      return;
+    }
     if (key === "color") {
       if (colorHistory.length > 0) {
         colorShown = colorHistory[0];
@@ -417,6 +427,67 @@ Singleton {
       return;
     }
     console.info("launcher: ferramenta pedida, ainda sem destino:", key);
+  }
+
+  // ---- Seletor de emoji (ficha 16, F5-T09) ----
+  // O inventário (emoji/emoji.json, gerado por emoji/build.py) só é lido na primeira vez que a página abre.
+  EmojiInventory {
+    id: emojiInventory
+  }
+
+  // O inventário, ou null até a primeira abertura da página.
+  readonly property var emojiData: emojiInventory.data
+  // O texto da busca do emoji, que não é o da busca do launcher: voltar ao launcher o zera.
+  property string emojiQuery: ""
+  // Os últimos emojis copiados (o caractere), o mais novo primeiro, no máximo `Emoji.RECENTS_KEPT`.
+  property var emojiRecents: []
+  // As seções da grade, no formato de Emoji.buildSections: os recentes e as categorias, ou os resultados da busca.
+  readonly property var emojiSections: page === "emoji" ? Emoji.buildSections(emojiData, emojiQuery, emojiRecents) : []
+
+  FileView {
+    id: emojiRecentsFile
+    path: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state")
+        + "/wintermute-shell/emoji-recents.json"
+    blockLoading: true
+    blockWrites: true
+    atomicWrites: true
+    printErrors: false
+    onSaveFailed: error => console.warn("launcher: não gravei os emojis recentes:", error)
+  }
+
+  // Relê o arquivo. Ausente, estragado ou fora do formato vale como lista vazia; emoji que não está no inventário é pulado.
+  function loadEmojiRecents() {
+    emojiRecentsFile.reload();
+    emojiRecentsFile.waitForJob();
+    let text = "";
+    try {
+      text = emojiRecentsFile.text();
+    } catch (error) {
+      text = "";
+    }
+    emojiRecents = Emoji.parseRecents(text, emojiData);
+  }
+
+  // O chip "Emoji": lê o inventário (só na primeira vez) e os recentes, e abre a página com a busca vazia e a primeira célula
+  // selecionada. Se o inventário não presta, o aviso já saiu no log e o launcher fica onde estava.
+  function openEmoji() {
+    if (!emojiInventory.ensure())
+      return;
+    loadEmojiRecents();
+    emojiQuery = "";
+    page = "emoji";
+  }
+
+  function setEmojiQuery(text) {
+    emojiQuery = text;
+  }
+
+  // Enter ou clique numa célula: copia o emoji (o `wl-copy`), põe nos recentes e fecha o launcher.
+  function copyEmoji(ch) {
+    copyText(ch);
+    emojiRecents = Emoji.pushRecent(emojiRecents, ch);
+    emojiRecentsFile.setText(Emoji.serializeRecents(emojiRecents));
+    close();
   }
 
   // Enter ou clique numa linha, despachado pelo alvo dela. A linha de ação do cálculo traz o texto em `copy`: copio e

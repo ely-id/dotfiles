@@ -11,10 +11,14 @@ import ".."
 // Medidas no quadro do launcher: o primeiro rótulo em y 64, cada linha de 44 logo abaixo do rótulo, o rótulo
 // seguinte 8 abaixo da última linha do grupo e o divisor do rodapé 4 abaixo da última linha (P-68).
 //
-// Seis formas. A página do seletor de cor (`service.page`, F5-T08) tira a busca e a lista de cena e vale por si; a do
-// menu de ações (F5-T05) tira só a busca; as outras quatro são escolhidas pelo texto da busca (`plan.kind`):
+// Sete formas. A página do seletor de cor (`service.page`, F5-T08) tira a busca e a lista de cena e vale por si, e a do
+// seletor de emoji (F5-T09) também; a do menu de ações (F5-T05) tira só a busca; as outras quatro são escolhidas pelo
+// texto da busca (`plan.kind`):
 //   color  `service.page === "color"`: o cabeçalho de busca vira voltar e título, o corpo é o resultado do seletor de cor
 //          (ColorPage.qml) e o divisor do rodapé fica fixo em y 432, com 476 de altura no total, sem rolar.
+//   emoji  `service.page === "emoji"`: o cabeçalho com voltar e o campo "Search emoji", as seis abas e a grade que rola
+//          (EmojiPage.qml), com o divisor do rodapé fixo em y 392, 436 de altura no total. O rodapé troca o modo pela prévia
+//          do emoji e pelo nome dele.
 //   actions `service.page === "actions"` (Ctrl+K numa linha): o cabeçalho de busca vira voltar e o nome do item
 //          (ActionsHeader.qml) e a lista é a de `service.actionSections`, com o rótulo em y 64, uma linha por ação a partir
 //          de y 88 e o divisor do rodapé 4 abaixo da última, como em toda lista. ↑↓ andam, Enter roda, Esc, Backspace, o
@@ -41,6 +45,11 @@ Item {
   property bool forceCursor: false
   // Amostra do histórico do seletor de cor sob o ponteiro (-1: nenhuma). Para fixar o hover na vitrine.
   property int historyHoverIndex: -1
+  // Seletor de emoji, para fixar na vitrine: a célula selecionada, a célula sob o ponteiro (-1: o ponteiro de verdade) e a
+  // aba cuja seção a grade mostra no começo (-1: no topo).
+  property alias emojiSelected: emojiPage.selected
+  property alias emojiHover: emojiPage.hoverIndex
+  property alias emojiStartTab: emojiPage.startTab
   // Chip das ferramentas com o foco do teclado (índice em `service.tools`), ou -1. Para fixar na vitrine.
   property int chipIndex: -1
   // Chip sob o ponteiro, para fixar o hover na vitrine.
@@ -58,8 +67,9 @@ Item {
   readonly property int chipCount: plan.chips ? plan.chips.items.length : 0
   readonly property real listTop: Theme.launcherSearchHeight + Theme.launcherDividerHeight
   // Sem lista, o divisor do rodapé é o próprio divisor do cabeçalho.
-  // A página do seletor de cor tem altura fixa (476): não encolhe para caber, porque não rola.
-  readonly property real footerY: plan.kind === "color" ? plan.footerY
+  // As páginas do seletor de cor (476) e do de emoji (436) têm altura fixa: não encolhem para caber, porque a rolagem delas
+  // é a da própria grade.
+  readonly property real footerY: plan.kind === "color" || plan.kind === "emoji" ? plan.footerY
       : Math.max(Theme.launcherSearchHeight, Math.min(plan.footerY, maxHeight - Theme.launcherFooterHeight))
 
   implicitWidth: Theme.launcherWidth
@@ -71,6 +81,10 @@ Item {
     if (page === "color") {
       return { kind: "color", labels: [], rows: [], card: null, chips: null, notice: null,
           footerY: Theme.launcherColorFooterY };
+    }
+    if (page === "emoji") {
+      return { kind: "emoji", labels: [], rows: [], card: null, chips: null, notice: null,
+          footerY: Theme.launcherEmojiFooterY };
     }
     const labels = [];
     const rows = [];
@@ -149,10 +163,13 @@ Item {
     };
   }
 
-  // O foco do teclado: no campo de busca, ou, nas páginas sem campo (seletor de cor e ações), na própria página.
+  // O foco do teclado: no campo de busca, ou, nas páginas sem campo (seletor de cor e ações), na própria página. A do emoji
+  // tem o campo dela.
   function focusCurrent() {
     if (plan.kind === "color")
       colorPage.forceActiveFocus(Qt.OtherFocusReason);
+    else if (plan.kind === "emoji")
+      emojiPage.focusField();
     else if (plan.kind === "actions")
       actionsHeader.forceActiveFocus(Qt.OtherFocusReason);
     else
@@ -394,7 +411,7 @@ Item {
 
     Launcher.SearchField {
       id: search
-      visible: root.plan.kind !== "color" && root.plan.kind !== "actions"
+      visible: root.plan.kind !== "color" && root.plan.kind !== "actions" && root.plan.kind !== "emoji"
       width: parent.width
       text: root.service.query
       // Sem sugestão fantasma no modo cálculo.
@@ -438,7 +455,7 @@ Item {
 
     Flickable {
       id: list
-      visible: root.plan.kind !== "color"
+      visible: root.plan.kind !== "color" && root.plan.kind !== "emoji"
       y: root.listTop
       width: parent.width
       height: Math.max(0, root.footerY - root.listTop)
@@ -521,12 +538,24 @@ Item {
       historyHoverIndex: root.historyHoverIndex
     }
 
+    Launcher.EmojiPage {
+      id: emojiPage
+      visible: root.plan.kind === "emoji"
+      width: parent.width
+      height: Theme.launcherEmojiFooterY
+      service: root.service
+      forceCursor: root.forceCursor
+    }
+
     Launcher.Footer {
       y: root.footerY
       width: parent.width
       modeIcon: root.service.modeIcon
       modeLabel: root.service.modeLabel
       actions: root.service.actions
+      previewMode: root.plan.kind === "emoji"
+      previewGlyph: emojiPage.previewGlyph
+      previewName: emojiPage.previewName
     }
   }
 }

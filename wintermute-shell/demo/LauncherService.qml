@@ -3,7 +3,9 @@ import ".."
 import "../launcher/Actions.js" as Actions
 import "../launcher/Calculator.js" as Calculator
 import "../launcher/Colors.js" as Colors
+import "../launcher/Emoji.js" as Emoji
 import "../launcher/Search.js" as Search
+import "../launcher" as Launcher
 
 // Serviço fictício do launcher para a vitrine e a bancada (decisão 0011). Tem a mesma superfície de
 // launcher/State.qml: opened, outputName, query, ghost, sections, recents, searching, tools, fallbackRows, decimalSeparator,
@@ -11,7 +13,8 @@ import "../launcher/Search.js" as Search
 // colorFreshStamp, colorCopied, colorInfo, colorOrigin, o menu de ações (actionsItem, actionsLevel, actionsWorkspaces,
 // actionsDepth, actionsTitle, actionSections, armedKey) e as funções open, close, toggle, setQuery, acceptGhost,
 // copyCommand, copyText, openTool, activate, selectRow, addColor, showColor, copyColor, pickAnother, closePage, openActions,
-// backActions e closeActions. Os dados são
+// backActions e closeActions, e o seletor de emoji (emojiData, emojiQuery, emojiRecents, emojiSections, setEmojiQuery e
+// copyEmoji). Os dados são
 // inventados: o histórico de cores é o do board, e nada aqui lê arquivo nem roda processo.
 // `scenario` escolhe o estado:
 //   "empty"        busca vazia com três recentes e as quatro ferramentas
@@ -27,6 +30,10 @@ import "../launcher/Search.js" as Search
 //                  é a do "grouped" ("no"), e a do cálculo é `expression`.
 //   "color"        a página de resultado do seletor de cor: #3FA9D9 "pega agora" no Firefox e o histórico do board.
 //                  `copied` ("", "hex", "rgb" ou "hsl") deixa a linha em "Copied".
+//   "emoji", "emoji-empty", "emoji-search" e "emoji-none": o seletor de emoji (F5-T09). A grade com os onze recentes do board
+//                  (👋 👍 🎮 🔥 ✨ 🙏 😂 💜 ☕ 🚀 ✅), a mesma sem recentes, a busca `emojiText` (padrão "gato", que mostra que o
+//                  português funciona) e a busca "xyzzy", sem resultado. O inventário é o emoji.json de verdade, lido na primeira
+//                  vez que o cenário precisa dele: não é dado da máquina.
 // O cálculo usa a mesma biblioteca da peça de verdade. As linhas de ação seguem o texto que estiver na busca em
 // qualquer cenário, menos no "no-result-bare", para o teste de comportamento poder digitar algo que não acha nada.
 QtObject {
@@ -49,6 +56,9 @@ QtObject {
 
   property bool opened: true
   property string outputName: ""
+  // Só no cenário "emoji-search": o que digitei na busca do emoji.
+  property string emojiText: "gato"
+
   property string query: scenario === "typing" ? "ter" : scenario === "grouped" || scenario === "confirm" ? "no"
       : scenario === "calc" || scenario === "actions-calc" ? expression
       : isActions ? "no"
@@ -75,16 +85,19 @@ QtObject {
 
   // A página aberta no lugar da busca: "", "color" ou "actions".
   readonly property bool isActions: scenario.indexOf("actions-") === 0
-  property string page: scenario === "color" ? "color" : isActions ? "actions" : ""
+  readonly property bool isEmoji: scenario.indexOf("emoji") === 0
+  property string page: scenario === "color" ? "color" : isActions ? "actions" : isEmoji ? "emoji" : ""
 
   readonly property bool calculating: calculation !== null && page !== "actions"
-  readonly property string mode: page === "color" ? "color" : calculating ? "calculator" : "launcher"
-  readonly property string modeLabel: page === "color" ? "Color picker" : calculating ? "Calculator" : "Launcher"
-  readonly property string modeIcon: page === "color" ? "pipette" : calculating ? "calculator" : "sparkles"
+  readonly property string mode: page === "color" ? "color" : page === "emoji" ? "emoji" : calculating ? "calculator" : "launcher"
+  readonly property string modeLabel: page === "color" ? "Color picker" : page === "emoji" ? "Emoji" : calculating ? "Calculator" : "Launcher"
+  readonly property string modeIcon: page === "color" ? "pipette" : page === "emoji" ? "smile" : calculating ? "calculator" : "sparkles"
   readonly property string searchIcon: calculation ? "calculator" : "search"
   readonly property var actions: page === "color" ? [
     { label: "Copy HEX", keys: ["↵"], primary: true },
     { label: "Pick another", keys: ["P"], primary: false }
+  ] : page === "emoji" ? [
+    { label: "Copy", keys: ["↵"], primary: true }
   ] : page === "actions" ? [
     { label: "Run", keys: ["↵"], primary: true },
     { label: "Back", keys: ["Esc"], primary: false }
@@ -197,6 +210,36 @@ QtObject {
     rows: section.rows.map(row => row.danger ? Object.assign({}, row, { detail: "Press ↵ again to confirm" }) : row)
   }))
 
+  // ---- Seletor de emoji (F5-T09) ----
+  // O mesmo leitor da peça de verdade, sobre o emoji.json do repositório.
+  readonly property Launcher.EmojiInventory inventory: Launcher.EmojiInventory {}
+  onScenarioChanged: {
+    if (isEmoji)
+      inventory.ensure();
+  }
+  Component.onCompleted: {
+    if (isEmoji)
+      inventory.ensure();
+  }
+  readonly property var emojiData: inventory.data
+  // Os onze recentes do board (13:17572), o mais novo primeiro.
+  readonly property var boardEmojis: ["👋", "👍", "🎮", "🔥", "✨", "🙏", "😂", "💜", "☕", "🚀", "✅"]
+  property string emojiQuery: scenario === "emoji-search" ? emojiText : scenario === "emoji-none" ? "xyzzy" : ""
+  property var emojiRecents: scenario === "emoji-empty" ? [] : boardEmojis
+  readonly property var emojiSections: page === "emoji" ? Emoji.buildSections(emojiData, emojiQuery, emojiRecents) : []
+  function setEmojiQuery(text) { emojiQuery = text; }
+  // Copiar anota o texto e fecha, como a peça de verdade (que também grava os recentes em arquivo; aqui só em memória).
+  function copyEmoji(ch) {
+    copyText(ch);
+    emojiRecents = Emoji.pushRecent(emojiRecents, ch);
+    close();
+  }
+  function openEmoji() {
+    inventory.ensure();
+    emojiQuery = "";
+    page = "emoji";
+  }
+
   // ---- Menu de ações (F5-T05) ----
   // Os ids dos apps "recentes": o "Notes" está entre eles, então o menu dele oferece "Remove from recent".
   property var recentIds: ["notes"]
@@ -304,6 +347,8 @@ QtObject {
   function openTool(key) {
     lastTool = key;
     toolOpens += 1;
+    if (key === "emoji")
+      openEmoji();
     if (key === "color") {
       if (colorHistory.length > 0) {
         colorShown = colorHistory[0];
@@ -341,6 +386,7 @@ QtObject {
     root.copiedTimer.stop();
     page = "";
     colorShown = null;
+    emojiQuery = "";
     setQuery("");
   }
   function activate(row) {

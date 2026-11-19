@@ -477,6 +477,34 @@ Singleton {
   readonly property int launcherLoupeTipsGap: 8
   readonly property int launcherLoupeTipsRowHeight: 20              // a fila tem a altura da tecla (20); o texto de 16 fica centrado nela
 
+  // Seletor de emoji (ficha 16, board 13:17120; grade 13:17552 e busca 13:17675). Coordenadas no quadro do launcher (640×436); o Figma
+  // dá 1 a menos por causa da borda, como nos outros nós do launcher.
+  // Família da fonte colorida (P-14, 2026-11-18): Noto Color Emoji (OFL), instalada pela F10. Sem ela o texto cai na fonte do sistema.
+  readonly property string emojiFontFamily: "Noto Color Emoji"
+  readonly property int launcherEmojiFooterY: 392                   // altura fixa de 436: divisor do rodapé em y 392 (13:17662)
+  readonly property int launcherEmojiTabsX: 20                      // seis abas de 36×36, raio radiusChip, em y 64, x 20 + 44·i (13:17559 a 13:17569)
+  readonly property int launcherEmojiTabsY: 64
+  readonly property int launcherEmojiTabSize: 36
+  readonly property int launcherEmojiTabStep: 44
+  readonly property int launcherEmojiTabIconSize: 16                // ícone de 16 em (10,10) da aba
+  readonly property int launcherEmojiTabIconOffset: 10
+  readonly property real launcherEmojiTabRestOpacity: 0.8           // ícone `text` a 80% nas abas sem destaque (13:17561)
+  readonly property real launcherEmojiTabDimOpacity: 0.5            // com texto na busca, as seis abas a 50% (13:17682); sem recentes, a aba dos recentes
+  readonly property int launcherEmojiDividerY: 108                  // divisor `border` de 640×1 em y 108 (13:17571)
+  readonly property int launcherEmojiLabelY: 116                    // primeiro rótulo de seção em y 116, 8 abaixo do divisor (13:17572)
+  readonly property int launcherEmojiCellSize: 48                   // célula 48×48, raio radiusRow, emoji de 28 centrado (13:17574)
+  readonly property int launcherEmojiCellStep: 52                   // passo de 52 na horizontal e na vertical
+  readonly property int launcherEmojiGridX: 36                      // primeira célula em x 36; 11 por fileira (x 36 a 556)
+  readonly property int launcherEmojiPerRow: 11
+  readonly property int launcherEmojiGlyphSize: 28
+  readonly property int launcherEmojiEndGap: 20                     // 20 de folga abaixo da última fileira (a fileira termina em 372 e o divisor está em 392)
+  readonly property int launcherEmojiRecentMax: 11                  // os recentes do board são uma fileira de 11
+  readonly property int launcherEmojiPreviewX: 12                   // prévia no rodapé: caixa de 32×44 em x 12, emoji de 20 (13:17663)
+  readonly property int launcherEmojiPreviewWidth: 32
+  readonly property int launcherEmojiPreviewSize: 20
+  readonly property int launcherEmojiNameX: 48                      // nome: caixa de 220×44 em x 48, Geist Medium 11 `text` (13:17664)
+  readonly property int launcherEmojiNameWidth: 220
+
   // ---- tipografia ----
   // Geist Serif + Geist (OFL-1.1). Alternativa de texto: Inter.
   // Números e atalhos: Geist Mono.

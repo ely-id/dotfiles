@@ -16,6 +16,10 @@ Item {
   // Na vitrine não há foco de teclado, então o cursor pode ser pedido à força.
   property bool forceCursor: false
   property string iconName: "search"
+  // O seletor de emoji (ficha 16) usa o campo sem o ícone de busca: o botão de voltar ocupa o lugar dele.
+  property bool showIcon: true
+  // O seletor de emoji também trata Backspace no campo vazio (voltar) e Shift+Tab (aba anterior).
+  property bool pageKeys: false
   // Com os chips das ferramentas em foco, ← e → andam nos chips; senão são do campo e movem o cursor do texto.
   property bool captureHorizontal: false
   // O contexto em que o launcher foi aberto ("On workspace 3"); vazio, sem etiqueta.
@@ -30,6 +34,8 @@ Item {
   signal tabPressed
   signal escapePressed
   signal actionsPressed
+  signal backtabPressed
+  signal backspaceOnEmpty
 
   readonly property bool cursorShown: editor.activeFocus || forceCursor
   readonly property bool cursorAtEnd: editor.cursorPosition === editor.length
@@ -46,6 +52,7 @@ Item {
   }
 
   Image {
+    visible: root.showIcon
     x: Theme.launcherSearchIconX
     y: Theme.launcherSearchIconY
     width: Theme.launcherSearchIconSize
@@ -131,11 +138,20 @@ Item {
         }
       }
       Keys.onTabPressed: event => { root.tabPressed(); event.accepted = true; }
+      Keys.onBacktabPressed: event => {
+        if (root.pageKeys)
+          root.backtabPressed();
+        event.accepted = root.pageKeys;
+      }
       Keys.onEscapePressed: event => { root.escapePressed(); event.accepted = true; }
       // Ctrl+K abre o menu de ações (F5-T05). Aceito o evento também para o Qt não apagar até o fim da linha.
       Keys.onPressed: event => {
         if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_K) {
           root.actionsPressed();
+          event.accepted = true;
+        } else if (root.pageKeys && event.key === Qt.Key_Backspace && editor.length === 0
+            && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))) {
+          root.backspaceOnEmpty();
           event.accepted = true;
         }
       }

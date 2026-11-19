@@ -47,5 +47,6 @@ Este repositório é distribuído sob a licença BSD-3-Clause. Veja [LICENSE](LI
 - **Pond** (Butterfly Interaction, Inc.): a interface da Pond é a referência de design e de comportamento da Wintermute Shell, e o código da shell parte do código da interface da Pond, distribuído sob BSD-3-Clause. O aviso de copyright e a licença originais acompanham o código derivado.
 - **Lucide**: ícones, licença ISC.
 - **Geist, Geist Mono e Geist Serif**: tipografia, licença SIL Open Font License 1.1.
+- **Unicode**: a lista de emojis (Emoji 17.0) e os nomes em inglês e em português (CLDR 48) do seletor de emoji, licença Unicode License V3. A cópia da licença acompanha os dados em `wintermute-shell/launcher/emoji/`.
 - **Niri** e **Quickshell**: o compositor e o toolkit sobre os quais a shell roda.
 - **Claude Code** (Anthropic): este projeto é construído com o apoio do Claude Code como agente de programação.

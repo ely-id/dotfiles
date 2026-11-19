@@ -1043,6 +1043,52 @@ PanelWindow {
               }
 
               SectionBlock {
+                title: "Seletor de emoji (ficha 16, board 13:17120; grade 13:17552, busca 13:17675) · peça real com serviço fictício e o emoji.json de verdade"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Grade 640×436 · voltar em (12,12) · campo \"Search emoji\" em (52,16) · abas de 36 em y 64 (a dos recentes ativa) · divisor em 108 · \"Recent\" em y 116 · onze células de 48 em y 140, x 36 a 556 · \"Smileys & emotion\" em 196 · rodapé com a prévia, o nome e Copy ↵"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.LauncherSpecimen { state: "emoji"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Hover numa célula · o rodapé mostra o emoji sob o ponteiro (🔥 Fire) e não o selecionado"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.LauncherSpecimen { state: "emoji"; selected: 0; hovered: 3 }
+                }
+                Specimen {
+                  caption: "Sem recentes · a primeira seção é \"Smileys & emotion\" em y 116 · a aba dos recentes a 50% e a dos rostos ativa"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.LauncherSpecimen { state: "emoji-empty"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Rolado até a aba da natureza (leaf) · a aba ativa acompanha a seção do topo · a primeira célula da seção selecionada"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.LauncherSpecimen { state: "emoji"; selected: 570; tab: 2 }
+                }
+                Specimen {
+                  caption: "Rolado até a aba dos símbolos (hash)"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.LauncherSpecimen { state: "emoji"; selected: 1701; tab: 5 }
+                }
+                Specimen {
+                  caption: "Busca \"gato\" (acha pelo português) · as seis abas a 50% e nenhuma ativa · \"Results for “gato” (N)\" com N igual ao número de células da seção"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.LauncherSpecimen { state: "emoji-search"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Busca \"cat\" (acha pelo inglês) · os resultados pelo nome e, abaixo, \"Related\" com os que só casam nas palavras-chave"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.LauncherSpecimen { state: "emoji-search"; emojiText: "cat"; selected: 0 }
+                }
+                Specimen {
+                  caption: "Sem resultado · o bloco \"Nothing found\" no lugar da grade · a altura continua 436"
+                  stageWidth: 640; stageHeight: 436
+                  Demo.LauncherSpecimen { state: "emoji-none" }
+                }
+              }
+
+              SectionBlock {
                 title: "Lupa do seletor de cor (ficha 15, board 13:17120, nó 13:17430) · peça real sobre uma cena fictícia, sem captura"
                 itemGap: 40
 

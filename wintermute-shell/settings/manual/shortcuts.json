@@ -12,6 +12,7 @@
   { "section": "Applications" },
   { "bind": "Mod+Return", "label": "Terminal", "spawn": "ghostty", "overlay": true },
   { "bind": "Mod+Shift+E", "label": "Files", "spawn": "nautilus", "overlay": true },
+  { "bind": "Mod+Shift+C", "label": "Claude", "spawn": "claude-desktop" },
 
   { "section": "Windows" },
   { "bind": "Mod+Q", "label": "Close window", "niri": "close-window" },

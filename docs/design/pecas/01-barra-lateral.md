@@ -18,7 +18,7 @@
 
 ## Exclusive zone
 
-A Pond reserva `10 + 156` (aberta) ou `10 + 48` (recolhida) (`spec` §3.1). No Figma do desktop (ficha 19) as janelas começam em **x 188** (aberta) e **x 80** (recolhida), que equivale a (10+156 ou 10+48) + 10 + gap 12. Manter o `exclusiveZone` da Pond até confirmação; ver *A CONFIRMAR* em `19-desktops.md`.
+A Pond reserva `10 + 156` (aberta) ou `10 + 48` (recolhida) (`spec` §3.1). No Figma do desktop (ficha 19) as janelas começam em **x 188** (aberta) e **x 80** (recolhida), que equivale a (10+156 ou 10+48) + 10 + gap 12. Resolvido na P-88: a zona passa a ser o quadro da barra do board, `10 + 156 + 10` = 176 aberta e `10 + 48 + 10` = 68 recolhida, e os 12 até a janela saem do `gaps 16` do Niri com `struts` de −4. A conta está em `19-desktops.md`, "Zona da barra e folga das janelas".
 
 ## Cores e tipografia
 

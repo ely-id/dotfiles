@@ -34,7 +34,8 @@ Rectangle {
   }
   Rectangle {
     visible: root.dimmed
-    width: parent.width * 788 / 1728
+    // Razão do Figma: 656 de 1440 (ficha 19, "Véu à esquerda", nó 13:21209); a origem usava 788 / 1728.
+    width: parent.width * 656 / 1440
     height: parent.height
     gradient: Gradient {
       orientation: Gradient.Horizontal

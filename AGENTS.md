@@ -17,6 +17,8 @@ Toda decisão registrada explica o motivo, para que eu entenda a escolha ao rele
 
 A atribuição ao Claude Code existe em um único lugar: a seção "Licenças e reconhecimentos" do `README.md`. Em nenhum outro ponto. Isso inclui mensagens de commit: **sem** rodapé `Co-Authored-By` e sem menção a ferramentas de IA.
 
+**Exceções desde a pausa do projeto (decisão `0018`, 2026-11-20):** a apresentação do repositório é em inglês (`README.md` da raiz, da shell e de `niri/`, `docs/showcase/` e `docs/agent-workflow/`), ainda em primeira pessoa; e `docs/agent-workflow/` documenta a estrutura de agentes e o painel pelo nome das ferramentas. O resto do registro continua em português, e as mensagens de commit continuam como esta regra diz.
+
 ## Onde fica cada coisa
 
 | Lugar | O que guarda | Entra no git? |

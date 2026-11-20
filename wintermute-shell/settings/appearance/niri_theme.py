@@ -10,10 +10,12 @@ dela: `~/.config/niri/cfg/wintermute.kdl` (ou o que `XDG_CONFIG_HOME` apontar). 
 keybinds.py, aqui não existe --apply. Em troca, eu nunca escrevo por cima de um arquivo que já existe sem o marcador
 `[wintermute]` na primeira linha, para jamais passar por cima de um arquivo meu. `check` só mostra o que escreveria.
 Se o destino é um link simbólico, escrevo no alvo e o link continua link. Um link quebrado vira arquivo novo no alvo.
+Um laço de links simbólicos no caminho é erro, e nada é escrito.
 Só uso a biblioteca padrão.
 """
 
 import argparse
+import errno
 import os
 import re
 import shutil
@@ -48,8 +50,27 @@ def destino_padrao():
 
 def resolver_destino(caminho):
     """Segue o link simbólico até o alvo. Na F8 a pasta niri/ do repositório pode ser ligada por link à ~/.config, e eu
-    tenho de escrever no alvo e deixar o link como está. Link quebrado devolve o caminho do alvo, que será criado."""
-    return Path(os.path.realpath(Path(caminho).expanduser()))
+    tenho de escrever no alvo e deixar o link como está. Link quebrado devolve o caminho do alvo, que será criado.
+
+    Um laço de links (a -> b -> a, ou um link para si mesmo), no arquivo ou numa pasta do caminho, é erro (P-89). Sem
+    isto o realpath devolvia o próprio link, ele parecia um arquivo que não existe, e a troca atômica punha um arquivo
+    comum no lugar do link, sem avisar."""
+    caminho = Path(caminho).expanduser()
+    try:
+        # strict: quero o ELOOP do sistema em vez do caminho devolvido pela metade.
+        return Path(os.path.realpath(caminho, strict=True))
+    except FileNotFoundError:
+        # Ainda não existe, ou é um link quebrado: sigo com o alvo, que será criado.
+        destino = Path(os.path.realpath(caminho))
+    except OSError as e:
+        if e.errno == errno.ELOOP:
+            raise Erro("%s passa por um laço de links simbólicos. Não escrevo nada: conserto o link e tento de novo" % caminho)
+        raise Erro("não consegui resolver %s: %s" % (caminho, e))
+    if destino.is_symlink():
+        # O realpath sem strict para no primeiro link que não consegue seguir. Se o que sobrou ainda é link, escrever
+        # ali trocaria o link por um arquivo comum.
+        raise Erro("%s é um link simbólico que não consegui seguir até o fim. Não escrevo nada" % destino)
+    return destino
 
 
 def normalizar_cor(texto):

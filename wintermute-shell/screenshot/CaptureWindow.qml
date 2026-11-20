@@ -114,6 +114,9 @@ PanelWindow {
       Screenshot.Capture {
         id: capture
         anchors.fill: parent
+        // Acima dos dois quadros (z 0 e 1). Sem isto o quadro à mostra cobria a peça inteira: a tela congelava e não aparecia véu,
+        // mira, dica nem barra de modos. Achei no QA ao vivo; a bancada usa a peça sem esta janela e não pegava.
+        z: 2
         visible: stage.framesReady
         service: Screenshot.CaptureState
         outputName: root.outputName

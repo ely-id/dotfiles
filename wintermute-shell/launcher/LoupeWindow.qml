@@ -20,8 +20,27 @@ PanelWindow {
   readonly property string outputName: menuScreen ? menuScreen.name : ""
   readonly property bool here: Launcher.LoupeState.pointerOutput === outputName
 
+  // A janela some um instante depois de a lupa fechar, e não no mesmo passo. No QA ao vivo o Quickshell caía com falha de
+  // segmentação dentro do Qt (QWaylandWindow::handleScreensChanged) sempre que esta janela sumia logo depois de um clique nela.
+  // O conteúdo é desmontado na hora (o Loader abaixo); só o sumiço da janela espera. O atraso é técnico, não é valor de desenho.
+  property bool presented: false
+  readonly property bool wanted: Launcher.LoupeState.picking
+  onWantedChanged: {
+    if (wanted) {
+      hideTimer.stop();
+      presented = true;
+    } else {
+      hideTimer.restart();
+    }
+  }
+  Timer {
+    id: hideTimer
+    interval: 150
+    onTriggered: root.presented = root.wanted
+  }
+
   screen: menuScreen
-  visible: Launcher.LoupeState.picking
+  visible: presented
   color: "transparent"
 
   anchors {

@@ -128,8 +128,11 @@ PanelWindow {
   WlrLayershell.keyboardFocus: workspacesCard.dragSession.active
       ? WlrKeyboardFocus.Exclusive : panelOpen ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
   WlrLayershell.exclusionMode: ExclusionMode.Normal
+  // A zona que o Niri reserva é o quadro da barra do board dos desktops (13:20907 e 13:20986): a margem, o cartão e a margem
+  // de novo, 10 + 156 + 10 = 176 aberta e 10 + 48 + 10 = 68 recolhida (P-88). A origem reservava só 10 + cartão. As janelas
+  // começam 12 depois (x 188 e x 80): são os 16 do `gaps` do Niri menos os 4 dos `struts` do wintermute.kdl (ficha 19).
   exclusiveZone: Theme.sidebarOuterMargin + (expanded
-      ? Theme.sidebarCardExpandedWidth : Theme.sidebarCardCollapsedWidth)
+      ? Theme.sidebarCardExpandedWidth : Theme.sidebarCardCollapsedWidth) + Theme.sidebarOuterMargin
   Behavior on collapseProgress { Motion {} }
 
   Column {

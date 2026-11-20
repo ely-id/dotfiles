@@ -6,9 +6,9 @@ import Quickshell.Io
 import "../.." as Shell
 
 // O anel de foco das janelas do Niri no acento da variação (ficha 19, estado 1). Quem escreve o arquivo é o niri_theme.py, que deixa
-// `niri/cfg/wintermute.kdl` com o anel de 2 px e o raio 12 das janelas; este singleton só decide quando chamá-lo: uma vez quando a shell
-// começa (o shell.qml chama `start()`, e a vitrine e a bancada não) e toda vez que o acento muda. O Niri observa os arquivos incluídos
-// e recarrega sozinho, e o script não reescreve o arquivo quando o conteúdo já é o mesmo.
+// `niri/cfg/wintermute.kdl` com o anel de 2 px, os struts de -4 da folga das bordas e o raio 12 das janelas; este singleton só decide
+// quando chamá-lo: uma vez quando a shell começa (o shell.qml chama `start()`, e a vitrine e a bancada não) e toda vez que o acento
+// muda. O Niri observa os arquivos incluídos e recarrega sozinho, e o script não reescreve o arquivo quando o conteúdo já é o mesmo.
 //
 // Espero a primeira leitura do theme.json (`Theme.selectionLoaded`) antes de chamar: sem isso a primeira chamada levaria o acento
 // padrão e a segunda, a escolha de verdade, e o anel piscaria numa cor que eu não escolhi.

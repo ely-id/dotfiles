@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Escreve o arquivo da shell na configuração do Niri: o anel de foco no acento da variação e o raio das janelas.
+"""Escreve o arquivo da shell na configuração do Niri: o anel de foco no acento da variação, o recuo das bordas e o raio das janelas.
 
 Uso:
   niri_theme.py check    --accent "#RRGGBB" [--output ARQUIVO]
@@ -31,6 +31,10 @@ RE_COR = re.compile(r"#[0-9A-Fa-f]{6}")
 # anel de 14 da captura em volta de uma janela de 12).
 LARGURA_DO_ANEL = 2
 RAIO_DAS_JANELAS = 12
+# Recuo das bordas (ficha 19, "Folga das janelas", P-88). No board dos desktops as janelas ficam a 12 da zona da barra, do
+# topo, da base e da direita, e a 16 uma da outra. O Niri só tem um `gaps`, que vale para os dois, então o `gaps 16` do meu
+# layout.kdl dá os 16 entre colunas e um strut negativo tira das bordas o que sobra: 12 - 16 = -4, nos quatro lados.
+RECUO_DAS_BORDAS = -4
 
 
 class Erro(Exception):
@@ -64,6 +68,13 @@ def gerar(cor):
         "    focus-ring {",
         "        width %d" % LARGURA_DO_ANEL,
         "        active-color \"%s\" // o acento da variação em uso" % cor,
+        "    }",
+        "    // Com o `gaps 16` do layout.kdl: 12 entre as janelas e as bordas (e a zona da barra), 16 entre uma coluna e a outra.",
+        "    struts {",
+        "        left %d" % RECUO_DAS_BORDAS,
+        "        right %d" % RECUO_DAS_BORDAS,
+        "        top %d" % RECUO_DAS_BORDAS,
+        "        bottom %d" % RECUO_DAS_BORDAS,
         "    }",
         "}",
         "",
@@ -149,7 +160,7 @@ def comando_generate(args):
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(description="Escreve o anel de foco e o raio das janelas do Niri no acento da variação.")
+    p = argparse.ArgumentParser(description="Escreve o anel de foco no acento da variação, o recuo das bordas e o raio das janelas do Niri.")
     sub = p.add_subparsers(dest="comando", required=True)
     for nome, ajuda, funcao in (("check", "mostra o que escreveria, sem escrever", comando_check),
                                 ("generate", "escreve o arquivo da shell na configuração do Niri", comando_generate)):

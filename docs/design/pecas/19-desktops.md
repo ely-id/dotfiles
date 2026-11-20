@@ -17,17 +17,53 @@ As peças são as mesmas dos boards 2 e 5a/5b, montadas num desktop **1440×900*
 ## Quatro estados, nas três variações
 
 1. **Barra aberta (10 + 156).** Janelas do niri começam depois da barra. Na composição do Figma, a primeira janela está em **x 188**. Janela focada com anel de **acento 2 px**, raio 12; a coluna seguinte pode sair da tela (niri).
-2. **Barra recolhida (10 + 48).** Recolher (Super+B ou o botão) devolve 108 px às janelas, em 300 ms. No Figma a primeira janela está em **x 80**.
+2. **Barra recolhida (10 + 48).** Recolher (o botão, ou Super+` pela lista de atalhos da shell; a origem usava Super+B) devolve 108 px às janelas, em 300 ms. No Figma a primeira janela está em **x 80**.
 3. **Launcher aberto** (Super+Espaço ou “+”; pela P-11, de 2026-11-15, o atalho é o Super+E, e o Super+Espaço troca o layout do teclado). Véu preto **20%** sobre o desktop; launcher em (400, 160) no frame 1440×900.
 4. **Captura em andamento.** Seleção começando do zero; barra de modos embaixo; ações ao lado da seleção. Exemplo da composição: seleção 640×400 em (560, 180).
 
 ## Véu à esquerda
 
-Faixa de degradê preto 40%→0 atrás da barra, para contraste (`g6.src.js` `VEIL`, largura 656 no frame 1440). A Pond usava 40%→0 em 788/1728 da largura (`spec` §3.27). São razões parecidas, não idênticas.
+Faixa de degradê preto 40%→0 atrás da barra, para contraste (`g6.src.js` `VEIL`, largura 656 no frame 1440). A Pond usava 40%→0 em 788/1728 da largura (`spec` §3.27). São razões parecidas, não idênticas (656,7 contra 656 num desktop de 1440). Desde a `F6-T09` o papel de parede (`wallpaper/desktop/Content.qml`) usa a do Figma, `656 / 1440`.
 
 ## Janelas de app nas prévias
 
 São genéricas (Ghostty, Firefox, Arquivos). Não é para clonar o conteúdo; é para conferir gaps, raios (12), anel de foco e a reserva da sidebar.
+
+## Conferência fora do Niri (`F6-T09`)
+
+O desktop de verdade só existe na sessão do Niri: as janelas, a zona da barra e o anel de foco são do compositor. Fora dele, o que dá para conferir é a composição das peças da shell. Para isso existe o espécime `demo/DesktopSpecimen.qml`, um palco de 1440×900 com quatro estados (`open`, `collapsed`, `launcher`, `capture`), que a bancada grava nas três variações com `--margem 0`.
+
+**O que é peça de verdade no espécime:** o papel de parede com o véu, os cartões da barra (relógio, organizador, mídia, notificações e controles de baixo, nos modos de prévia), o launcher e a captura. **O que é dado de exemplo:** as duas janelas de aplicativo (`demo/SampleWindow.qml`), o anel de foco e a seleção da captura.
+
+Medidas do board (`13:20899`, variação Chiba) que o espécime reproduz:
+
+| O quê | Board | Nó |
+|---|---|---|
+| Janelas, barra aberta | "Firefox" em (188,12) com 744×876; "Ghostty" em (948,12) com 480×876 | `13:20908`, `13:20917` |
+| Janelas, barra recolhida | "Firefox" em (80,12) com 808×876; "Ghostty" em (904,12) com 524×876 | `13:20987`, `13:20996` |
+| Dentro da janela | barra de título de 40; imagem em (24,64), com a largura da janela menos 48 e 368 de altura; cinco linhas de 10 em y 464, 488, 512, 536 e 560 | `13:20909` a `13:20916` |
+| Pilha da barra | em (10,10), com 156 ou 48 de largura e 880 de altura; os controles terminam em y 890 | `13:20936`, `13:21015` |
+| Launcher | véu de 20% nos 1440×900; vidro de 640×496 em (400,160) | `13:21139`, `13:21140` |
+| Captura | seleção de 640×400 em (560,180); pílula de tamanho de 88×24 em (560,148); pílula de ações de 208×48 em (992,588); barra de modos de 496×56 em (472,812) | `13:21289`, `13:21298`, `13:21300`, `13:21306` |
+| Véu da barra | preto de 40% a 0, de x 0 a 656 | `13:21209` |
+
+No espécime os nomes das janelas são "Browser" e "Terminal", sem texto dentro, porque dado de exemplo não leva nome de aplicativo nem saída de terminal.
+
+**O que bate com o board,** medido nos prints das três variações: a pilha da barra em (10,10) com 156 e 48, e os controles terminando em y 890; as janelas em x 188 e 948 (aberta) e em x 80 e 904 (recolhida), de y 12 a 888, terminando em x 1428; o véu da barra, linear de 40% a 0 em 656; o véu de 20% do launcher e o vidro de 640×496 em (400,160); e, na captura, a seleção, a borda, as oito alças, a pílula de tamanho em (560,148) e a pílula de ações em (992,588), com o escurecimento de 45% por fora, inclusive sobre a barra.
+
+**O que não bate, e fica como está:**
+
+- **A barra de modos da captura** fica em y 820 (a 24 da base, como no board da captura, ficha 17) e o board do desktop a põe em y 812 (a 32). É a P-90.
+- **O anel de foco** fica por fora da janela, de x 186 a 934 e de y 10 a 890 com a barra aberta, que é como o `focus-ring` do Niri desenha. O board o põe por dentro do quadro da janela (188 a 190). Também é a P-90.
+- **O papel de parede.** O board tem um fundo desenhado, azul-escuro. O espécime usa o céu da shell fixo em 13 de novembro de 2026, 14:32, que é claro e acinzentado; isso muda o tom do vidro dos cartões. Na sessão do Niri o fundo é o papel de parede que eu escolher.
+- **O organizador** lê o Niri, e fora dele não tem workspaces: aberto, aparece como um cartão vazio de 156×160 (a altura do board); recolhido, some, e os cartões de baixo sobem 266 px em relação ao board. O espécime não inventa workspaces, para não escrever no estado de verdade.
+- **Os dados de prévia dos cartões** são os que a barra já usa com `demoCards`, e não os do board: a bateria em 76% (o board mostra cerca de 72%), os ícones de notificação `hash`, `mail` e `terminal` (o board tem `mail`, calendário e download), e o primeiro botão dos controles mostra o glifo de sem rede, porque fora da shell não há rede para ler.
+- **As janelas de exemplo** têm o corpo 5 níveis mais claro que as do board (`#1B1D22` contra `#16181D`) e a barra de título 6 níveis mais clara (`#24262C` contra `#1E2026`), porque usam o desenho que o espécime da captura já tinha. Também não têm o título ("Firefox", "Ghostty") nem a saída de terminal que o board desenha. Não são peça da shell.
+- **O hover** da terceira linha do launcher, que o board mostra, não está no print.
+- **O vidro do launcher** sai bem mais escuro que o do board: na média de cada faixa, 10 contra 19 no topo, 14 contra 37 no meio e 19 contra 48 no rodapé (de 255). Não vem desta tarefa: o print avulso do launcher da F5 já saía assim contra o board `07-launcher-ferramentas-chiba.png`. A bancada não tem o desfoque do compositor, que é o que clareia o vidro com o que está atrás; se ao vivo ele continuar mais escuro que o board, a diferença é da peça, e vira ajuste no QA da F5.
+- **O idioma:** a shell é em inglês (decisão 0012) e as referências, em português.
+
+**O que só se confere ao vivo:** os quatro desktops com janelas de verdade, que são o critério de aceite da fase. O roteiro está no handoff da F6.
 
 ## A CONFIRMAR
 

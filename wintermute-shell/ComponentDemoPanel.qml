@@ -1388,6 +1388,32 @@ PanelWindow {
                   Demo.ClipboardSpecimen { state: "many"; selected: 12 }
                 }
               }
+
+              SectionBlock {
+                title: "Desktop completo (ficha 19, board 13:20899; quadros 13:20907, 13:20986, 13:21063 e 13:21208) · peças reais num palco de 1440×900, mostrado a 50% (720×450) · as janelas, o anel de foco e a seleção são dado de exemplo; o organizador aparece como vier fora do Niri"
+                itemGap: 40
+
+                Specimen {
+                  caption: "Barra aberta (13:20907) · zona de 176, janelas em x 188 e 948 · anel de acento de 2 por fora da primeira, que é como o Niri o desenha (P-90) · véu de 40% a 0 em 656 · pilha em (10,10), controles terminando em y 890"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.DesktopSpecimen { state: "open"; scale: 0.5; transformOrigin: Item.TopLeft }
+                }
+                Specimen {
+                  caption: "Barra recolhida (13:20986) · zona de 68, janelas em x 80 e 904 · os cartões com collapseProgress 1"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.DesktopSpecimen { state: "collapsed"; scale: 0.5; transformOrigin: Item.TopLeft }
+                }
+                Specimen {
+                  caption: "Launcher aberto (13:21063) · véu de 20% sobre tudo · vidro de 640×496 em (400,160), no estado dos resultados agrupados"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.DesktopSpecimen { state: "launcher"; scale: 0.5; transformOrigin: Item.TopLeft }
+                }
+                Specimen {
+                  caption: "Captura em andamento (13:21208) · modo Area, seleção de 640×400 em (560,180) · barra de modos a 24 da base, e não a 32 como no board do desktop (P-90)"
+                  stageWidth: 720; stageHeight: 450
+                  Demo.DesktopSpecimen { state: "capture"; scale: 0.5; transformOrigin: Item.TopLeft }
+                }
+              }
             }
 
             // =================================================================

@@ -117,44 +117,15 @@ Item {
     Repeater {
       model: root.windows
 
-      delegate: Rectangle {
-        id: windowBox
-
+      // O desenho da janela é o de demo/SampleWindow.qml, o mesmo do espécime do desktop.
+      delegate: SampleWindow {
         required property var modelData
 
+        name: modelData.entryName
         x: modelData.layout.tile_pos_in_workspace_view[0] + modelData.layout.window_offset_in_tile[0]
         y: modelData.layout.tile_pos_in_workspace_view[1] + modelData.layout.window_offset_in_tile[1]
         width: modelData.layout.window_size[0]
         height: modelData.layout.window_size[1]
-        radius: 12
-        color: "#1B1D22"
-        border.width: 1
-        border.color: Theme.border
-
-        Rectangle {
-          x: 1
-          y: 1
-          width: parent.width - 2
-          height: 32
-          topLeftRadius: 11
-          topRightRadius: 11
-          color: "#24262C"
-        }
-
-        Rectangle {
-          visible: windowBox.modelData.entryName === "Browser"
-          x: 16
-          y: 52
-          width: parent.width - 32
-          height: 120
-          radius: 8
-          gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop { position: 0; color: "#12283E" }
-            GradientStop { position: 0.5; color: "#3FA9D9" }
-            GradientStop { position: 1; color: "#F4A846" }
-          }
-        }
       }
     }
 

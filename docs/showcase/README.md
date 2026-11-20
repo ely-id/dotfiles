@@ -22,9 +22,9 @@ These are real screenshots of the running shell on Niri, taken on an empty works
 | ![The settings home screen](assets/live/settings-home-chiba.jpg) | ![The Appearance page with the three variations](assets/live/settings-appearance-chiba.jpg) |
 | ![The manual of shortcuts](assets/live/manual-chiba.jpg) | ![The launcher on an empty desktop](assets/live/launcher-chiba.jpg) |
 
-![A short tour assembled from these screenshots](assets/live/tour.gif)
+![A screen recording of the shell on Niri: two windows open and tile, the sidebar collapses, then the launcher, settings, the three variations, the manual, Niri's overview and the capture](assets/live/tour.gif)
 
-The tour is a slideshow of still screenshots, not a screen recording: I had no screen recorder installed when I paused the project.
+This is a real screen recording, about 40 seconds, also available as [tour.mp4](assets/live/tour.mp4). I drove the shell over IPC while recording, so it shows what opens by command: there are no clicks or hover states in it, and the panels that only open with a click (Wi-Fi, sound, Bluetooth, calendar, notification centre) are not in it.
 
 ## Status
 

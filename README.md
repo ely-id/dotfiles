@@ -6,7 +6,9 @@ A desktop shell for the [Niri](https://github.com/niri-wm/niri) compositor, writ
 
 > **Status: paused on 2026-11-20.** I built this in one week (14 to 20 November 2026) as the desktop for a CachyOS + Niri installation and stopped during the live QA of the last construction phase, because I am moving to Fedora with GNOME. Most of the shell passed my live testing; screen capture did not. The [status](#status) section says exactly what works, what was never validated and what is broken. There is no installer.
 
-![A short tour: desktop, launcher, settings, manual, capture and the three variations](docs/showcase/assets/live/tour.gif)
+![A screen recording of the shell on Niri: two windows open and tile, the sidebar collapses, then the launcher, settings, the three variations, the manual, Niri's overview and the capture](docs/showcase/assets/live/tour.gif)
+
+*A 40-second recording of the running shell on Niri, driven over IPC. The same clip in better quality: [tour.mp4](docs/showcase/assets/live/tour.mp4).*
 
 ## What is in it
 

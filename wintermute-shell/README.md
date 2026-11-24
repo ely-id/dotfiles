@@ -1,6 +1,6 @@
 # Wintermute Shell
 
-A desktop shell for the [Niri](https://github.com/YaLTeR/niri) compositor, written in Quickshell/QML. It draws a sidebar with a workspace organiser, stacked panels (Wi-Fi, Bluetooth, sound, battery, calendar, notifications), a Settings screen, a launcher with a colour picker and an emoji picker, screen capture with an annotation editor, and a clipboard history. The visual system is called **Armitage** and comes in three dark variations: **Chiba**, **Freeside** and **Sprawl**.
+A desktop shell for the [Niri](https://github.com/niri-wm/niri) compositor, written in Quickshell/QML. It draws a sidebar with a workspace organiser, stacked panels (Wi-Fi, Bluetooth, sound, battery, calendar, notifications), a Settings screen, a launcher with a colour picker and an emoji picker, screen capture with an annotation editor, and a clipboard history. The visual system is called **Armitage** and comes in three dark variations: **Chiba**, **Freeside** and **Sprawl**.
 
 > **Status:** paused on 2026-11-20 ([decision 0018](../docs/decisoes/0018-pausa-e-apresentacao-em-ingles.md)). The shell runs and I used it in a live Niri session, but there is no installer, part of what it needs from Niri is not shipped here, and screen capture is not stable. Read [What the shell needs from Niri](#what-the-shell-needs-from-niri) and [Known issues](#known-issues) before trying it.
 

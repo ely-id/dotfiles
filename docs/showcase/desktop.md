@@ -85,7 +85,7 @@ The file is marked as generated, and the script refuses to write over a file tha
 include "./cfg/wintermute.kdl"
 ```
 
-The shell never edits any other file of the Niri configuration. Removing the `include` undoes everything.
+The theme script never edits `config.kdl` or any other Niri file (the Display and System pages in Settings write their own separate files under `cfg/`). Removing the `include` and deleting `cfg/wintermute.kdl` undoes the theme integration.
 
 ## Known differences from the design board
 

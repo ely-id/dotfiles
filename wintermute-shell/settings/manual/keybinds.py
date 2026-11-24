@@ -254,7 +254,7 @@ def gerar(itens, pasta_da_shell):
         "// [wintermute] Gerado por wintermute-shell/settings/manual/keybinds.py a partir de",
         "// wintermute-shell/settings/manual/shortcuts.json. Não edito este arquivo à mão: edito o",
         "// shortcuts.json e gero de novo.",
-        "// https://github.com/YaLTeR/niri/wiki/Configuration:-Key-Bindings",
+        "// https://github.com/niri-wm/niri/wiki/Configuration:-Key-Bindings",
         "binds {",
     ]
     for secao in secoes:

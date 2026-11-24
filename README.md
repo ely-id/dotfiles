@@ -111,4 +111,4 @@ This repository is distributed under the BSD-3-Clause licence. See [LICENSE](LIC
 - **Geist, Geist Mono and Geist Serif**: typography, SIL Open Font License 1.1.
 - **Unicode**: the emoji list (Emoji 17.0) and the English and Portuguese names (CLDR 48) used by the emoji picker, Unicode License V3. A copy of the licence accompanies the data in `wintermute-shell/launcher/emoji/`.
 - **Niri** and **Quickshell**: the compositor and the toolkit the shell runs on.
-- **Claude Code** (Anthropic): this project was built with Claude Code as a coding agent.
+- **Claude Code** (Anthropic) and **Antigravity** (Google): this project was built with Claude Code and Antigravity as coding agents (see [agent workflow](docs/agent-workflow/README.md#two-tools-one-protocol)).

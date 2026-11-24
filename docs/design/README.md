@@ -35,7 +35,7 @@ Uma diferença de nome entre os dois: o token `onAccent` do `tokens.json` e das 
 
 ## Figma
 
-Arquivo: [Wintermute Shell](https://www.figma.com/design/NNTSBuWuiTGYpvlEVFXKLU/Wintermute-Shell?node-id=3-1257)
+Arquivo: **Wintermute Shell** (arquivo privado no Figma).
 
 | Board | node-id | Fase |
 |---|---|---|
@@ -65,7 +65,7 @@ As PNGs de aceite não estão no repositório ([decisão 0005](../decisoes/0005-
 ~/Projects/referencias/dotfiles-estudo/pacote-entrega-original/referencias/pond/
 ```
 
-Quem não tiver essa pasta exporta o board correspondente direto do Figma, pelos node-ids da tabela acima.
+No meu fluxo local, quando não uso essa pasta, exporto o board correspondente direto do Figma pelos node-ids da tabela acima.
 
 ## Como ler as citações de origem nas fichas
 

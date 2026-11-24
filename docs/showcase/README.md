@@ -71,4 +71,4 @@ These are bench compositions: the sidebar cards are the real pieces, the two win
 - The pure accent appears only in fills and details; coloured text uses a lighter accent tone, and text on top of the accent is near-black.
 - No value is invented: every colour, measure, radius and duration comes from the tokens and the design cards.
 
-The shell's code starts from a copy of the Pond shell interface (BSD-3-Clause) and was redesigned piece by piece. How to run it and where each part lives is in [`wintermute-shell/README.md`](../../wintermute-shell/README.md) (in Portuguese).
+The shell's code starts from a copy of the Pond shell interface (BSD-3-Clause) and was redesigned piece by piece. How to run it and where each part lives is in [`wintermute-shell/README.md`](../../wintermute-shell/README.md).

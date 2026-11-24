@@ -1,5 +1,7 @@
 # Estrutura do repositório
 
+> **Nota (pausa em 2026-11-20):** este arquivo registra a estrutura planejada do repositório. Com a pausa do projeto ([decisão 0018](decisoes/0018-pausa-e-apresentacao-em-ingles.md)), as fases F7 a F11 não começaram: `niri/` permaneceu vazia e as pastas `terminal/` e `plymouth/` nunca foram criadas. Mantive a árvore abaixo como registro histórico do plano.
+
 ```
 dotfiles/
 ├── README.md               Apresentação, estado e licenças

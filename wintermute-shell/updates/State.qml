@@ -17,10 +17,11 @@ Singleton {
   property string pending: ""
   property int availableCount: 0
 
-  readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME")
+  readonly property string stateBaseDir: Quickshell.env("XDG_STATE_HOME")
       || (StandardPaths.writableLocation(StandardPaths.GenericStateLocation)
-          || Quickshell.env("HOME") + "/.local/state")) + "/arch-update"
-  readonly property string runtimeStatusPath: (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp")
+          || Quickshell.env("HOME") + "/.local/state")
+  readonly property string stateDir: stateBaseDir + "/arch-update"
+  readonly property string runtimeStatusPath: (Quickshell.env("XDG_RUNTIME_DIR") || stateBaseDir)
       + "/wintermute-cachy-update"
 
   function _recomputeFromFiles() {
@@ -46,7 +47,7 @@ Singleton {
     root.status = "updating";
     Installs.State.update("system-update", "System", "installing", -1, "", "refresh-cw");
     Quickshell.execDetached(["sh", "-c",
-      'rm -f "$1.after"; echo updating > "$1"; '
+      'mkdir -p "$(dirname "$1")"; rm -f "$1.after"; echo updating > "$1"; '
       + 'ghostty --title="Cachy-Update" -e cachy-update; '
       + 'if [ ! -f "/usr/lib/modules/$(uname -r)/vmlinuz" ]; then echo restart > "$1"; '
       + 'elif [ -s "$2" ]; then echo available > "$1"; '
